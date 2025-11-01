@@ -1,40 +1,50 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { Text, View } from '@/components/Themed';
+import { UIContainer, UIText } from "@/components/ui";
+import { Link, Stack } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export default function NotFoundScreen() {
+  const { theme } = useUnistyles();
+  const styles = stylesheet;
+
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
-
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </View>
+      <Stack.Screen options={{ title: "Oops!" }} />
+      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+        <UIContainer style={styles.container}>
+          <UIText size="xl" style={styles.title}>
+            This screen doesn't exist.
+          </UIText>
+          <Link href="/" style={styles.link}>
+            <UIText size="default" color="primary" style={styles.linkText}>
+              Go to home screen!
+            </UIText>
+          </Link>
+        </UIContainer>
+      </SafeAreaView>
     </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+const stylesheet = StyleSheet.create((theme) => ({
+  safeArea: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    backgroundColor: theme.colors.background,
+  },
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: theme.spacing.lg,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    textAlign: "center",
+    marginBottom: theme.spacing.md,
   },
   link: {
-    marginTop: 15,
-    paddingVertical: 15,
+    marginTop: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
   },
   linkText: {
-    fontSize: 14,
-    color: '#2e78b7',
+    textAlign: "center",
   },
-});
+}));
