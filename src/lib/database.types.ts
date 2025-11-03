@@ -14,16 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      car: {
+        Row: {
+          color: string | null
+          created_at: string
+          fuel: Database["public"]["Enums"]["car_fuel_type"] | null
+          id: string
+          make: string
+          metadata: Json | null
+          mileage: number | null
+          model: string
+          owner_id: string
+          price: number | null
+          status: Database["public"]["Enums"]["car_status"] | null
+          transmission: Database["public"]["Enums"]["car_transmission"] | null
+          updated_at: string
+          user_id: number
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          fuel?: Database["public"]["Enums"]["car_fuel_type"] | null
+          id?: string
+          make: string
+          metadata?: Json | null
+          mileage?: number | null
+          model: string
+          owner_id: string
+          price?: number | null
+          status?: Database["public"]["Enums"]["car_status"] | null
+          transmission?: Database["public"]["Enums"]["car_transmission"] | null
+          updated_at?: string
+          user_id: number
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          fuel?: Database["public"]["Enums"]["car_fuel_type"] | null
+          id?: string
+          make?: string
+          metadata?: Json | null
+          mileage?: number | null
+          model?: string
+          owner_id?: string
+          price?: number | null
+          status?: Database["public"]["Enums"]["car_status"] | null
+          transmission?: Database["public"]["Enums"]["car_transmission"] | null
+          updated_at?: string
+          user_id?: number
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_car_user_id"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user: {
         Row: {
+          full_name: string
           id: number
           username: string
         }
         Insert: {
+          full_name?: string
           id?: number
           username: string
         }
         Update: {
+          full_name?: string
           id?: number
           username?: string
         }
@@ -37,7 +105,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      car_fuel_type: "petrol" | "diesel" | "electric" | "hybrid" | "other"
+      car_status: "available" | "reserved" | "sold" | "maintenance" | "inactive"
+      car_transmission: "manual" | "automatic" | "cvt" | "semi-automatic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -164,6 +234,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      car_fuel_type: ["petrol", "diesel", "electric", "hybrid", "other"],
+      car_status: ["available", "reserved", "sold", "maintenance", "inactive"],
+      car_transmission: ["manual", "automatic", "cvt", "semi-automatic"],
+    },
   },
 } as const
