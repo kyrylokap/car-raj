@@ -1,5 +1,7 @@
-import { UICard, UIContainer, UIText } from "@/components/ui";
+import { useUser } from "@/api/auth";
+import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
@@ -8,6 +10,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export default function ProfileScreen() {
   const { theme, rt } = useUnistyles();
+  const user = useUser();
   const styles = stylesheet;
   const router = useRouter();
 
@@ -84,15 +87,13 @@ export default function ProfileScreen() {
           ]}
           showsVerticalScrollIndicator={false}
         >
-          {/* Header Section */}
           <View style={styles.header}>
             <View style={styles.avatarSection}>
               <View style={styles.avatarContainer}>
-                <View style={styles.avatar}>
-                  <UIText size="xxl" color="white" weight="bold">
-                    JD
-                  </UIText>
-                </View>
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: user?.user_metadata?.avatar_url }}
+                />
                 <TouchableOpacity
                   style={styles.editAvatarButton}
                   activeOpacity={0.7}
@@ -108,7 +109,7 @@ export default function ProfileScreen() {
               <View style={styles.profileInfo}>
                 <View style={styles.nameRow}>
                   <UIText size="xl" weight="bold" style={styles.name}>
-                    John Doe
+                    {user?.user_metadata?.full_name}
                   </UIText>
                   <View style={styles.verifiedBadge}>
                     <Ionicons
@@ -119,7 +120,7 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 <UIText size="sm" color="textSecondary" style={styles.email}>
-                  john.doe@example.com
+                  {user?.email}
                 </UIText>
                 <View style={styles.locationRow}>
                   <Ionicons
@@ -307,7 +308,6 @@ const stylesheet = StyleSheet.create((theme) => ({
     width: 110,
     height: 110,
     borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 4,

@@ -1,4 +1,4 @@
-import { UIText } from "@/components/ui";
+import { UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";

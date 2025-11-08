@@ -1,4 +1,4 @@
-import { UICard, UIContainer, UIText } from "@/components/ui";
+import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";

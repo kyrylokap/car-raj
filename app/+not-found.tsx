@@ -1,4 +1,4 @@
-import { UIContainer, UIText } from "@/components/ui";
+import { UIContainer, UIText } from "@/ui";
 import { Link, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";

@@ -4,7 +4,7 @@ import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { UIText } from "./ui";
+import { UIText } from "../UIText";
 
 type TabItem = {
   name: string;

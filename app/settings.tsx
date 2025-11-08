@@ -1,5 +1,6 @@
-import { UICard, UIContainer, UIText } from "@/components/ui";
+import { supabase } from "@/api/supabase";
 import { useThemeContext } from "@/contexts/ThemeContext";
+import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -254,7 +255,10 @@ export default function SettingsScreen() {
       </TouchableOpacity>
     );
   };
-
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.replace("/auth"); // safe, because useRouter is called during render
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
@@ -335,7 +339,11 @@ export default function SettingsScreen() {
           </UICard>
 
           {/* Logout */}
-          <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={handleSignOut}
+            style={styles.logoutButton}
+            activeOpacity={0.7}
+          >
             <Ionicons
               name="log-out-outline"
               size={20}

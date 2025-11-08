@@ -61,6 +61,10 @@ function RootLayoutNavContent() {
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
         <Stack.Screen
           name="chat/[id]"
+          options={{ presentation: "modal", headerShown: false }}
+        />
+        <Stack.Screen
+          name="auth"
           options={{ presentation: "fullScreenModal", headerShown: false }}
         />
         <Stack.Screen

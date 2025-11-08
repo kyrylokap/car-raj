@@ -1,12 +1,9 @@
-import { CustomTabBar } from "@/components/CustomTabBar";
+import { CustomTabBar } from "@/ui/components/CustomTabBar";
 import { Tabs } from "expo-router";
 import React from "react";
 import { View } from "react-native";
-import { useUnistyles } from "react-native-unistyles";
 
 export default function TabLayout() {
-  const { theme } = useUnistyles();
-
   return (
     <View style={{ flex: 1 }}>
       <Tabs

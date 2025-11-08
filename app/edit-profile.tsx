@@ -1,11 +1,7 @@
-import {
-  UIButton,
-  UICard,
-  UIContainer,
-  UIInput,
-  UIText,
-} from "@/components/ui";
+import { useUser } from "@/api/auth";
+import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
@@ -24,6 +20,7 @@ type ProfileForm = {
 export default function EditProfileScreen() {
   const { theme, rt } = useUnistyles();
   const styles = stylesheet;
+  const user = useUser();
   const router = useRouter();
   const [formData, setFormData] = useState<ProfileForm>({
     firstName: "John",
@@ -57,11 +54,11 @@ export default function EditProfileScreen() {
     return formData.firstName && formData.lastName && formData.email;
   };
 
-  const getInitials = () => {
-    const first = formData.firstName.charAt(0) || "";
-    const last = formData.lastName.charAt(0) || "";
-    return (first + last).toUpperCase();
-  };
+  // const getInitials = () => {
+  //   const first = formData.firstName.charAt(0) || "";
+  //   const last = formData.lastName.charAt(0) || "";
+  //   return (first + last).toUpperCase();
+  // };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -90,11 +87,14 @@ export default function EditProfileScreen() {
           <UICard variant="elevated" style={styles.avatarCard}>
             <View style={styles.avatarSection}>
               <View style={styles.avatarContainer}>
-                <View style={styles.avatar}>
-                  <UIText size="xxl" color="white" weight="bold">
+                <Image
+                  source={{ uri: user?.user_metadata?.avatar_url }}
+                  style={styles.avatar}
+                >
+                  {/* <UIText size="xxl" color="white" weight="bold">
                     {getInitials()}
-                  </UIText>
-                </View>
+                  </UIText> */}
+                </Image>
                 <TouchableOpacity
                   style={styles.editAvatarButton}
                   activeOpacity={0.7}

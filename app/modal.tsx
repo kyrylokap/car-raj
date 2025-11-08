@@ -1,4 +1,4 @@
-import { UIContainer, UIText } from "@/components/ui";
+import { UIContainer, UIText } from "@/ui";
 import { StatusBar } from "expo-status-bar";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
