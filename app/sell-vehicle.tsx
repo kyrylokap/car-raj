@@ -1,3 +1,4 @@
+import { useAddCar } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -12,15 +13,19 @@ type ListingForm = {
   year: string;
   price: string;
   mileage: string;
-  fuelType: string;
+  fuel: "Petrol" | "Diesel" | "Electric" | "Hybrid" | "Other";
   location: string;
   description: string;
+  vin: string;
+  transmission: "Manual" | "Automatic" | "Cvt" | "Semi-automatic";
+  color: string;
 };
 
-const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid"];
-
+const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
+const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
 export default function CreateListingScreen() {
   const { theme, rt } = useUnistyles();
+  const addCar = useAddCar();
   const styles = stylesheet;
   const router = useRouter();
   const [formData, setFormData] = useState<ListingForm>({
@@ -28,38 +33,34 @@ export default function CreateListingScreen() {
     model: "",
     year: "",
     price: "",
+    vin: "",
     mileage: "",
-    fuelType: "",
+    fuel: "Petrol",
     location: "",
     description: "",
+    transmission: "Manual",
+    color: "",
   });
 
   const [showFuelTypePicker, setShowFuelTypePicker] = useState(false);
-
+  const [showTransmissionPicker, setShowTransmissionPicker] = useState(false);
   const handleInputChange = (field: keyof ListingForm, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
 
   const handleSubmit = () => {
-    // Validate form
-    if (
-      !formData.brand ||
-      !formData.model ||
-      !formData.year ||
-      !formData.price ||
-      !formData.mileage ||
-      !formData.fuelType ||
-      !formData.location
-    ) {
-      // Show error - in a real app you'd show a toast or alert
+    if (!isFormValid()) {
       return;
     }
 
-    // Handle form submission
-    // In a real app, this would send data to an API
     console.log("Listing created:", formData);
-
-    // Navigate back or to listings
+    const formattedCar = {
+      ...formData,
+      year: Number(formData.year),
+      price: Number(formData.price),
+      mileage: Number(formData.mileage),
+    };
+    addCar(formattedCar);
     router.back();
   };
 
@@ -70,7 +71,7 @@ export default function CreateListingScreen() {
       formData.year &&
       formData.price &&
       formData.mileage &&
-      formData.fuelType &&
+      formData.fuel &&
       formData.location
     );
   };
@@ -85,7 +86,7 @@ export default function CreateListingScreen() {
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
         <UIText size="xl" weight="bold" style={styles.headerTitle}>
-          Create Listing
+          Sell vehicle
         </UIText>
         <View style={styles.headerRight} />
       </View>
@@ -158,7 +159,14 @@ export default function CreateListingScreen() {
                 containerStyle={styles.halfInput}
               />
             </View>
-
+            <UIInput
+              label="Color"
+              placeholder="Black"
+              value={formData.color}
+              onChangeText={(text) => handleInputChange("color", text)}
+              keyboardType="numeric"
+              containerStyle={styles.halfInput}
+            />
             <TouchableOpacity
               onPress={() => setShowFuelTypePicker(!showFuelTypePicker)}
             >
@@ -166,7 +174,7 @@ export default function CreateListingScreen() {
                 <UIInput
                   label="Fuel Type"
                   placeholder="Select fuel type"
-                  value={formData.fuelType}
+                  value={formData.fuel}
                   editable={false}
                 />
               </View>
@@ -179,20 +187,17 @@ export default function CreateListingScreen() {
                     key={type}
                     style={[
                       styles.pickerOption,
-                      formData.fuelType === type && styles.pickerOptionActive,
+                      formData.fuel === type && styles.pickerOptionActive,
                     ]}
                     onPress={() => {
-                      handleInputChange("fuelType", type);
+                      handleInputChange("fuel", type);
                       setShowFuelTypePicker(false);
                     }}
                   >
-                    <UIText
-                      size="default"
-                      color={formData.fuelType === type ? "white" : "text"}
-                    >
+                    <UIText color={formData.fuel === type ? "white" : "text"}>
                       {type}
                     </UIText>
-                    {formData.fuelType === type && (
+                    {formData.fuel === type && (
                       <Ionicons
                         name="checkmark"
                         size={20}
@@ -203,6 +208,58 @@ export default function CreateListingScreen() {
                 ))}
               </View>
             )}
+            <TouchableOpacity
+              onPress={() => setShowTransmissionPicker(!showTransmissionPicker)}
+            >
+              <View pointerEvents="none">
+                <UIInput
+                  label="Transmission"
+                  placeholder="Select Transmission"
+                  value={formData.transmission}
+                  editable={false}
+                />
+              </View>
+            </TouchableOpacity>
+
+            {showTransmissionPicker && (
+              <View style={styles.pickerContainer}>
+                {transmissions.map((transmission) => (
+                  <TouchableOpacity
+                    key={transmission}
+                    style={[
+                      styles.pickerOption,
+                      formData.transmission === transmission &&
+                        styles.pickerOptionActive,
+                    ]}
+                    onPress={() => {
+                      handleInputChange("transmission", transmission);
+                      setShowTransmissionPicker(false);
+                    }}
+                  >
+                    <UIText
+                      color={formData.fuel === transmission ? "white" : "text"}
+                    >
+                      {transmission}
+                    </UIText>
+                    {formData.transmission === transmission && (
+                      <Ionicons
+                        name="checkmark"
+                        size={20}
+                        color={theme.colors.white}
+                      />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            <UIInput
+              label="Vin number"
+              placeholder=""
+              value={formData.vin}
+              onChangeText={(text) => handleInputChange("vin", text)}
+              keyboardType="numeric"
+              containerStyle={styles.halfInput}
+            />
           </UICard>
 
           {/* Pricing & Location */}
@@ -249,9 +306,7 @@ export default function CreateListingScreen() {
               style={styles.cancelButton}
               onPress={() => router.back()}
             >
-              <UIText size="default" weight="semibold">
-                Cancel
-              </UIText>
+              <UIText weight="semibold">Cancel</UIText>
             </UIButton>
             <UIButton
               variant="primary"
@@ -259,8 +314,8 @@ export default function CreateListingScreen() {
               onPress={handleSubmit}
               disabled={!isFormValid()}
             >
-              <UIText size="default" color="white" weight="semibold">
-                Create Listing
+              <UIText color="white" weight="semibold">
+                Sell vehicle
               </UIText>
             </UIButton>
           </View>

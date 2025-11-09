@@ -1,105 +1,68 @@
 import { ThemeProvider as ThemeContextProvider } from "@/contexts/ThemeContext";
 import "@/unistyles";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
 import "react-native-reanimated";
 
+import { useUser } from "@/api/auth";
 import { useThemeContext } from "@/contexts/ThemeContext";
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
-
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
-};
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNavContent() {
-  const { isDarkMode } = useThemeContext();
-
   return (
-    <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-        <Stack.Screen
-          name="chat/[id]"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="auth"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="car/[id]"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="user/[userId]/cars"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="my-listings"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="create-listing"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="edit-profile"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="settings"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-      </Stack>
-    </ThemeProvider>
+    <ThemeContextProvider>
+      <RootLayoutNav />
+    </ThemeContextProvider>
   );
 }
 
 function RootLayoutNav() {
+  const { isDarkMode } = useThemeContext();
+  const user = useUser();
   return (
-    <ThemeContextProvider>
-      <RootLayoutNavContent />
-    </ThemeContextProvider>
+    <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Protected guard={!!user}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+          <Stack.Screen
+            name="chat/[id]"
+            options={{ presentation: "modal", headerShown: false }}
+          />
+
+          <Stack.Screen
+            name="car/[id]"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
+          <Stack.Screen
+            name="user/[userId]/cars"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
+          <Stack.Screen
+            name="my-vehicles"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
+          <Stack.Screen
+            name="sell-vehicle"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
+          <Stack.Screen
+            name="edit-profile"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
+          <Stack.Screen
+            name="settings"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
+        </Stack.Protected>
+        <Stack.Screen
+          name="auth"
+          options={{ presentation: "fullScreenModal", headerShown: false }}
+        />
+      </Stack>
+    </ThemeProvider>
   );
 }

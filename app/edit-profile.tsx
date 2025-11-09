@@ -202,9 +202,7 @@ export default function EditProfileScreen() {
               style={styles.cancelButton}
               onPress={() => router.back()}
             >
-              <UIText size="default" weight="semibold">
-                Cancel
-              </UIText>
+              <UIText weight="semibold">Cancel</UIText>
             </UIButton>
             <UIButton
               variant="primary"
@@ -212,7 +210,7 @@ export default function EditProfileScreen() {
               onPress={handleSubmit}
               disabled={!isFormValid()}
             >
-              <UIText size="default" color="white" weight="semibold">
+              <UIText color="white" weight="semibold">
                 Save Changes
               </UIText>
             </UIButton>

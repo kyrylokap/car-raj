@@ -1,89 +1,34 @@
+import { useUser } from "@/api/auth";
+import { Car, useUserCars } from "@/api/car";
 import { UICard, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
-type Car = {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
-  mileage: number;
-  fuelType: string;
-  image: string;
-  location: string;
-  status?: "active" | "sold";
-};
-
-// Mock listings for current user (John Doe)
-const mockMyListings: Car[] = [
-  {
-    id: "1",
-    brand: "BMW",
-    model: "320d",
-    year: 2020,
-    price: 125000,
-    mileage: 45000,
-    fuelType: "Diesel",
-    image: "https://via.placeholder.com/300x200",
-    location: "Warsaw",
-    status: "active",
-  },
-  {
-    id: "4",
-    brand: "BMW",
-    model: "X5",
-    year: 2022,
-    price: 280000,
-    mileage: 15000,
-    fuelType: "Petrol",
-    image: "https://via.placeholder.com/300x200",
-    location: "Warsaw",
-    status: "active",
-  },
-  {
-    id: "5",
-    brand: "BMW",
-    model: "118i",
-    year: 2019,
-    price: 95000,
-    mileage: 62000,
-    fuelType: "Petrol",
-    image: "https://via.placeholder.com/300x200",
-    location: "Warsaw",
-    status: "sold",
-  },
-  {
-    id: "9",
-    brand: "BMW",
-    model: "M3",
-    year: 2021,
-    price: 320000,
-    mileage: 12000,
-    fuelType: "Petrol",
-    image: "https://via.placeholder.com/300x200",
-    location: "Warsaw",
-    status: "active",
-  },
-];
 
 export default function MyListingsScreen() {
   const { theme, rt } = useUnistyles();
   const styles = stylesheet;
   const router = useRouter();
+  const user = useUser();
+  const fetchUserCars = useUserCars();
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const activeListings = mockMyListings.filter(
-    (car) => car.status === "active"
-  );
-  const soldListings = mockMyListings.filter((car) => car.status === "sold");
+  useEffect(() => {
+    if (!user) return;
 
+    setLoading(true);
+    fetchUserCars(user.id)
+      .then(setCars)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [user]);
   const renderCarCard = ({ item }: { item: Car }) => (
     <TouchableOpacity
-      onPress={() => router.push(`/car/${item.id}`)}
+      onPress={() => router.push(`/car/${item?.id}`)}
       activeOpacity={0.7}
     >
       <UICard variant="elevated" style={styles.carCard}>
@@ -91,7 +36,7 @@ export default function MyListingsScreen() {
           <View style={styles.carImagePlaceholder}>
             <Ionicons name="car" size={48} color={theme.colors.textSecondary} />
           </View>
-          {item.status === "sold" && (
+          {item?.status === "Sold" && (
             <View style={styles.soldBadge}>
               <UIText size="xs" color="white" weight="semibold">
                 SOLD
@@ -101,25 +46,24 @@ export default function MyListingsScreen() {
         </View>
         <View style={styles.carInfo}>
           <UIText size="lg" style={styles.carTitle}>
-            {item.brand} {item.model}
+            {item?.brand} {item?.model}
           </UIText>
           <UIText size="sm" color="textSecondary" style={styles.carYear}>
-            {item.year} • {item.mileage.toLocaleString()} km • {item.fuelType}
+            {item?.year} • {item?.mileage?.toLocaleString()} km • {item?.fuel}
           </UIText>
           <View style={styles.carFooter}>
             <UIText size="lg" color="primary">
-              {item.price.toLocaleString()} PLN
+              {item?.price?.toLocaleString()} PLN
             </UIText>
             <View style={styles.footerRight}>
               <UIText size="sm" color="textSecondary">
-                {item.location}
+                {item?.location}
               </UIText>
-              {item.status === "active" && (
+              {/* {item?.status === "active" && (
                 <TouchableOpacity
                   style={styles.editButton}
                   onPress={(e) => {
                     e.stopPropagation();
-                    // Handle edit action
                   }}
                 >
                   <Ionicons
@@ -128,7 +72,7 @@ export default function MyListingsScreen() {
                     color={theme.colors.primary}
                   />
                 </TouchableOpacity>
-              )}
+              )} */}
             </View>
           </View>
         </View>
@@ -147,24 +91,24 @@ export default function MyListingsScreen() {
         </TouchableOpacity>
         <View style={styles.headerText}>
           <UIText size="xl" weight="bold">
-            My Listings
+            My vehicles
           </UIText>
           <UIText size="sm" color="textSecondary">
-            {activeListings.length} active • {soldListings.length} sold
+            {cars.length} active • {cars.length} sold
           </UIText>
         </View>
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => router.push("/create-listing")}
+          onPress={() => router.push("/sell-vehicle")}
         >
           <Ionicons name="add" size={24} color={theme.colors.primary} />
         </TouchableOpacity>
       </View>
 
       <FlatList
-        data={mockMyListings}
+        data={cars}
         renderItem={renderCarCard}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item?.id || ""}
         contentContainerStyle={[
           styles.listContent,
           { paddingBottom: rt.insets.bottom + 100 },
@@ -181,7 +125,7 @@ export default function MyListingsScreen() {
               No listings yet
             </UIText>
             <UIText size="sm" color="textSecondary" style={styles.emptySubtext}>
-              Create your first listing to get started
+              Sell your first car to get started
             </UIText>
           </View>
         }

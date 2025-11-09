@@ -1,58 +1,16 @@
+import { Car, getCarById } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
-type Car = {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
-  mileage: number;
-  fuelType: string;
-  image: string;
-  location: string;
-};
-
-const mockCars: Car[] = [
-  {
-    id: "1",
-    brand: "BMW",
-    model: "320d",
-    year: 2020,
-    price: 125000,
-    mileage: 45000,
-    fuelType: "Diesel",
-    image: "https://via.placeholder.com/300x200",
-    location: "Warsaw",
-  },
-  {
-    id: "2",
-    brand: "Mercedes-Benz",
-    model: "C-Class",
-    year: 2021,
-    price: 145000,
-    mileage: 32000,
-    fuelType: "Petrol",
-    image: "https://via.placeholder.com/300x200",
-    location: "Krakow",
-  },
-  {
-    id: "3",
-    brand: "Audi",
-    model: "A4",
-    year: 2019,
-    price: 110000,
-    mileage: 58000,
-    fuelType: "Diesel",
-    image: "https://via.placeholder.com/300x200",
-    location: "Wroclaw",
-  },
-];
 
 export default function CarDetailsScreen() {
   const { theme, rt } = useUnistyles();
@@ -60,10 +18,29 @@ export default function CarDetailsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const carId = params.id as string;
+  const fetchCarById = getCarById();
+  const [car, setCar] = useState<Car | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const car = mockCars.find((c) => c.id === carId);
+  useEffect(() => {
+    if (!carId) return;
 
-  if (!car) {
+    const fetch = async () => {
+      try {
+        setLoading(true);
+        const fetchedCar = await fetchCarById(carId);
+        setCar(fetchedCar[0] || null);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetch();
+  }, [carId]);
+
+  if (loading) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <UIContainer>
@@ -76,9 +53,7 @@ export default function CarDetailsScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.emptyState}>
-            <UIText size="lg" color="textSecondary">
-              Car not found
-            </UIText>
+            <ActivityIndicator />
           </View>
         </UIContainer>
       </SafeAreaView>
@@ -128,10 +103,10 @@ export default function CarDetailsScreen() {
         <UIContainer>
           <View style={styles.titleSection}>
             <UIText size="xxl" style={styles.carTitle}>
-              {car.brand} {car.model}
+              {car?.brand} {car?.model}
             </UIText>
             <UIText size="lg" color="primary" style={styles.price}>
-              {car.price.toLocaleString()} PLN
+              {car?.price?.toLocaleString()} PLN
             </UIText>
           </View>
 
@@ -147,9 +122,7 @@ export default function CarDetailsScreen() {
                   <UIText size="xs" color="textSecondary">
                     Year
                   </UIText>
-                  <UIText size="default" weight="semibold">
-                    {car.year}
-                  </UIText>
+                  <UIText weight="semibold">{car?.year}</UIText>
                 </View>
               </View>
 
@@ -163,8 +136,8 @@ export default function CarDetailsScreen() {
                   <UIText size="xs" color="textSecondary">
                     Mileage
                   </UIText>
-                  <UIText size="default" weight="semibold">
-                    {car.mileage.toLocaleString()} km
+                  <UIText weight="semibold">
+                    {car?.mileage?.toLocaleString()} km
                   </UIText>
                 </View>
               </View>
@@ -181,9 +154,7 @@ export default function CarDetailsScreen() {
                   <UIText size="xs" color="textSecondary">
                     Fuel Type
                   </UIText>
-                  <UIText size="default" weight="semibold">
-                    {car.fuelType}
-                  </UIText>
+                  <UIText weight="semibold">{car?.fuel}</UIText>
                 </View>
               </View>
 
@@ -197,28 +168,19 @@ export default function CarDetailsScreen() {
                   <UIText size="xs" color="textSecondary">
                     Location
                   </UIText>
-                  <UIText size="default" weight="semibold">
-                    {car.location}
-                  </UIText>
+                  <UIText weight="semibold">{car?.location}</UIText>
                 </View>
               </View>
             </View>
-          </UICard>
-
-          <UICard variant="elevated" style={styles.descriptionCard}>
-            <UIText size="lg" style={styles.sectionTitle}>
-              Description
-            </UIText>
-            <UIText
-              size="default"
-              color="textSecondary"
-              style={styles.description}
-            >
-              Well-maintained {car.brand} {car.model} from {car.year}. This
-              vehicle has been regularly serviced and is in excellent condition.
-              Perfect for daily commuting and long trips. Don't miss this
-              opportunity!
-            </UIText>
+            <View style={styles.detailItem}>
+              <UIText style={{ color: theme.colors.textSecondary }}>VIN</UIText>
+              <View style={styles.detailContent}>
+                <UIText size="xs" color="textSecondary">
+                  VIN Number
+                </UIText>
+                <UIText weight="semibold">{car?.vin}</UIText>
+              </View>
+            </View>
           </UICard>
 
           <UICard variant="elevated" style={styles.specsCard}>
@@ -227,54 +189,48 @@ export default function CarDetailsScreen() {
             </UIText>
             <View style={styles.specsList}>
               <View style={styles.specRow}>
-                <UIText size="default" color="textSecondary">
-                  Brand
-                </UIText>
-                <UIText size="default" weight="semibold">
-                  {car.brand}
-                </UIText>
+                <UIText color="textSecondary">Brand</UIText>
+                <UIText weight="semibold">{car?.brand}</UIText>
               </View>
               <View style={styles.specRow}>
-                <UIText size="default" color="textSecondary">
-                  Model
-                </UIText>
-                <UIText size="default" weight="semibold">
-                  {car.model}
-                </UIText>
+                <UIText color="textSecondary">Model</UIText>
+                <UIText weight="semibold">{car?.model}</UIText>
               </View>
               <View style={styles.specRow}>
-                <UIText size="default" color="textSecondary">
-                  Year
-                </UIText>
-                <UIText size="default" weight="semibold">
-                  {car.year}
-                </UIText>
+                <UIText color="textSecondary">Year</UIText>
+                <UIText weight="semibold">{car?.year}</UIText>
               </View>
               <View style={styles.specRow}>
-                <UIText size="default" color="textSecondary">
-                  Mileage
-                </UIText>
-                <UIText size="default" weight="semibold">
-                  {car.mileage.toLocaleString()} km
-                </UIText>
+                <UIText color="textSecondary">Mileage</UIText>
+                <UIText weight="semibold">{car?.mileage} km</UIText>
               </View>
               <View style={styles.specRow}>
-                <UIText size="default" color="textSecondary">
-                  Fuel Type
-                </UIText>
-                <UIText size="default" weight="semibold">
-                  {car.fuelType}
-                </UIText>
+                <UIText color="textSecondary">Fuel Type</UIText>
+                <UIText weight="semibold">{car?.fuel}</UIText>
+              </View>
+              <View style={styles.specRow}>
+                <UIText color="textSecondary">Transmission</UIText>
+                <UIText weight="semibold">{car?.transmission}</UIText>
+              </View>
+              <View style={styles.specRow}>
+                <UIText color="textSecondary">Color</UIText>
+                <UIText weight="semibold">{car?.color}</UIText>
               </View>
             </View>
           </UICard>
-
+          <UICard variant="elevated" style={styles.descriptionCard}>
+            <UIText size="lg" style={styles.sectionTitle}>
+              Description
+            </UIText>
+            <UIText color="textSecondary" style={styles.description}>
+              {car?.description}
+            </UIText>
+          </UICard>
           <View style={styles.actionButtons}>
             <UIButton
               variant="outline"
               style={styles.contactButton}
               onPress={() => {
-                // Navigate to chat or contact seller
                 router.push(`/chat/${carId}`);
               }}
             >
@@ -284,16 +240,12 @@ export default function CarDetailsScreen() {
                 color={theme.colors.primary}
                 style={styles.buttonIcon}
               />
-              <UIText size="default" weight="semibold">
-                Contact Seller
-              </UIText>
+              <UIText weight="semibold">Contact Seller</UIText>
             </UIButton>
             <UIButton
               variant="primary"
               style={styles.callButton}
-              onPress={() => {
-                // Handle call action
-              }}
+              onPress={() => {}}
             >
               <Ionicons
                 name="call-outline"
@@ -301,7 +253,7 @@ export default function CarDetailsScreen() {
                 color={theme.colors.white}
                 style={styles.buttonIcon}
               />
-              <UIText size="default" color="white" weight="semibold">
+              <UIText color="white" weight="semibold">
                 Call Now
               </UIText>
             </UIButton>

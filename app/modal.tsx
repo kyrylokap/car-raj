@@ -2,10 +2,9 @@ import { UIContainer, UIText } from "@/ui";
 import { StatusBar } from "expo-status-bar";
 import { Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 export default function ModalScreen() {
-  const { theme } = useUnistyles();
   const styles = stylesheet;
 
   return (
@@ -14,7 +13,7 @@ export default function ModalScreen() {
         <UIText size="xl" style={styles.title}>
           Modal
         </UIText>
-        <UIText size="default" color="textSecondary" style={styles.subtitle}>
+        <UIText color="textSecondary" style={styles.subtitle}>
           This is a modal screen
         </UIText>
         <StatusBar style={Platform.OS === "ios" ? "light" : "auto"} />

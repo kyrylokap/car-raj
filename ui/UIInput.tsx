@@ -41,7 +41,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.md,
   },
   label: {
-    ...theme.typography.bodySmall,
+    ...theme.typography.body,
     color: theme.colors.text,
     marginBottom: theme.spacing.xs,
     fontWeight: "600",

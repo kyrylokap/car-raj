@@ -163,7 +163,7 @@ export default function SettingsScreen() {
           />
         </View>
         <View style={styles.settingContent}>
-          <UIText size="default" weight="medium" style={styles.settingLabel}>
+          <UIText weight="medium" style={styles.settingLabel}>
             {item.label}
           </UIText>
           {item.subtitle && (
@@ -257,7 +257,6 @@ export default function SettingsScreen() {
   };
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.replace("/auth"); // safe, because useRouter is called during render
   };
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -349,7 +348,7 @@ export default function SettingsScreen() {
               size={20}
               color={theme.colors.error}
             />
-            <UIText size="default" color="error" weight="semibold">
+            <UIText color="error" weight="semibold">
               Log Out
             </UIText>
           </TouchableOpacity>

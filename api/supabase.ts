@@ -6,7 +6,6 @@ import "react-native-url-polyfill/auto";
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_PUBLIC_KEY!;
 
-// Create a Supabase client with persistent session storage
 export const supabase = createClient<Database>(
   SUPABASE_URL,
   SUPABASE_ANON_KEY,

@@ -1,58 +1,11 @@
+import { Car, getCarsRandom } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
-type Car = {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
-  mileage: number;
-  fuelType: string;
-  image: string;
-  location: string;
-};
-
-const mockCars: Car[] = [
-  {
-    id: "1",
-    brand: "BMW",
-    model: "320d",
-    year: 2020,
-    price: 125000,
-    mileage: 45000,
-    fuelType: "Diesel",
-    image: "https://via.placeholder.com/300x200",
-    location: "Warsaw",
-  },
-  {
-    id: "2",
-    brand: "Mercedes-Benz",
-    model: "C-Class",
-    year: 2021,
-    price: 145000,
-    mileage: 32000,
-    fuelType: "Petrol",
-    image: "https://via.placeholder.com/300x200",
-    location: "Krakow",
-  },
-  {
-    id: "3",
-    brand: "Audi",
-    model: "A4",
-    year: 2019,
-    price: 110000,
-    mileage: 58000,
-    fuelType: "Diesel",
-    image: "https://via.placeholder.com/300x200",
-    location: "Wroclaw",
-  },
-];
 
 type Filter = {
   brand: string;
@@ -70,6 +23,17 @@ export default function SearchScreen() {
   const styles = stylesheet;
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
+  const fetchCars = getCarsRandom();
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchCars()
+      .then(setCars)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
   const [filters, setFilters] = useState<Filter>({
     brand: "",
     model: "",
@@ -83,7 +47,7 @@ export default function SearchScreen() {
 
   const renderCarCard = ({ item }: { item: Car }) => (
     <TouchableOpacity
-      onPress={() => router.push(`/car/${item.id}`)}
+      onPress={() => router.push(`/car/${item?.id}`)}
       activeOpacity={0.7}
     >
       <UICard variant="elevated" style={styles.carCard}>
@@ -94,17 +58,17 @@ export default function SearchScreen() {
         </View>
         <View style={styles.carInfo}>
           <UIText size="lg" style={styles.carTitle}>
-            {item.brand} {item.model}
+            {item?.brand} {item?.model}
           </UIText>
           <UIText size="sm" color="textSecondary" style={styles.carYear}>
-            {item.year} • {item.mileage.toLocaleString()} km • {item.fuelType}
+            {item?.year} year • {item?.mileage} km • {item?.fuel}
           </UIText>
           <View style={styles.carFooter}>
             <UIText size="lg" color="primary">
-              {item.price.toLocaleString()} PLN
+              {item?.price?.toLocaleString()} PLN
             </UIText>
             <UIText size="sm" color="textSecondary">
-              {item.location}
+              {item?.location}
             </UIText>
           </View>
         </View>
@@ -124,7 +88,7 @@ export default function SearchScreen() {
               style={styles.searchIcon}
             />
             <UIInput
-              placeholder="Search cars..."
+              placeholder="Search vehicles..."
               style={styles.searchInput}
               containerStyle={styles.searchInputContainer}
             />
@@ -238,16 +202,14 @@ export default function SearchScreen() {
                 }
                 style={styles.resetButton}
               >
-                <UIText size="default" weight="semibold">
-                  Reset
-                </UIText>
+                <UIText weight="semibold">Reset</UIText>
               </UIButton>
               <UIButton
                 variant="primary"
                 onPress={() => setShowFilters(false)}
                 style={styles.applyButton}
               >
-                <UIText size="default" color="white" weight="semibold">
+                <UIText color="white" weight="semibold">
                   Apply Filters
                 </UIText>
               </UIButton>
@@ -256,9 +218,9 @@ export default function SearchScreen() {
         )}
 
         <FlatList
-          data={mockCars}
+          data={cars}
           renderItem={renderCarCard}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item?.id || ""}
           contentContainerStyle={[
             styles.listContent,
             { paddingBottom: rt.insets.bottom + 100 },

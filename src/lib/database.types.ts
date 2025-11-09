@@ -16,83 +16,72 @@ export type Database = {
     Tables: {
       car: {
         Row: {
+          brand: string
           color: string | null
           created_at: string
+          description: string | null
           fuel: Database["public"]["Enums"]["car_fuel_type"] | null
           id: string
-          make: string
-          metadata: Json | null
+          location: string | null
           mileage: number | null
           model: string
-          owner_id: string
           price: number | null
           status: Database["public"]["Enums"]["car_status"] | null
           transmission: Database["public"]["Enums"]["car_transmission"] | null
-          updated_at: string
-          user_id: number
+          user_id: string
           vin: string | null
           year: number | null
         }
         Insert: {
+          brand: string
           color?: string | null
           created_at?: string
+          description?: string | null
           fuel?: Database["public"]["Enums"]["car_fuel_type"] | null
           id?: string
-          make: string
-          metadata?: Json | null
+          location?: string | null
           mileage?: number | null
           model: string
-          owner_id: string
           price?: number | null
           status?: Database["public"]["Enums"]["car_status"] | null
           transmission?: Database["public"]["Enums"]["car_transmission"] | null
-          updated_at?: string
-          user_id: number
+          user_id: string
           vin?: string | null
           year?: number | null
         }
         Update: {
+          brand?: string
           color?: string | null
           created_at?: string
+          description?: string | null
           fuel?: Database["public"]["Enums"]["car_fuel_type"] | null
           id?: string
-          make?: string
-          metadata?: Json | null
+          location?: string | null
           mileage?: number | null
           model?: string
-          owner_id?: string
           price?: number | null
           status?: Database["public"]["Enums"]["car_status"] | null
           transmission?: Database["public"]["Enums"]["car_transmission"] | null
-          updated_at?: string
-          user_id?: number
+          user_id?: string
           vin?: string | null
           year?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_car_user_id"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user: {
         Row: {
           full_name: string
-          id: number
+          id: string
           username: string
         }
         Insert: {
           full_name?: string
-          id?: number
+          id?: string
           username: string
         }
         Update: {
           full_name?: string
-          id?: number
+          id?: string
           username?: string
         }
         Relationships: []
@@ -105,9 +94,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      car_fuel_type: "petrol" | "diesel" | "electric" | "hybrid" | "other"
-      car_status: "available" | "reserved" | "sold" | "maintenance" | "inactive"
-      car_transmission: "manual" | "automatic" | "cvt" | "semi-automatic"
+      car_fuel_type: "Petrol" | "Diesel" | "Electric" | "Hybrid" | "Other"
+      car_status: "Available" | "Reserved" | "Sold" | "Maintenance" | "Inactive"
+      car_transmission: "Manual" | "Automatic" | "Cvt" | "Semi-automatic"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -235,9 +224,9 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      car_fuel_type: ["petrol", "diesel", "electric", "hybrid", "other"],
-      car_status: ["available", "reserved", "sold", "maintenance", "inactive"],
-      car_transmission: ["manual", "automatic", "cvt", "semi-automatic"],
+      car_fuel_type: ["Petrol", "Diesel", "Electric", "Hybrid", "Other"],
+      car_status: ["Available", "Reserved", "Sold", "Maintenance", "Inactive"],
+      car_transmission: ["Manual", "Automatic", "Cvt", "Semi-automatic"],
     },
   },
 } as const

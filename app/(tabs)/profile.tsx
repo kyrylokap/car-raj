@@ -16,7 +16,7 @@ export default function ProfileScreen() {
 
   const stats = [
     {
-      label: "Listings",
+      label: "Vehicles",
       value: "12",
       icon: "car-outline",
       color: theme.colors.primary,
@@ -38,7 +38,7 @@ export default function ProfileScreen() {
   const quickActions = [
     {
       icon: "add-circle",
-      label: "Create Listing",
+      label: "Sell vehicle",
       color: theme.colors.primary,
     },
     { icon: "create", label: "Edit Profile", color: theme.colors.text },
@@ -47,14 +47,14 @@ export default function ProfileScreen() {
   const menuItems = [
     {
       icon: "car-outline",
-      label: "My Listings",
+      label: "My vehicles",
       subtitle: "Manage your vehicles",
       color: theme.colors.primary,
     },
     {
       icon: "heart-outline",
       label: "Favorites",
-      subtitle: "Saved listings",
+      subtitle: "Favorite vehicles",
       color: theme.colors.error,
     },
     {
@@ -149,8 +149,8 @@ export default function ProfileScreen() {
                   activeOpacity={0.7}
                   style={styles.statCardWrapper}
                   onPress={() => {
-                    if (stat.label === "Listings") {
-                      router.push("/my-listings");
+                    if (stat.label === "Vehicles") {
+                      router.push("/my-vehicles");
                     }
                   }}
                 >
@@ -196,8 +196,8 @@ export default function ProfileScreen() {
                     index === 0 && styles.quickActionPrimary,
                   ]}
                   onPress={() => {
-                    if (action.label === "Create Listing") {
-                      router.push("/create-listing");
+                    if (action.label === "Sell vehicle") {
+                      router.push("/sell-vehicle");
                     } else if (action.label === "Edit Profile") {
                       router.push("/edit-profile");
                     }
@@ -233,8 +233,8 @@ export default function ProfileScreen() {
                   ]}
                   activeOpacity={0.7}
                   onPress={() => {
-                    if (item.label === "My Listings") {
-                      router.push("/my-listings");
+                    if (item.label === "My vehicles") {
+                      router.push("/my-vehicles");
                     } else if (item.label === "Settings") {
                       router.push("/settings");
                     }
@@ -253,11 +253,7 @@ export default function ProfileScreen() {
                     />
                   </View>
                   <View style={styles.menuTextContainer}>
-                    <UIText
-                      size="default"
-                      weight="medium"
-                      style={styles.menuLabel}
-                    >
+                    <UIText weight="medium" style={styles.menuLabel}>
                       {item.label}
                     </UIText>
                     <UIText

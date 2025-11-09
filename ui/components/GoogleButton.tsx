@@ -1,8 +1,10 @@
 import { supabase } from "@/api/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { router } from "expo-router";
 import { useEffect } from "react";
-import { TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+import { UIButton } from "../UIButton";
 import { UIText } from "../UIText";
 export const GoogleButton = () => {
   useEffect(() => {
@@ -22,27 +24,22 @@ export const GoogleButton = () => {
         provider: "google",
         token: userInfo.data?.idToken,
       });
+      router.replace("/");
     } catch (err) {
       console.log("Google error:", err);
     }
   };
 
   return (
-    <TouchableOpacity
-      style={{
-        backgroundColor: "black",
-        padding: 12,
-        borderRadius: 6,
-        alignItems: "center",
-        flexDirection: "row",
-        gap: 10,
-      }}
-      onPress={handleGoogleLogin}
-    >
+    <UIButton variant="ghost" style={styles.button} onPress={handleGoogleLogin}>
       <Ionicons name="logo-google" color="white" size={24} />
-      <UIText style={{ color: "white", fontWeight: "600" }}>
-        Sign in with Google
-      </UIText>
-    </TouchableOpacity>
+      <UIText size="lg">Continue with Google</UIText>
+    </UIButton>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    gap: 10,
+  },
+});

@@ -1,50 +1,22 @@
 import React from "react";
 import { TextProps as RNTextProps, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
-type UITextProps = RNTextProps & {
-  size?: "xxs" | "xs" | "sm" | "md" | "default" | "lg" | "xl" | "xxl";
-  color?:
-    | "primary"
-    | "secondary"
-    | "text"
-    | "textSecondary"
-    | "error"
-    | "success"
-    | "white";
-  weight?: "normal" | "medium" | "semibold" | "bold";
-};
+type UITextProps = RNTextProps & UnistylesVariants<typeof styles>;
 
-export const UIText: React.FC<UITextProps> = ({
-  size = "default",
+export const UIText = ({
+  size,
   color = "text",
   weight,
   style,
   children,
   ...props
-}) => {
-  const finalSize = (size === "default" ? "md" : size) as
-    | "xxs"
-    | "xs"
-    | "sm"
-    | "md"
-    | "lg"
-    | "xl"
-    | "xxl";
-  const finalWeight =
-    weight ||
-    (finalSize === "xxl" || finalSize === "xl"
-      ? "bold"
-      : finalSize === "lg"
-      ? "semibold"
-      : "normal");
-
-  stylesheet.useVariants({
-    size: finalSize,
+}: UITextProps) => {
+  styles.useVariants({
+    size,
     color,
-    weight: finalWeight,
+    weight,
   });
-  const styles = stylesheet;
 
   return (
     <Text style={[styles.text, style]} {...props}>
@@ -53,7 +25,7 @@ export const UIText: React.FC<UITextProps> = ({
   );
 };
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   text: {
     includeFontPadding: false,
     variants: {
