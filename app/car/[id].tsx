@@ -1,8 +1,9 @@
 import { useCarById } from "@/api/car";
+import { useChangeFavorite, useIsCarFavorite } from "@/api/favorites";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -14,12 +15,21 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 export default function CarDetailsScreen() {
   const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const carId = params.id as string;
-  const { data: car, isLoading } = useCarById(carId);
 
+  const params = useLocalSearchParams();
+
+  const carId = params.id as string;
+  const { data: isFavorite } = useIsCarFavorite(carId);
+
+  const [isCarFavorite, setIsCarFavorite] = useState<boolean>(isFavorite!);
+  const styles = stylesheet;
+  const { data: car, isLoading } = useCarById(carId);
+  const { mutate: pressFavorite } = useChangeFavorite();
+  const onPressFavorite = () => {
+    pressFavorite(carId);
+    setIsCarFavorite((prev) => !prev);
+  };
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea}>
@@ -57,9 +67,12 @@ export default function CarDetailsScreen() {
               color={theme.colors.text}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={onPressFavorite}
+          >
             <Ionicons
-              name="heart-outline"
+              name={isCarFavorite ? "heart" : "heart-outline"}
               size={24}
               color={theme.colors.text}
             />

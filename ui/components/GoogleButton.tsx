@@ -10,6 +10,7 @@ export const GoogleButton = () => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID,
+      scopes: ["profile", "email", "phone"],
     });
   }, []);
 

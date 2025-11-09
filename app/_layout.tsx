@@ -61,6 +61,10 @@ function RootLayoutNav() {
             name="settings"
             options={{ presentation: "fullScreenModal", headerShown: false }}
           />
+          <Stack.Screen
+            name="favorites"
+            options={{ presentation: "fullScreenModal", headerShown: false }}
+          />
         </Stack.Protected>
         <Stack.Screen
           name="auth"

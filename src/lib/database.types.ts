@@ -68,23 +68,34 @@ export type Database = {
         }
         Relationships: []
       }
-      user: {
+      favorites: {
         Row: {
-          full_name: string
+          car_id: string
+          created_at: string
           id: string
-          username: string
+          user_id: string
         }
         Insert: {
-          full_name?: string
+          car_id: string
+          created_at?: string
           id?: string
-          username: string
+          user_id: string
         }
         Update: {
-          full_name?: string
+          car_id?: string
+          created_at?: string
           id?: string
-          username?: string
+          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "favorites_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "car"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

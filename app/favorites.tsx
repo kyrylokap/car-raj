@@ -1,5 +1,5 @@
-import { useUser } from "@/api/auth";
-import { Car, useUserCars } from "@/api/car";
+import { Car } from "@/api/car";
+import { useUserFavorites } from "@/api/favorites";
 import { UICard, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -8,13 +8,12 @@ import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-export default function MyListingsScreen() {
+export default function FavoritesScreen() {
   const { theme, rt } = useUnistyles();
   const styles = stylesheet;
   const router = useRouter();
-  const user = useUser();
-  const { data: cars } = useUserCars(user?.id!);
-
+  const { data: cars } = useUserFavorites();
+  console.log(cars?.length);
   const renderCarCard = ({ item }: { item: Car }) => (
     <TouchableOpacity
       onPress={() => router.push(`/car/${item?.id}`)}
@@ -48,20 +47,6 @@ export default function MyListingsScreen() {
               <UIText size="sm" color="textSecondary">
                 {item?.location}
               </UIText>
-              {/* {item?.status === "active" && (
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <Ionicons
-                    name="create-outline"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                </TouchableOpacity>
-              )} */}
             </View>
           </View>
         </View>
@@ -80,18 +65,9 @@ export default function MyListingsScreen() {
         </TouchableOpacity>
         <View style={styles.headerText}>
           <UIText size="xl" weight="bold">
-            My vehicles
-          </UIText>
-          <UIText size="sm" color="textSecondary">
-            {cars?.length} active • {cars?.length} sold
+            My favorites
           </UIText>
         </View>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push("/sell-vehicle")}
-        >
-          <Ionicons name="add" size={24} color={theme.colors.primary} />
-        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -111,10 +87,10 @@ export default function MyListingsScreen() {
               color={theme.colors.textSecondary}
             />
             <UIText size="lg" color="textSecondary" style={styles.emptyText}>
-              No vehicles yet
+              No favorites yet
             </UIText>
             <UIText size="sm" color="textSecondary" style={styles.emptySubtext}>
-              Sell your first car to get started
+              Add car in favorite and it will be here
             </UIText>
           </View>
         }

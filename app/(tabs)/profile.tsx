@@ -221,7 +221,6 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Menu Section */}
           <View style={styles.menuSection}>
             <UICard variant="outlined" style={styles.menuCard}>
               {menuItems.map((item, index) => (
@@ -237,6 +236,8 @@ export default function ProfileScreen() {
                       router.push("/my-vehicles");
                     } else if (item.label === "Settings") {
                       router.push("/settings");
+                    } else if (item.label === "Favorites") {
+                      router.push("/favorites");
                     }
                   }}
                 >
