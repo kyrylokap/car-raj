@@ -16,7 +16,7 @@ export default function NotFoundScreen() {
             This screen doesn't exist.
           </UIText>
           <Link href="/" style={styles.link}>
-            <UIText size="default" color="primary" style={styles.linkText}>
+            <UIText color="primary" style={styles.linkText}>
               Go to home screen!
             </UIText>
           </Link>

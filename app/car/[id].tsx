@@ -1,8 +1,8 @@
-import { Car, getCarById } from "@/api/car";
+import { useCarById } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -18,29 +18,9 @@ export default function CarDetailsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const carId = params.id as string;
-  const fetchCarById = getCarById();
-  const [car, setCar] = useState<Car | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { data: car, isLoading } = useCarById(carId);
 
-  useEffect(() => {
-    if (!carId) return;
-
-    const fetch = async () => {
-      try {
-        setLoading(true);
-        const fetchedCar = await fetchCarById(carId);
-        setCar(fetchedCar[0] || null);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetch();
-  }, [carId]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea}>
         <UIContainer>

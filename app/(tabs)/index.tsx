@@ -1,8 +1,8 @@
-import { Car, getCarsRandom } from "@/api/car";
+import { Car, useCarsRandom } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -23,17 +23,8 @@ export default function SearchScreen() {
   const styles = stylesheet;
   const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
-  const fetchCars = getCarsRandom();
-  const [cars, setCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: cars } = useCarsRandom();
 
-  useEffect(() => {
-    setLoading(true);
-    fetchCars()
-      .then(setCars)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
   const [filters, setFilters] = useState<Filter>({
     brand: "",
     model: "",

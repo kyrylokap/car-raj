@@ -5,17 +5,21 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import "react-native-reanimated";
 
 import { useUser } from "@/api/auth";
 import { useThemeContext } from "@/contexts/ThemeContext";
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <ThemeContextProvider>
-      <RootLayoutNav />
-    </ThemeContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeContextProvider>
+        <RootLayoutNav />
+      </ThemeContextProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -25,7 +25,7 @@ const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
 export default function CreateListingScreen() {
   const { theme, rt } = useUnistyles();
-  const addCar = useAddCar();
+  const sellCar = useAddCar();
   const styles = stylesheet;
   const router = useRouter();
   const [formData, setFormData] = useState<ListingForm>({
@@ -53,14 +53,13 @@ export default function CreateListingScreen() {
       return;
     }
 
-    console.log("Listing created:", formData);
     const formattedCar = {
       ...formData,
       year: Number(formData.year),
       price: Number(formData.price),
       mileage: Number(formData.mileage),
     };
-    addCar(formattedCar);
+    sellCar.mutate(formattedCar);
     router.back();
   };
 

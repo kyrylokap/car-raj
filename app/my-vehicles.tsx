@@ -3,7 +3,7 @@ import { Car, useUserCars } from "@/api/car";
 import { UICard, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -13,19 +13,8 @@ export default function MyListingsScreen() {
   const styles = stylesheet;
   const router = useRouter();
   const user = useUser();
-  const fetchUserCars = useUserCars();
-  const [cars, setCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { data: cars } = useUserCars(user?.id!);
 
-  useEffect(() => {
-    if (!user) return;
-
-    setLoading(true);
-    fetchUserCars(user.id)
-      .then(setCars)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [user]);
   const renderCarCard = ({ item }: { item: Car }) => (
     <TouchableOpacity
       onPress={() => router.push(`/car/${item?.id}`)}
@@ -94,7 +83,7 @@ export default function MyListingsScreen() {
             My vehicles
           </UIText>
           <UIText size="sm" color="textSecondary">
-            {cars.length} active • {cars.length} sold
+            {cars?.length} active • {cars?.length} sold
           </UIText>
         </View>
         <TouchableOpacity
