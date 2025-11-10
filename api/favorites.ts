@@ -26,7 +26,6 @@ export function useChangeFavorite() {
     },
     onSettled: (_data, _error, carId) => {
       if (!user) return;
-      // invalidate queries properly
       queryClient.invalidateQueries({ queryKey: ["userFavorites", user.id] });
       queryClient.invalidateQueries({ queryKey: ["isCarFavorite", carId] });
     },
@@ -104,6 +103,7 @@ async function toggleFavorite(carId: string, userId: string) {
       .from("favorites")
       .delete()
       .eq("id", existed.id);
+
     if (error) throw error;
   } else {
     const { error } = await supabase
