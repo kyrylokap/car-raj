@@ -1,7 +1,11 @@
 import { Database } from "@/src/lib/database.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as FileSystem from "expo-file-system/legacy";
+
+import mime from "mime"; // if not available, map extensions manually
 import { useUser } from "./auth";
 import { supabase } from "./supabase";
+
 export type Car = {
   brand: string;
   color?: string | null;
@@ -37,25 +41,47 @@ export function useAddCar() {
     },
   });
 }
-
 async function uploadCarPhotos(
   userId: string,
   carId: string,
   photos: string[]
 ) {
-  const folderPath = `${userId}$${carId}`;
-  console.log(photos);
-  const uploads = photos.map(async (uri) => {
-    const parts = uri.split("/");
-    const fileName = parts[parts.length - 1];
-    const file = await fetch(uri).then((res) => res.blob());
+  const folderPath = `${userId}/${carId}`;
 
-    const { data, error } = await supabase.storage
-      .from("cars_images")
-      .upload(`${folderPath}/${fileName}`, file, { upsert: true });
+  const uploads = photos.map(async (uri: string) => {
+    try {
+      const parts = uri.split("/");
+      const fileName = `${Date.now()}_${parts[parts.length - 1]}`;
 
-    if (error) throw error;
-    return data;
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const ext = fileName.split(".").pop();
+      const contentType = ext
+        ? mime.getType(ext) || "image/jpeg"
+        : "image/jpeg";
+
+      const dataUrl = `data:${contentType};base64,${base64}`;
+
+      const filePath = `${folderPath}/${fileName}`;
+      const { data, error } = await supabase.storage
+        .from("cars_images")
+        .upload(filePath, dataUrl, {
+          contentType,
+          upsert: true,
+        });
+
+      if (error) {
+        console.error("Upload error", error);
+        throw error;
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Upload failed for", uri, err);
+      throw err;
+    }
   });
 
   return Promise.all(uploads);
