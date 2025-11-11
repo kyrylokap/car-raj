@@ -5,7 +5,7 @@ import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 type CardProps = ViewProps & {
   children: React.ReactNode;
   onPress?: () => void;
-} & UnistylesVariants<typeof stylesheet>;
+} & UnistylesVariants<typeof styles>;
 
 export const UICard: React.FC<CardProps> = ({
   variant,
@@ -14,8 +14,7 @@ export const UICard: React.FC<CardProps> = ({
   style,
   ...props
 }) => {
-  stylesheet.useVariants({ variant: variant || "elevated" });
-  const styles = stylesheet;
+  styles.useVariants({ variant: variant || "elevated" });
 
   const Component = onPress ? TouchableOpacity : View;
 
@@ -31,7 +30,7 @@ export const UICard: React.FC<CardProps> = ({
   );
 };
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   card: {
     backgroundColor: theme.colors.card,
     borderRadius: theme.borderRadius.lg,

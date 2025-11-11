@@ -13,7 +13,6 @@ export default function FavoritesScreen() {
   const styles = stylesheet;
   const router = useRouter();
   const { data: cars } = useUserFavorites();
-  console.log(cars?.length);
   const renderCarCard = ({ item }: { item: Car }) => (
     <TouchableOpacity
       onPress={() => router.push(`/car/${item?.id}`)}

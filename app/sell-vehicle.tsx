@@ -1,12 +1,12 @@
 import { useAddCar } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-
 type ListingForm = {
   brand: string;
   model: string;
@@ -19,6 +19,20 @@ type ListingForm = {
   vin: string;
   transmission: "Manual" | "Automatic" | "Cvt" | "Semi-automatic";
   color: string;
+};
+
+const pickImages = async () => {
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ["images"],
+    allowsEditing: true,
+    aspect: [5, 3],
+    quality: 1,
+  });
+
+  if (!result.canceled) {
+    return result?.assets?.map((image) => image.uri);
+  }
+  return [];
 };
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
@@ -42,6 +56,8 @@ export default function CreateListingScreen() {
     color: "",
   });
 
+  const [photos, setPhotos] = useState<string[]>([]);
+
   const [showFuelTypePicker, setShowFuelTypePicker] = useState(false);
   const [showTransmissionPicker, setShowTransmissionPicker] = useState(false);
   const handleInputChange = (field: keyof ListingForm, value: string) => {
@@ -49,9 +65,9 @@ export default function CreateListingScreen() {
   };
 
   const handleSubmit = () => {
-    if (!isFormValid()) {
-      return;
-    }
+    // if (!isFormValid()) {
+    //   return;
+    // }
 
     const formattedCar = {
       ...formData,
@@ -59,10 +75,9 @@ export default function CreateListingScreen() {
       price: Number(formData.price),
       mileage: Number(formData.mileage),
     };
-    sellCar.mutate(formattedCar);
+    sellCar.mutate({ car: formattedCar, photos: photos });
     router.back();
   };
-
   const isFormValid = () => {
     return (
       formData.brand &&
@@ -104,7 +119,13 @@ export default function CreateListingScreen() {
               Photos
             </UIText>
             <View style={styles.imageUploadContainer}>
-              <TouchableOpacity style={styles.imageUploadButton}>
+              <TouchableOpacity
+                style={styles.imageUploadButton}
+                onPress={async () => {
+                  const newImages = await pickImages();
+                  setPhotos((prev) => [...prev, ...newImages]);
+                }}
+              >
                 <Ionicons
                   name="camera"
                   size={32}
@@ -311,7 +332,7 @@ export default function CreateListingScreen() {
               variant="primary"
               style={styles.submitButton}
               onPress={handleSubmit}
-              disabled={!isFormValid()}
+              // disabled={!isFormValid()}
             >
               <UIText color="white" weight="semibold">
                 Sell vehicle

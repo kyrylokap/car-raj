@@ -2,7 +2,6 @@ import { Database } from "@/src/lib/database.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "./auth";
 import { supabase } from "./supabase";
-
 export type Car = {
   brand: string;
   color?: string | null;
@@ -19,21 +18,47 @@ export type Car = {
   vin?: string | null;
   year?: number | null;
 };
-
 export function useAddCar() {
   const user = useUser();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (car: Car) => {
+    mutationFn: async ({ car, photos }: { car: Car; photos: string[] }) => {
       if (!user) throw new Error("Not authenticated");
-      return insertCar(car, user.id);
+
+      const newCar = await insertCar(car, user.id);
+
+      await uploadCarPhotos(user.id, newCar.id, photos);
+      return newCar;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       queryClient.invalidateQueries({ queryKey: ["userCars", user?.id] });
     },
   });
+}
+
+async function uploadCarPhotos(
+  userId: string,
+  carId: string,
+  photos: string[]
+) {
+  const folderPath = `${userId}$${carId}`;
+  console.log(photos);
+  const uploads = photos.map(async (uri) => {
+    const parts = uri.split("/");
+    const fileName = parts[parts.length - 1];
+    const file = await fetch(uri).then((res) => res.blob());
+
+    const { data, error } = await supabase.storage
+      .from("cars_images")
+      .upload(`${folderPath}/${fileName}`, file, { upsert: true });
+
+    if (error) throw error;
+    return data;
+  });
+
+  return Promise.all(uploads);
 }
 
 export function useUserCars(userId: string) {
@@ -100,8 +125,14 @@ async function getUserCarsById(userId: string) {
 async function insertCar(car: Car, userId: string) {
   const carWithUserId = { ...car, user_id: userId };
 
-  const { data, error } = await supabase.from("car").insert(carWithUserId);
+  const { data, error } = await supabase
+    .from("car")
+    .insert(carWithUserId)
+    .select();
 
   if (error) throw error;
-  return data;
+
+  if (!data || data.length === 0) throw new Error("Car not inserted");
+
+  return data[0];
 }

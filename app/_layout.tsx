@@ -7,6 +7,7 @@ import {
 } from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { useUser } from "@/api/auth";
@@ -15,11 +16,13 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeContextProvider>
-        <RootLayoutNav />
-      </ThemeContextProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView>
+      <QueryClientProvider client={queryClient}>
+        <ThemeContextProvider>
+          <RootLayoutNav />
+        </ThemeContextProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 
