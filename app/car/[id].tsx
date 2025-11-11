@@ -1,4 +1,4 @@
-import { useCarById } from "@/api/car";
+import { useCarById, useCarPhotos } from "@/api/car";
 import { useChangeFavorite, useIsCarFavorite } from "@/api/favorites";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -16,7 +16,6 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 export default function CarDetailsScreen() {
   const { theme, rt } = useUnistyles();
   const router = useRouter();
-
   const params = useLocalSearchParams();
 
   const carId = params.id as string;
@@ -25,6 +24,8 @@ export default function CarDetailsScreen() {
   const [isCarFavorite, setIsCarFavorite] = useState<boolean>(isFavorite!);
   const styles = stylesheet;
   const { data: car, isLoading } = useCarById(carId);
+  const { data: carImages } = useCarPhotos({ userId: car?.user_id!, carId });
+  console.log(carImages);
   const { mutate: pressFavorite } = useChangeFavorite();
   const onPressFavorite = () => {
     pressFavorite(carId);

@@ -41,52 +41,72 @@ export function useAddCar() {
     },
   });
 }
-async function uploadCarPhotos(
-  userId: string,
-  carId: string,
-  photos: string[]
-) {
-  const folderPath = `${userId}/${carId}`;
-
-  const uploads = photos.map(async (uri: string) => {
-    try {
-      const parts = uri.split("/");
-      const fileName = `${Date.now()}_${parts[parts.length - 1]}`;
-
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      const ext = fileName.split(".").pop();
-      const contentType = ext
-        ? mime.getType(ext) || "image/jpeg"
-        : "image/jpeg";
-
-      const dataUrl = `data:${contentType};base64,${base64}`;
-
-      const filePath = `${folderPath}/${fileName}`;
-      const { data, error } = await supabase.storage
-        .from("cars_images")
-        .upload(filePath, dataUrl, {
-          contentType,
-          upsert: true,
-        });
-
-      if (error) {
-        console.error("Upload error", error);
-        throw error;
-      }
-
-      return data;
-    } catch (err) {
-      console.error("Upload failed for", uri, err);
-      throw err;
-    }
+export function useCarPhotos({
+  userId,
+  carId,
+}: {
+  userId: string;
+  carId: string;
+}) {
+  return useQuery({
+    queryKey: ["useCarPhotos", userId, carId],
+    queryFn: async () => {
+      return await getCarPhotos({ userId, carId });
+    },
   });
-
-  return Promise.all(uploads);
 }
 
+async function getCarPhotos({
+  userId,
+  carId,
+}: {
+  userId: string;
+  carId: string;
+}) {
+  if (!userId || !carId) throw new Error("No ids in getCarPhotos");
+
+  const folderPath = `${userId}/${carId}`; // matches your upload path prefix
+  const bucket = "cars_images"; // adjust if your bucket name differs
+
+  // list files in the folder (increase limit if you expect >1000 files)
+  const { data: files, error: listError } = await supabase.storage
+    .from(bucket)
+    .list(folderPath, { limit: 1000, offset: 0 });
+
+  if (listError) throw listError;
+  if (!files || files.length === 0) return [];
+
+  // For each file, return metadata + URL. Use signed URLs for private buckets.
+  const results = await Promise.all(
+    files.map(async (f) => {
+      const path = `${folderPath}/${f.name}`;
+
+      // Try getPublicUrl first (works for public buckets)
+      try {
+        const publicRes = supabase.storage.from(bucket).getPublicUrl(path);
+        // supabase-js returns { data: { publicUrl } } or { publicUrl } depending on version
+        const publicUrl = publicRes?.data?.publicUrl ?? null;
+        if (publicUrl) return { ...f, url: publicUrl, path };
+      } catch (_) {
+        // ignore and fallback to signed url
+      }
+
+      // Fallback: create a signed URL (valid temporarily). Adjust expiresIn as required.
+      const { data: signedData, error: signedError } = await supabase.storage
+        .from(bucket)
+        .createSignedUrl(path, 60 * 60); // 1 hour
+
+      if (signedError) {
+        console.error("Failed to create signed URL for", path, signedError);
+        return { ...f, url: null, path };
+      }
+
+      return { ...f, url: signedData?.signedUrl ?? null, path };
+    })
+  );
+
+  return results;
+}
 export function useUserCars(userId: string) {
   return useQuery({
     queryKey: ["userCars", userId],
@@ -161,4 +181,50 @@ async function insertCar(car: Car, userId: string) {
   if (!data || data.length === 0) throw new Error("Car not inserted");
 
   return data[0];
+}
+
+async function uploadCarPhotos(
+  userId: string,
+  carId: string,
+  photos: string[]
+) {
+  const folderPath = `${userId}/${carId}`;
+
+  const uploads = photos.map(async (uri: string) => {
+    try {
+      const parts = uri.split("/");
+      const fileName = `${Date.now()}_${parts[parts.length - 1]}`;
+
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const ext = fileName.split(".").pop();
+      const contentType = ext
+        ? mime.getType(ext) || "image/jpeg"
+        : "image/jpeg";
+
+      const dataUrl = `data:${contentType};base64,${base64}`;
+
+      const filePath = `${folderPath}/${fileName}`;
+      const { data, error } = await supabase.storage
+        .from("cars_images")
+        .upload(filePath, dataUrl, {
+          contentType,
+          upsert: true,
+        });
+
+      if (error) {
+        console.error("Upload error", error);
+        throw error;
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Upload failed for", uri, err);
+      throw err;
+    }
+  });
+
+  return Promise.all(uploads);
 }
