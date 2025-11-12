@@ -1,5 +1,6 @@
 import { Database } from "@/src/lib/database.types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { decode } from "base64-arraybuffer"; // npm install base64-arraybuffer
 import * as FileSystem from "expo-file-system/legacy";
 
 import mime from "mime"; // if not available, map extensions manually
@@ -21,18 +22,19 @@ export type Car = {
   transmission?: Database["public"]["Enums"]["car_transmission"] | null;
   vin?: string | null;
   year?: number | null;
+  user_id?: string;
 };
 export function useAddCar() {
   const user = useUser();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ car, photos }: { car: Car; photos: string[] }) => {
+    mutationFn: async ({ car, images }: { car: Car; images: string[] }) => {
       if (!user) throw new Error("Not authenticated");
 
       const newCar = await insertCar(car, user.id);
 
-      await uploadCarPhotos(user.id, newCar.id, photos);
+      await uploadCarImages(user.id, newCar.id, images);
       return newCar;
     },
     onSuccess: () => {
@@ -41,72 +43,7 @@ export function useAddCar() {
     },
   });
 }
-export function useCarPhotos({
-  userId,
-  carId,
-}: {
-  userId: string;
-  carId: string;
-}) {
-  return useQuery({
-    queryKey: ["useCarPhotos", userId, carId],
-    queryFn: async () => {
-      return await getCarPhotos({ userId, carId });
-    },
-  });
-}
 
-async function getCarPhotos({
-  userId,
-  carId,
-}: {
-  userId: string;
-  carId: string;
-}) {
-  if (!userId || !carId) throw new Error("No ids in getCarPhotos");
-
-  const folderPath = `${userId}/${carId}`; // matches your upload path prefix
-  const bucket = "cars_images"; // adjust if your bucket name differs
-
-  // list files in the folder (increase limit if you expect >1000 files)
-  const { data: files, error: listError } = await supabase.storage
-    .from(bucket)
-    .list(folderPath, { limit: 1000, offset: 0 });
-
-  if (listError) throw listError;
-  if (!files || files.length === 0) return [];
-
-  // For each file, return metadata + URL. Use signed URLs for private buckets.
-  const results = await Promise.all(
-    files.map(async (f) => {
-      const path = `${folderPath}/${f.name}`;
-
-      // Try getPublicUrl first (works for public buckets)
-      try {
-        const publicRes = supabase.storage.from(bucket).getPublicUrl(path);
-        // supabase-js returns { data: { publicUrl } } or { publicUrl } depending on version
-        const publicUrl = publicRes?.data?.publicUrl ?? null;
-        if (publicUrl) return { ...f, url: publicUrl, path };
-      } catch (_) {
-        // ignore and fallback to signed url
-      }
-
-      // Fallback: create a signed URL (valid temporarily). Adjust expiresIn as required.
-      const { data: signedData, error: signedError } = await supabase.storage
-        .from(bucket)
-        .createSignedUrl(path, 60 * 60); // 1 hour
-
-      if (signedError) {
-        console.error("Failed to create signed URL for", path, signedError);
-        return { ...f, url: null, path };
-      }
-
-      return { ...f, url: signedData?.signedUrl ?? null, path };
-    })
-  );
-
-  return results;
-}
 export function useUserCars(userId: string) {
   return useQuery({
     queryKey: ["userCars", userId],
@@ -183,7 +120,7 @@ async function insertCar(car: Car, userId: string) {
   return data[0];
 }
 
-async function uploadCarPhotos(
+async function uploadCarImages(
   userId: string,
   carId: string,
   photos: string[]
@@ -199,17 +136,18 @@ async function uploadCarPhotos(
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      const fileBuffer = decode(base64);
+
       const ext = fileName.split(".").pop();
       const contentType = ext
         ? mime.getType(ext) || "image/jpeg"
         : "image/jpeg";
 
-      const dataUrl = `data:${contentType};base64,${base64}`;
-
       const filePath = `${folderPath}/${fileName}`;
+
       const { data, error } = await supabase.storage
         .from("cars_images")
-        .upload(filePath, dataUrl, {
+        .upload(filePath, fileBuffer, {
           contentType,
           upsert: true,
         });
@@ -227,4 +165,84 @@ async function uploadCarPhotos(
   });
 
   return Promise.all(uploads);
+}
+
+export function useCarImages({
+  userId,
+  carId,
+}: {
+  userId: string;
+  carId: string;
+}) {
+  return useQuery({
+    queryKey: ["useCarPhotos", userId, carId],
+    queryFn: async () => {
+      return await getCarImages({ userId, carId });
+    },
+    enabled: userId !== undefined && carId !== undefined,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+async function getCarImages({
+  userId,
+  carId,
+}: {
+  userId: string;
+  carId: string;
+}): Promise<string[]> {
+  if (!userId || !carId) {
+    throw new Error("No ids in getCarImages");
+  }
+
+  const folderPath = `${userId}/${carId}`;
+  const bucket = "cars_images";
+
+  const { data: files, error: listError } = await supabase.storage
+    .from(bucket)
+    .list(folderPath, { limit: 1000, offset: 0 });
+
+  if (listError) {
+    throw listError;
+  }
+
+  if (!files || files.length === 0) {
+    return [];
+  }
+
+  const urls: string[] = [];
+
+  for (const f of files) {
+    const path = `${folderPath}/${f.name}`;
+    const { data: signedData, error: signedError } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, 60 * 60);
+
+    if (signedError) {
+      console.error("Failed to create signed URL for", path, signedError);
+      continue;
+    }
+
+    if (signedData && signedData.signedUrl) {
+      urls.push(signedData.signedUrl);
+    }
+  }
+
+  return urls;
+}
+export function useCarFirstImage({
+  userId,
+  carId,
+}: {
+  userId: string;
+  carId: string;
+}) {
+  return useQuery<string | null>({
+    queryKey: ["useCarFirstImage", userId, carId],
+    queryFn: async () => {
+      const images = await getCarImages({ userId, carId });
+      return images.length > 0 ? images[0] : null;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
 }

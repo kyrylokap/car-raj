@@ -1,5 +1,6 @@
 import { useAddCar } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
+import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -7,6 +8,7 @@ import React, { useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 type ListingForm = {
   brand: string;
   model: string;
@@ -56,18 +58,17 @@ export default function CreateListingScreen() {
     color: "",
   });
 
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([]);
 
   const [showFuelTypePicker, setShowFuelTypePicker] = useState(false);
   const [showTransmissionPicker, setShowTransmissionPicker] = useState(false);
   const handleInputChange = (field: keyof ListingForm, value: string) => {
     setFormData({ ...formData, [field]: value });
   };
-
   const handleSubmit = () => {
-    // if (!isFormValid()) {
-    //   return;
-    // }
+    if (!isFormValid()) {
+      return;
+    }
 
     const formattedCar = {
       ...formData,
@@ -75,7 +76,7 @@ export default function CreateListingScreen() {
       price: Number(formData.price),
       mileage: Number(formData.mileage),
     };
-    sellCar.mutate({ car: formattedCar, photos: photos });
+    sellCar.mutate({ car: formattedCar, images });
     router.back();
   };
   const isFormValid = () => {
@@ -86,7 +87,8 @@ export default function CreateListingScreen() {
       formData.price &&
       formData.mileage &&
       formData.fuel &&
-      formData.location
+      formData.location &&
+      images.length > 3
     );
   };
 
@@ -99,6 +101,7 @@ export default function CreateListingScreen() {
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
+
         <UIText size="xl" weight="bold" style={styles.headerTitle}>
           Sell vehicle
         </UIText>
@@ -113,17 +116,24 @@ export default function CreateListingScreen() {
         showsVerticalScrollIndicator={false}
       >
         <UIContainer>
-          {/* Image Upload Section */}
           <UICard variant="elevated" style={styles.imageCard}>
-            <UIText size="lg" style={styles.sectionTitle}>
-              Photos
-            </UIText>
-            <View style={styles.imageUploadContainer}>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <View>
+                <UIText size="lg" style={styles.sectionTitle}>
+                  Images
+                </UIText>
+                <UIText size="xs" color="textSecondary" style={styles.hintText}>
+                  Add at least 4 images of your vehicle
+                </UIText>
+              </View>
+
               <TouchableOpacity
                 style={styles.imageUploadButton}
                 onPress={async () => {
                   const newImages = await pickImages();
-                  setPhotos((prev) => [...prev, ...newImages]);
+                  setImages((prev) => [...prev, ...newImages]);
                 }}
               >
                 <Ionicons
@@ -131,14 +141,10 @@ export default function CreateListingScreen() {
                   size={32}
                   color={theme.colors.primary}
                 />
-                <UIText size="sm" color="primary" style={styles.uploadText}>
-                  Add Photos
-                </UIText>
               </TouchableOpacity>
             </View>
-            <UIText size="xs" color="textSecondary" style={styles.hintText}>
-              Add at least 3 photos of your vehicle
-            </UIText>
+
+            <ImagesCarousel images={images} />
           </UICard>
 
           {/* Basic Information */}
@@ -374,6 +380,7 @@ const stylesheet = StyleSheet.create((theme) => ({
   imageCard: {
     marginBottom: theme.spacing.md,
     padding: theme.spacing.md,
+    gap: 10,
   },
   sectionTitle: {
     marginBottom: theme.spacing.md,
@@ -382,8 +389,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.sm,
   },
   imageUploadButton: {
-    width: "100%",
-    height: 200,
+    padding: 10,
     borderWidth: 2,
     borderColor: theme.colors.border,
     borderStyle: "dashed",
@@ -391,7 +397,6 @@ const stylesheet = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
-    gap: theme.spacing.sm,
   },
   uploadText: {
     marginTop: theme.spacing.xs,

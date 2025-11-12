@@ -1,6 +1,6 @@
-import { Car } from "@/api/car";
 import { useUserFavorites } from "@/api/favorites";
-import { UICard, UIText } from "@/ui";
+import { UIText } from "@/ui";
+import { CarItem } from "@/ui/components/CarItem";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -13,45 +13,6 @@ export default function FavoritesScreen() {
   const styles = stylesheet;
   const router = useRouter();
   const { data: cars } = useUserFavorites();
-  const renderCarCard = ({ item }: { item: Car }) => (
-    <TouchableOpacity
-      onPress={() => router.push(`/car/${item?.id}`)}
-      activeOpacity={0.7}
-    >
-      <UICard variant="elevated" style={styles.carCard}>
-        <View style={styles.carImageContainer}>
-          <View style={styles.carImagePlaceholder}>
-            <Ionicons name="car" size={48} color={theme.colors.textSecondary} />
-          </View>
-          {item?.status === "Sold" && (
-            <View style={styles.soldBadge}>
-              <UIText size="xs" color="white" weight="semibold">
-                SOLD
-              </UIText>
-            </View>
-          )}
-        </View>
-        <View style={styles.carInfo}>
-          <UIText size="lg" style={styles.carTitle}>
-            {item?.brand} {item?.model}
-          </UIText>
-          <UIText size="sm" color="textSecondary" style={styles.carYear}>
-            {item?.year} • {item?.mileage?.toLocaleString()} km • {item?.fuel}
-          </UIText>
-          <View style={styles.carFooter}>
-            <UIText size="lg" color="primary">
-              {item?.price?.toLocaleString()} PLN
-            </UIText>
-            <View style={styles.footerRight}>
-              <UIText size="sm" color="textSecondary">
-                {item?.location}
-              </UIText>
-            </View>
-          </View>
-        </View>
-      </UICard>
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -71,7 +32,9 @@ export default function FavoritesScreen() {
 
       <FlatList
         data={cars}
-        renderItem={renderCarCard}
+        renderItem={({ item }) => {
+          return <CarItem item={item} />;
+        }}
         keyExtractor={(item) => item?.id || ""}
         contentContainerStyle={[
           styles.listContent,

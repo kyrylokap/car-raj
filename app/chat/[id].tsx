@@ -96,7 +96,6 @@ export default function ChatScreen() {
         ]}
       >
         <UIText
-          size="default"
           style={[styles.messageText, item.isOwn && styles.messageTextOwn]}
         >
           {item.text}

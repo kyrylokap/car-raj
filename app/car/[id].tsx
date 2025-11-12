@@ -1,6 +1,7 @@
-import { useCarById, useCarPhotos } from "@/api/car";
+import { useCarById, useCarImages } from "@/api/car";
 import { useChangeFavorite, useIsCarFavorite } from "@/api/favorites";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
+import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -22,10 +23,12 @@ export default function CarDetailsScreen() {
   const { data: isFavorite } = useIsCarFavorite(carId);
 
   const [isCarFavorite, setIsCarFavorite] = useState<boolean>(isFavorite!);
-  const styles = stylesheet;
   const { data: car, isLoading } = useCarById(carId);
-  const { data: carImages } = useCarPhotos({ userId: car?.user_id!, carId });
-  console.log(carImages);
+  const {
+    data: carImages,
+    isLoading: imagesIsLoading,
+    isFetching: imagesIsFetching,
+  } = useCarImages({ userId: car?.user_id!, carId });
   const { mutate: pressFavorite } = useChangeFavorite();
   const onPressFavorite = () => {
     pressFavorite(carId);
@@ -88,12 +91,15 @@ export default function CarDetailsScreen() {
           { paddingBottom: rt.insets.bottom + theme.spacing.xl },
         ]}
       >
-        <View style={styles.imageContainer}>
-          <View style={styles.imagePlaceholder}>
-            <Ionicons name="car" size={80} color={theme.colors.textSecondary} />
+        {imagesIsFetching || imagesIsLoading ? (
+          <View style={styles.imageContainer}>
+            <View style={styles.imagePlaceholder}>
+              <ActivityIndicator size="large" />
+            </View>
           </View>
-        </View>
-
+        ) : (
+          <ImagesCarousel images={carImages!} />
+        )}
         <UIContainer>
           <View style={styles.titleSection}>
             <UIText size="xxl" style={styles.carTitle}>
@@ -258,7 +264,18 @@ export default function CarDetailsScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
+  currentImageText: {
+    position: "absolute",
+    bottom: 8,
+    right: 12,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    color: "#fff",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    fontSize: 14,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

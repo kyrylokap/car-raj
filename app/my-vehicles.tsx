@@ -1,6 +1,7 @@
 import { useUser } from "@/api/auth";
-import { Car, useUserCars } from "@/api/car";
-import { UICard, UIText } from "@/ui";
+import { useUserCars } from "@/api/car";
+import { UIText } from "@/ui";
+import { CarItem } from "@/ui/components/CarItem";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -14,60 +15,6 @@ export default function MyListingsScreen() {
   const router = useRouter();
   const user = useUser();
   const { data: cars } = useUserCars(user?.id!);
-
-  const renderCarCard = ({ item }: { item: Car }) => (
-    <TouchableOpacity
-      onPress={() => router.push(`/car/${item?.id}`)}
-      activeOpacity={0.7}
-    >
-      <UICard variant="elevated" style={styles.carCard}>
-        <View style={styles.carImageContainer}>
-          <View style={styles.carImagePlaceholder}>
-            <Ionicons name="car" size={48} color={theme.colors.textSecondary} />
-          </View>
-          {item?.status === "Sold" && (
-            <View style={styles.soldBadge}>
-              <UIText size="xs" color="white" weight="semibold">
-                SOLD
-              </UIText>
-            </View>
-          )}
-        </View>
-        <View style={styles.carInfo}>
-          <UIText size="lg" style={styles.carTitle}>
-            {item?.brand} {item?.model}
-          </UIText>
-          <UIText size="sm" color="textSecondary" style={styles.carYear}>
-            {item?.year} • {item?.mileage?.toLocaleString()} km • {item?.fuel}
-          </UIText>
-          <View style={styles.carFooter}>
-            <UIText size="lg" color="primary">
-              {item?.price?.toLocaleString()} PLN
-            </UIText>
-            <View style={styles.footerRight}>
-              <UIText size="sm" color="textSecondary">
-                {item?.location}
-              </UIText>
-              {/* {item?.status === "active" && (
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                  }}
-                >
-                  <Ionicons
-                    name="create-outline"
-                    size={18}
-                    color={theme.colors.primary}
-                  />
-                </TouchableOpacity>
-              )} */}
-            </View>
-          </View>
-        </View>
-      </UICard>
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -96,7 +43,9 @@ export default function MyListingsScreen() {
 
       <FlatList
         data={cars}
-        renderItem={renderCarCard}
+        renderItem={({ item }) => {
+          return <CarItem item={item} />;
+        }}
         keyExtractor={(item) => item?.id || ""}
         contentContainerStyle={[
           styles.listContent,

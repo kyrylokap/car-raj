@@ -1,4 +1,5 @@
-import { UICard, UIContainer, UIText } from "@/ui";
+import { UIContainer, UIText } from "@/ui";
+import { CarItem } from "@/ui/components/CarItem";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
@@ -172,37 +173,6 @@ export default function UserCarsScreen() {
     );
   }
 
-  const renderCarCard = ({ item }: { item: Car }) => (
-    <TouchableOpacity
-      onPress={() => router.push(`/car/${item.id}`)}
-      activeOpacity={0.7}
-    >
-      <UICard variant="elevated" style={styles.carCard}>
-        <View style={styles.carImageContainer}>
-          <View style={styles.carImagePlaceholder}>
-            <Ionicons name="car" size={48} color={theme.colors.textSecondary} />
-          </View>
-        </View>
-        <View style={styles.carInfo}>
-          <UIText size="lg" style={styles.carTitle}>
-            {item.brand} {item.model}
-          </UIText>
-          <UIText size="sm" color="textSecondary" style={styles.carYear}>
-            {item.year} • {item.mileage.toLocaleString()} km • {item.fuelType}
-          </UIText>
-          <View style={styles.carFooter}>
-            <UIText size="lg" color="primary">
-              {item.price.toLocaleString()} PLN
-            </UIText>
-            <UIText size="sm" color="textSecondary">
-              {item.location}
-            </UIText>
-          </View>
-        </View>
-      </UICard>
-    </TouchableOpacity>
-  );
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
@@ -229,7 +199,9 @@ export default function UserCarsScreen() {
 
       <FlatList
         data={userCars}
-        renderItem={renderCarCard}
+        renderItem={({ item }) => {
+          return <CarItem item={item} />;
+        }}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[
           styles.listContent,

@@ -1,7 +1,7 @@
-import { Car, useCarsRandom } from "@/api/car";
+import { useCarsRandom } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
+import { CarItem } from "@/ui/components/CarItem";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { FlatList, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,7 +21,6 @@ type Filter = {
 export default function SearchScreen() {
   const { theme, rt } = useUnistyles();
   const styles = stylesheet;
-  const router = useRouter();
   const [showFilters, setShowFilters] = useState(false);
   const { data: cars } = useCarsRandom();
 
@@ -35,37 +34,6 @@ export default function SearchScreen() {
     fuelType: "",
     location: "",
   });
-
-  const renderCarCard = ({ item }: { item: Car }) => (
-    <TouchableOpacity
-      onPress={() => router.push(`/car/${item?.id}`)}
-      activeOpacity={0.7}
-    >
-      <UICard variant="elevated" style={styles.carCard}>
-        <View style={styles.carImageContainer}>
-          <View style={styles.carImagePlaceholder}>
-            <Ionicons name="car" size={48} color={theme.colors.textSecondary} />
-          </View>
-        </View>
-        <View style={styles.carInfo}>
-          <UIText size="lg" style={styles.carTitle}>
-            {item?.brand} {item?.model}
-          </UIText>
-          <UIText size="sm" color="textSecondary" style={styles.carYear}>
-            {item?.year} year • {item?.mileage} km • {item?.fuel}
-          </UIText>
-          <View style={styles.carFooter}>
-            <UIText size="lg" color="primary">
-              {item?.price?.toLocaleString()} PLN
-            </UIText>
-            <UIText size="sm" color="textSecondary">
-              {item?.location}
-            </UIText>
-          </View>
-        </View>
-      </UICard>
-    </TouchableOpacity>
-  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -210,7 +178,9 @@ export default function SearchScreen() {
 
         <FlatList
           data={cars}
-          renderItem={renderCarCard}
+          renderItem={({ item }) => {
+            return <CarItem item={item} />;
+          }}
           keyExtractor={(item) => item?.id || ""}
           contentContainerStyle={[
             styles.listContent,
@@ -299,36 +269,5 @@ const stylesheet = StyleSheet.create((theme) => ({
   listContent: {
     padding: theme.spacing.md,
     paddingTop: theme.spacing.sm,
-  },
-  carCard: {
-    marginBottom: theme.spacing.md,
-    overflow: "hidden",
-  },
-  carImageContainer: {
-    width: "100%",
-    height: 200,
-    marginBottom: theme.spacing.md,
-  },
-  carImagePlaceholder: {
-    flex: 1,
-    backgroundColor: theme.colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: theme.borderRadius.md,
-  },
-  carInfo: {
-    gap: theme.spacing.xs,
-  },
-  carTitle: {
-    marginBottom: theme.spacing.xs,
-  },
-  carYear: {
-    marginBottom: theme.spacing.sm,
-  },
-  carFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: theme.spacing.sm,
   },
 }));
