@@ -10,21 +10,23 @@ export const GoogleButton = () => {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId: process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID,
-      scopes: ["profile", "email", "phone"],
+      scopes: ["profile", "email"],
     });
   }, []);
 
   const handleGoogleLogin = async () => {
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
+      const { data: userInfo } = await GoogleSignin.signIn();
+      if (!userInfo?.idToken) throw new Error("No ID token");
+      console.log(userInfo);
 
-      if (!userInfo.data?.idToken) throw new Error("No ID token");
-
-      await supabase.auth.signInWithIdToken({
+      const signInResponse = await supabase.auth.signInWithIdToken({
         provider: "google",
-        token: userInfo.data?.idToken,
+        token: userInfo.idToken,
       });
+      console.log(signInResponse);
+
       router.replace("/");
     } catch (err) {
       console.log("Google error:", err);

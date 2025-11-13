@@ -40,8 +40,32 @@ export function useAddCar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cars"] });
       queryClient.invalidateQueries({ queryKey: ["userCars", user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["carsCount", user?.id] });
     },
   });
+}
+
+export function useUserCarsCount() {
+  const user = useUser();
+
+  return useQuery({
+    queryKey: ["carsCount", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return 0;
+      return await getUserCarsCount(user.id);
+    },
+    staleTime: 1000 * 60 * 24,
+  });
+}
+async function getUserCarsCount(userId: string) {
+  const { count, error } = await supabase
+    .from("car")
+    .select("*", { count: "exact" })
+    .eq("user_id", userId);
+
+  if (error) throw error;
+
+  return count || 0;
 }
 
 export function useUserCars(userId: string) {

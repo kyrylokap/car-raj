@@ -1,4 +1,5 @@
 import { useUser } from "@/api/auth";
+import { useUserCarsCount } from "@/api/car";
 import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
@@ -13,11 +14,11 @@ export default function ProfileScreen() {
   const user = useUser();
   const styles = stylesheet;
   const router = useRouter();
-
+  const { data: userCarsCount } = useUserCarsCount();
   const stats = [
     {
       label: "Vehicles",
-      value: "12",
+      value: userCarsCount,
       icon: "car-outline",
       color: theme.colors.primary,
     },

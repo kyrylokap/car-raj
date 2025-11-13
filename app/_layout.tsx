@@ -29,6 +29,9 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const { isDarkMode } = useThemeContext();
   const user = useUser();
+  if (user === undefined) {
+    return null;
+  }
   return (
     <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
       <Stack>

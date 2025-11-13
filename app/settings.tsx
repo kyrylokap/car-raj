@@ -1,4 +1,4 @@
-import { supabase } from "@/api/supabase";
+import { handleSignOut } from "@/api/auth";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
@@ -255,9 +255,7 @@ export default function SettingsScreen() {
       </TouchableOpacity>
     );
   };
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
