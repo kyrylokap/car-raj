@@ -1,27 +1,63 @@
-import { useAddCar } from "@/api/car";
+import { Car, useAddCar } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import * as z from "zod";
 
-type ListingForm = {
-  brand: string;
-  model: string;
-  year: string;
-  price: string;
-  mileage: string;
-  fuel: "Petrol" | "Diesel" | "Electric" | "Hybrid" | "Other";
-  location: string;
-  description: string;
-  vin: string;
-  transmission: "Manual" | "Automatic" | "Cvt" | "Semi-automatic";
-  color: string;
-};
+const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
+const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
+const FormData = z.object({
+  images: z.string().refine(
+    (val) => {
+      const num = Number(val);
+      return !isNaN(num) && num >= 4 && num <= 10;
+    },
+    { message: "*Please, choose between 4-10 images" }
+  ),
+  brand: z.string().nonempty({ message: "*Please, provide valid brand" }),
+  model: z.string().nonempty({ message: "*Please, provide valid model" }),
+  year: z
+    .string()
+    .nonempty({ message: "*Please, provide valid year" })
+    .refine(
+      (val) => {
+        const num = Number(val);
+        return !isNaN(num) && num >= 1900 && num <= new Date().getFullYear();
+      },
+      { message: "*Year must be a number between 1900 and current year" }
+    ),
+  price: z
+    .string()
+    .nonempty({ message: "*Please, provide valid price" })
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: "*Price must be a valid number",
+    }),
+  mileage: z
+    .string()
+    .nonempty({ message: "*Please, provide valid mileage" })
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: "*Mileage must be a valid number",
+    }),
+  fuel: z.enum(fuelTypes),
+  location: z.string().min(3, { message: "*Please, provide valid location" }),
+  description: z.string().optional().default(""),
+  vin: z
+    .string()
+    .length(17, { message: "*VIN number must contain exactly 17 characters" })
+    .regex(/^[A-HJ-NPR-Z0-9]+$/, {
+      message: "*Please, provide valid VIN number",
+    }),
+  transmission: z.enum(transmissions),
+  color: z.string().min(2, { message: "*Please, provide valid car color" }),
+});
+
+type ListingForm = z.infer<typeof FormData>;
 
 const pickImages = async () => {
   let result = await ImagePicker.launchImageLibraryAsync({
@@ -37,59 +73,92 @@ const pickImages = async () => {
   return [];
 };
 
-const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
-const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
 export default function CreateListingScreen() {
   const { theme, rt } = useUnistyles();
   const sellCar = useAddCar();
   const styles = stylesheet;
   const router = useRouter();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [images, setImages] = useState<string[]>([]);
+
   const [formData, setFormData] = useState<ListingForm>({
     brand: "",
     model: "",
     year: "",
     price: "",
-    vin: "",
     mileage: "",
     fuel: "Petrol",
     location: "",
     description: "",
+    vin: "",
     transmission: "Manual",
     color: "",
+    images: images.length.toString(),
   });
-
-  const [images, setImages] = useState<string[]>([]);
-
   const [showFuelTypePicker, setShowFuelTypePicker] = useState(false);
   const [showTransmissionPicker, setShowTransmissionPicker] = useState(false);
+
   const handleInputChange = (field: keyof ListingForm, value: string) => {
-    setFormData({ ...formData, [field]: value });
+    setFormData((prev) => ({ ...prev, [field]: value as any }));
+
+    const singleFieldSchema = FormData.pick({ [field]: true });
+    const result = singleFieldSchema.safeParse({ [field]: value });
+
+    setErrors((prev) => ({
+      ...prev,
+      [field]: result.success
+        ? ""
+        : result.error.flatten().fieldErrors[field]?.[0] || "",
+    }));
   };
+
   const handleSubmit = () => {
-    if (!isFormValid()) {
+    const result = FormData.safeParse(formData);
+
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      const flattened = result.error.flatten().fieldErrors;
+
+      for (const key of Object.keys(flattened)) {
+        const messages = flattened[key as keyof typeof flattened];
+        if (messages && messages.length > 0) {
+          fieldErrors[key] = messages[0];
+        }
+      }
+
+      setErrors(fieldErrors);
       return;
     }
 
-    const formattedCar = {
-      ...formData,
-      year: Number(formData.year),
-      price: Number(formData.price),
-      mileage: Number(formData.mileage),
+    if (images.length < 4) {
+      setErrors({ images: "Please add at least 4 images" });
+      console.log(errors);
+      return;
+    }
+
+    setErrors({});
+    const car: Car = {
+      brand: result.data.brand,
+      model: result.data.model,
+      year: Number(result.data.year),
+      price: Number(result.data.price),
+      mileage: Number(result.data.mileage),
+      fuel: result.data.fuel as Car["fuel"],
+      transmission: result.data.transmission as Car["transmission"],
+      location: result.data.location,
+      description: result.data.description,
+      vin: result.data.vin,
+      color: result.data.color,
     };
-    sellCar.mutate({ car: formattedCar, images });
+
+    sellCar.mutate({ car, images });
     router.back();
-  };
-  const isFormValid = () => {
-    return (
-      formData.brand &&
-      formData.model &&
-      formData.year &&
-      formData.price &&
-      formData.mileage &&
-      formData.fuel &&
-      formData.location &&
-      images.length > 3
-    );
+    Alert.alert("Success", "You added new car to marketplace!", [
+      {
+        text: "Ok",
+        style: "cancel",
+      },
+    ]);
   };
 
   return (
@@ -133,7 +202,13 @@ export default function CreateListingScreen() {
                 style={styles.imageUploadButton}
                 onPress={async () => {
                   const newImages = await pickImages();
-                  setImages((prev) => [...prev, ...newImages]);
+                  setImages((prev) => {
+                    handleInputChange(
+                      "images",
+                      (prev.length + newImages.length).toString()
+                    );
+                    return [...prev, ...newImages];
+                  });
                 }}
               >
                 <Ionicons
@@ -144,10 +219,15 @@ export default function CreateListingScreen() {
               </TouchableOpacity>
             </View>
 
-            <ImagesCarousel images={images} />
+            <ImagesCarousel
+              images={images}
+              setImages={setImages}
+              handleDecrementImagesCount={() =>
+                handleInputChange("images", (images.length - 1).toString())
+              }
+            />
           </UICard>
 
-          {/* Basic Information */}
           <UICard variant="elevated" style={styles.formCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Basic Information
@@ -155,14 +235,14 @@ export default function CreateListingScreen() {
 
             <UIInput
               label="Brand"
-              placeholder="e.g., BMW, Mercedes-Benz"
+              placeholder="e.g., BMW"
               value={formData.brand}
               onChangeText={(text) => handleInputChange("brand", text)}
             />
 
             <UIInput
               label="Model"
-              placeholder="e.g., 320d, C-Class"
+              placeholder="e.g., C-Class"
               value={formData.model}
               onChangeText={(text) => handleInputChange("model", text)}
             />
@@ -171,35 +251,34 @@ export default function CreateListingScreen() {
               <UIInput
                 label="Year"
                 placeholder="2020"
-                value={formData.year}
+                value={String(formData.year)}
                 onChangeText={(text) => handleInputChange("year", text)}
                 keyboardType="numeric"
                 containerStyle={styles.halfInput}
               />
               <UIInput
-                label="Mileage (km)"
+                label="Mileage"
                 placeholder="45000"
-                value={formData.mileage}
+                value={String(formData.mileage)}
                 onChangeText={(text) => handleInputChange("mileage", text)}
                 keyboardType="numeric"
                 containerStyle={styles.halfInput}
               />
             </View>
+
             <UIInput
               label="Color"
               placeholder="Black"
               value={formData.color}
               onChangeText={(text) => handleInputChange("color", text)}
-              keyboardType="numeric"
-              containerStyle={styles.halfInput}
             />
+
             <TouchableOpacity
               onPress={() => setShowFuelTypePicker(!showFuelTypePicker)}
             >
               <View pointerEvents="none">
                 <UIInput
                   label="Fuel Type"
-                  placeholder="Select fuel type"
                   value={formData.fuel}
                   editable={false}
                 />
@@ -234,13 +313,13 @@ export default function CreateListingScreen() {
                 ))}
               </View>
             )}
+
             <TouchableOpacity
               onPress={() => setShowTransmissionPicker(!showTransmissionPicker)}
             >
               <View pointerEvents="none">
                 <UIInput
                   label="Transmission"
-                  placeholder="Select Transmission"
                   value={formData.transmission}
                   editable={false}
                 />
@@ -249,25 +328,24 @@ export default function CreateListingScreen() {
 
             {showTransmissionPicker && (
               <View style={styles.pickerContainer}>
-                {transmissions.map((transmission) => (
+                {transmissions.map((t) => (
                   <TouchableOpacity
-                    key={transmission}
+                    key={t}
                     style={[
                       styles.pickerOption,
-                      formData.transmission === transmission &&
-                        styles.pickerOptionActive,
+                      formData.transmission === t && styles.pickerOptionActive,
                     ]}
                     onPress={() => {
-                      handleInputChange("transmission", transmission);
+                      handleInputChange("transmission", t);
                       setShowTransmissionPicker(false);
                     }}
                   >
                     <UIText
-                      color={formData.fuel === transmission ? "white" : "text"}
+                      color={formData.transmission === t ? "white" : "text"}
                     >
-                      {transmission}
+                      {t}
                     </UIText>
-                    {formData.transmission === transmission && (
+                    {formData.transmission === t && (
                       <Ionicons
                         name="checkmark"
                         size={20}
@@ -278,17 +356,15 @@ export default function CreateListingScreen() {
                 ))}
               </View>
             )}
+
             <UIInput
-              label="Vin number"
-              placeholder=""
+              label="VIN"
+              placeholder="Vehicle Identification Number"
               value={formData.vin}
               onChangeText={(text) => handleInputChange("vin", text)}
-              keyboardType="numeric"
-              containerStyle={styles.halfInput}
             />
           </UICard>
 
-          {/* Pricing & Location */}
           <UICard variant="elevated" style={styles.formCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Pricing & Location
@@ -297,35 +373,42 @@ export default function CreateListingScreen() {
             <UIInput
               label="Price (PLN)"
               placeholder="125000"
-              value={formData.price}
+              value={String(formData.price)}
               onChangeText={(text) => handleInputChange("price", text)}
               keyboardType="numeric"
             />
 
             <UIInput
               label="Location"
-              placeholder="e.g., Warsaw, Krakow"
+              placeholder="e.g., Warsaw"
               value={formData.location}
               onChangeText={(text) => handleInputChange("location", text)}
             />
           </UICard>
 
-          {/* Description */}
           <UICard variant="elevated" style={styles.formCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Description
             </UIText>
             <UIInput
-              placeholder="Describe your vehicle... (optional)"
+              placeholder="Describe your vehicle..."
               value={formData.description}
               onChangeText={(text) => handleInputChange("description", text)}
               multiline
               numberOfLines={6}
               style={styles.descriptionInput}
             />
+            <UICard variant="elevated" style={styles.formCard}>
+              {Object.entries(errors)
+                .filter(([_, message]) => message != "")
+                .map(([field, message]) => (
+                  <UIText key={field} style={styles.errorText}>
+                    {message}
+                  </UIText>
+                ))}
+            </UICard>
           </UICard>
 
-          {/* Submit Button */}
           <View style={styles.actionButtons}>
             <UIButton
               variant="outline"
@@ -334,11 +417,11 @@ export default function CreateListingScreen() {
             >
               <UIText weight="semibold">Cancel</UIText>
             </UIButton>
+
             <UIButton
               variant="primary"
               style={styles.submitButton}
               onPress={handleSubmit}
-              // disabled={!isFormValid()}
             >
               <UIText color="white" weight="semibold">
                 Sell vehicle
@@ -352,6 +435,9 @@ export default function CreateListingScreen() {
 }
 
 const stylesheet = StyleSheet.create((theme) => ({
+  errorText: {
+    color: "#eb4f4fff",
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -385,9 +471,6 @@ const stylesheet = StyleSheet.create((theme) => ({
   sectionTitle: {
     marginBottom: theme.spacing.md,
   },
-  imageUploadContainer: {
-    marginBottom: theme.spacing.sm,
-  },
   imageUploadButton: {
     padding: 10,
     borderWidth: 2,
@@ -397,9 +480,6 @@ const stylesheet = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
-  },
-  uploadText: {
-    marginTop: theme.spacing.xs,
   },
   hintText: {
     marginTop: theme.spacing.xs,
