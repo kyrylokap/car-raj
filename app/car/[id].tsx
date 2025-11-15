@@ -54,6 +54,40 @@ export default function CarDetailsScreen() {
     );
   }
 
+  const createdTime = new Date(car!.created_at).toLocaleString("en-GB", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  const specsWithIcons = [
+    { icon: "car-outline", label: "Brand", value: car?.brand },
+    { icon: "pricetag-outline", label: "Model", value: car?.model },
+    { icon: "calendar-outline", label: "Year", value: car?.year },
+
+    {
+      icon: "speedometer-outline",
+      label: "Mileage",
+      value: car?.mileage ? `${car.mileage} km` : "-",
+    },
+    {
+      icon: "cash-outline",
+      label: "Price",
+      value: car?.price ? `${car.price.toLocaleString()} PLN` : "-",
+    },
+    { icon: "flash-outline", label: "Fuel Type", value: car?.fuel },
+    {
+      icon: "options-outline",
+      label: "Transmission",
+      value: car?.transmission,
+    },
+    { icon: "color-palette-outline", label: "Color", value: car?.color },
+    { icon: "location-outline", label: "Location", value: car?.location },
+    { icon: "time-outline", label: "Created", value: createdTime },
+  ];
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
@@ -91,6 +125,15 @@ export default function CarDetailsScreen() {
           { paddingBottom: rt.insets.bottom + theme.spacing.xl },
         ]}
       >
+        <View style={{ padding: 20 }}>
+          <UIText size="xxl" style={styles.carTitle}>
+            {car?.brand} {car?.model}
+          </UIText>
+          <UIText size="lg" color="primary" style={styles.price}>
+            {car?.price?.toLocaleString()} PLN
+          </UIText>
+        </View>
+
         {imagesIsFetching || imagesIsLoading ? (
           <View style={styles.imageContainer}>
             <View style={styles.imagePlaceholder}>
@@ -101,123 +144,41 @@ export default function CarDetailsScreen() {
           <ImagesCarousel images={carImages!} />
         )}
         <UIContainer>
-          <View style={styles.titleSection}>
-            <UIText size="xxl" style={styles.carTitle}>
-              {car?.brand} {car?.model}
-            </UIText>
-            <UIText size="lg" color="primary" style={styles.price}>
-              {car?.price?.toLocaleString()} PLN
-            </UIText>
-          </View>
-
-          <UICard variant="elevated" style={styles.detailsCard}>
-            <View style={styles.detailRow}>
-              <View style={styles.detailItem}>
-                <Ionicons
-                  name="calendar-outline"
-                  size={20}
-                  color={theme.colors.textSecondary}
-                />
-                <View style={styles.detailContent}>
-                  <UIText size="xs" color="textSecondary">
-                    Year
-                  </UIText>
-                  <UIText weight="semibold">{car?.year}</UIText>
-                </View>
-              </View>
-
-              <View style={styles.detailItem}>
-                <Ionicons
-                  name="speedometer-outline"
-                  size={20}
-                  color={theme.colors.textSecondary}
-                />
-                <View style={styles.detailContent}>
-                  <UIText size="xs" color="textSecondary">
-                    Mileage
-                  </UIText>
-                  <UIText weight="semibold">
-                    {car?.mileage?.toLocaleString()} km
-                  </UIText>
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-              <View style={styles.detailItem}>
-                <Ionicons
-                  name="flash-outline"
-                  size={20}
-                  color={theme.colors.textSecondary}
-                />
-                <View style={styles.detailContent}>
-                  <UIText size="xs" color="textSecondary">
-                    Fuel Type
-                  </UIText>
-                  <UIText weight="semibold">{car?.fuel}</UIText>
-                </View>
-              </View>
-
-              <View style={styles.detailItem}>
-                <Ionicons
-                  name="location-outline"
-                  size={20}
-                  color={theme.colors.textSecondary}
-                />
-                <View style={styles.detailContent}>
-                  <UIText size="xs" color="textSecondary">
-                    Location
-                  </UIText>
-                  <UIText weight="semibold">{car?.location}</UIText>
-                </View>
-              </View>
-            </View>
-            <View style={styles.detailItem}>
-              <UIText style={{ color: theme.colors.textSecondary }}>VIN</UIText>
-              <View style={styles.detailContent}>
-                <UIText size="xs" color="textSecondary">
-                  VIN Number
-                </UIText>
-                <UIText weight="semibold">{car?.vin}</UIText>
-              </View>
-            </View>
-          </UICard>
-
           <UICard variant="elevated" style={styles.specsCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Specifications
             </UIText>
+
             <View style={styles.specsList}>
               <View style={styles.specRow}>
-                <UIText color="textSecondary">Brand</UIText>
-                <UIText weight="semibold">{car?.brand}</UIText>
+                <UIText style={{ color: theme.colors.textSecondary }}>
+                  VIN
+                </UIText>
+
+                <UIText weight="semibold">{car?.vin}</UIText>
               </View>
-              <View style={styles.specRow}>
-                <UIText color="textSecondary">Model</UIText>
-                <UIText weight="semibold">{car?.model}</UIText>
-              </View>
-              <View style={styles.specRow}>
-                <UIText color="textSecondary">Year</UIText>
-                <UIText weight="semibold">{car?.year}</UIText>
-              </View>
-              <View style={styles.specRow}>
-                <UIText color="textSecondary">Mileage</UIText>
-                <UIText weight="semibold">{car?.mileage} km</UIText>
-              </View>
-              <View style={styles.specRow}>
-                <UIText color="textSecondary">Fuel Type</UIText>
-                <UIText weight="semibold">{car?.fuel}</UIText>
-              </View>
-              <View style={styles.specRow}>
-                <UIText color="textSecondary">Transmission</UIText>
-                <UIText weight="semibold">{car?.transmission}</UIText>
-              </View>
-              <View style={styles.specRow}>
-                <UIText color="textSecondary">Color</UIText>
-                <UIText weight="semibold">{car?.color}</UIText>
-              </View>
+              {specsWithIcons.map((spec) => (
+                <View key={spec.label} style={styles.specRow}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <Ionicons
+                      name={spec.icon as any}
+                      size={18}
+                      color={theme.colors.textSecondary}
+                    />
+                    <UIText color="textSecondary">{spec.label}</UIText>
+                  </View>
+                  <UIText weight="semibold">{spec.value ?? "-"}</UIText>
+                </View>
+              ))}
             </View>
           </UICard>
+
           <UICard variant="elevated" style={styles.descriptionCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Description

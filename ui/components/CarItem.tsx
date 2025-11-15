@@ -14,7 +14,7 @@ export const CarItem = ({ item }: { item: Car }) => {
     isLoading: isFirstImageLoading,
     isFetching: isFirstImageFetching,
   } = useCarFirstImage({
-    userId: item.user_id,
+    userId: item.user_id!,
     carId: item.id!,
   });
   return (

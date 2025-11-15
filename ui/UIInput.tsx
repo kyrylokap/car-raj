@@ -1,42 +1,38 @@
 import React from "react";
-import { Text, TextInput, TextInputProps, View } from "react-native";
+import { TextInput, TextInputProps, View } from "react-native";
 import {
   StyleSheet,
   UnistylesVariants,
   useUnistyles,
 } from "react-native-unistyles";
+import { UIText } from "./UIText";
 
 type InputProps = TextInputProps & {
   label?: string;
-  error?: string;
   containerStyle?: object;
-} & UnistylesVariants<typeof stylesheet>;
+} & UnistylesVariants<typeof styles>;
 
 export const UIInput: React.FC<InputProps> = ({
   label,
-  error,
   containerStyle,
   style,
   ...props
 }) => {
   const { theme } = useUnistyles();
-  stylesheet.useVariants({ hasError: !!error });
-  const styles = stylesheet;
 
   return (
     <View style={[styles.container, containerStyle]}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <UIText style={styles.label}>{label}</UIText>}
       <TextInput
         style={[styles.input, style]}
         placeholderTextColor={theme.colors.textSecondary}
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 };
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     marginBottom: theme.spacing.md,
   },
@@ -65,10 +61,5 @@ const stylesheet = StyleSheet.create((theme) => ({
         },
       },
     },
-  },
-  errorText: {
-    ...theme.typography.caption,
-    color: theme.colors.error,
-    marginTop: theme.spacing.xs,
   },
 }));

@@ -1,8 +1,8 @@
 import { Car, useAddCar } from "@/api/car";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
 import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
+import { UIPicker } from "@/ui/UIPicker";
 import { Ionicons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
@@ -28,14 +28,14 @@ const FormData = z.object({
     .refine(
       (val) => {
         const num = Number(val);
-        return !isNaN(num) && num >= 1900 && num <= new Date().getFullYear();
+        return !isNaN(num) && num >= 1990 && num <= new Date().getFullYear();
       },
-      { message: "*Year must be a number between 1900 and current year" }
+      { message: "*Year must be a number between 1990 and current year" }
     ),
   price: z
     .string()
     .nonempty({ message: "*Please, provide valid price" })
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 1, {
       message: "*Price must be a valid number",
     }),
   mileage: z
@@ -59,20 +59,6 @@ const FormData = z.object({
 
 type ListingForm = z.infer<typeof FormData>;
 
-const pickImages = async () => {
-  let result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ["images"],
-    allowsEditing: true,
-    aspect: [5, 3],
-    quality: 1,
-  });
-
-  if (!result.canceled) {
-    return result?.assets?.map((image) => image.uri);
-  }
-  return [];
-};
-
 export default function CreateListingScreen() {
   const { theme, rt } = useUnistyles();
   const sellCar = useAddCar();
@@ -95,8 +81,6 @@ export default function CreateListingScreen() {
     color: "",
     images: images.length.toString(),
   });
-  const [showFuelTypePicker, setShowFuelTypePicker] = useState(false);
-  const [showTransmissionPicker, setShowTransmissionPicker] = useState(false);
 
   const handleInputChange = (field: keyof ListingForm, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value as any }));
@@ -185,50 +169,14 @@ export default function CreateListingScreen() {
         showsVerticalScrollIndicator={false}
       >
         <UIContainer>
-          <UICard variant="elevated" style={styles.imageCard}>
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <View>
-                <UIText size="lg" style={styles.sectionTitle}>
-                  Images
-                </UIText>
-                <UIText size="xs" color="textSecondary" style={styles.hintText}>
-                  Add at least 4 images of your vehicle
-                </UIText>
-              </View>
-
-              <TouchableOpacity
-                style={styles.imageUploadButton}
-                onPress={async () => {
-                  const newImages = await pickImages();
-                  setImages((prev) => {
-                    handleInputChange(
-                      "images",
-                      (prev.length + newImages.length).toString()
-                    );
-                    return [...prev, ...newImages];
-                  });
-                }}
-              >
-                <Ionicons
-                  name="camera"
-                  size={32}
-                  color={theme.colors.primary}
-                />
-              </TouchableOpacity>
-            </View>
-
-            <ImagesCarousel
-              images={images}
-              setImages={setImages}
-              handleDecrementImagesCount={() =>
-                handleInputChange("images", (images.length - 1).toString())
-              }
-            />
-          </UICard>
-
-          <UICard variant="elevated" style={styles.formCard}>
+          <ImagesCarousel
+            images={images}
+            setImages={setImages}
+            handleChangeImagesCount={(newImagesCount) =>
+              handleInputChange("images", newImagesCount.toString())
+            }
+          />
+          <UICard style={styles.formCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Basic Information
             </UIText>
@@ -273,90 +221,23 @@ export default function CreateListingScreen() {
               onChangeText={(text) => handleInputChange("color", text)}
             />
 
-            <TouchableOpacity
-              onPress={() => setShowFuelTypePicker(!showFuelTypePicker)}
-            >
-              <View pointerEvents="none">
-                <UIInput
-                  label="Fuel Type"
-                  value={formData.fuel}
-                  editable={false}
-                />
-              </View>
-            </TouchableOpacity>
+            <UIPicker
+              label="Fuel Type"
+              values={fuelTypes}
+              pick={(value) => {
+                handleInputChange("fuel", value);
+              }}
+              currentPickerValue={formData.fuel}
+            />
 
-            {showFuelTypePicker && (
-              <View style={styles.pickerContainer}>
-                {fuelTypes.map((type) => (
-                  <TouchableOpacity
-                    key={type}
-                    style={[
-                      styles.pickerOption,
-                      formData.fuel === type && styles.pickerOptionActive,
-                    ]}
-                    onPress={() => {
-                      handleInputChange("fuel", type);
-                      setShowFuelTypePicker(false);
-                    }}
-                  >
-                    <UIText color={formData.fuel === type ? "white" : "text"}>
-                      {type}
-                    </UIText>
-                    {formData.fuel === type && (
-                      <Ionicons
-                        name="checkmark"
-                        size={20}
-                        color={theme.colors.white}
-                      />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            <TouchableOpacity
-              onPress={() => setShowTransmissionPicker(!showTransmissionPicker)}
-            >
-              <View pointerEvents="none">
-                <UIInput
-                  label="Transmission"
-                  value={formData.transmission}
-                  editable={false}
-                />
-              </View>
-            </TouchableOpacity>
-
-            {showTransmissionPicker && (
-              <View style={styles.pickerContainer}>
-                {transmissions.map((t) => (
-                  <TouchableOpacity
-                    key={t}
-                    style={[
-                      styles.pickerOption,
-                      formData.transmission === t && styles.pickerOptionActive,
-                    ]}
-                    onPress={() => {
-                      handleInputChange("transmission", t);
-                      setShowTransmissionPicker(false);
-                    }}
-                  >
-                    <UIText
-                      color={formData.transmission === t ? "white" : "text"}
-                    >
-                      {t}
-                    </UIText>
-                    {formData.transmission === t && (
-                      <Ionicons
-                        name="checkmark"
-                        size={20}
-                        color={theme.colors.white}
-                      />
-                    )}
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
+            <UIPicker
+              label="Transmission"
+              values={transmissions}
+              pick={(value) => {
+                handleInputChange("transmission", value);
+              }}
+              currentPickerValue={formData.transmission}
+            />
             <UIInput
               label="VIN"
               placeholder="Vehicle Identification Number"
@@ -365,7 +246,7 @@ export default function CreateListingScreen() {
             />
           </UICard>
 
-          <UICard variant="elevated" style={styles.formCard}>
+          <UICard style={styles.formCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Pricing & Location
             </UIText>
@@ -386,7 +267,7 @@ export default function CreateListingScreen() {
             />
           </UICard>
 
-          <UICard variant="elevated" style={styles.formCard}>
+          <UICard style={styles.formCard}>
             <UIText size="lg" style={styles.sectionTitle}>
               Description
             </UIText>
@@ -398,7 +279,7 @@ export default function CreateListingScreen() {
               numberOfLines={6}
               style={styles.descriptionInput}
             />
-            <UICard variant="elevated" style={styles.formCard}>
+            <UICard style={styles.formCard}>
               {Object.entries(errors)
                 .filter(([_, message]) => message != "")
                 .map(([field, message]) => (

@@ -15,7 +15,7 @@ export default function MyListingsScreen() {
   const router = useRouter();
   const user = useUser();
   const { data: cars } = useUserCars(user?.id!);
-
+  //TODO change vehicle status
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
