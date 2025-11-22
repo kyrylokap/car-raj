@@ -220,8 +220,8 @@ export default function CreateListingScreen() {
               value={formData.color}
               onChangeText={(text) => handleInputChange("color", text)}
             />
-
-            <UIPicker
+            <View style={styles.row}>
+            <UIPicker 
               label="Fuel Type"
               values={fuelTypes}
               pick={(value) => {
@@ -238,6 +238,8 @@ export default function CreateListingScreen() {
               }}
               currentPickerValue={formData.transmission}
             />
+            </View>
+            
             <UIInput
               label="VIN"
               placeholder="Vehicle Identification Number"

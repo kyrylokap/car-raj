@@ -4,7 +4,7 @@ import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
 type ContainerProps = ViewProps & {
   children: React.ReactNode;
-} & UnistylesVariants<typeof stylesheet>;
+} & UnistylesVariants<typeof styles>;
 
 export const UIContainer: React.FC<ContainerProps> = ({
   padding,
@@ -12,8 +12,7 @@ export const UIContainer: React.FC<ContainerProps> = ({
   style,
   ...props
 }) => {
-  stylesheet.useVariants({ padding: padding || "md" });
-  const styles = stylesheet;
+  styles.useVariants({ padding: padding || "md" });
 
   return (
     <View style={[styles.container, style]} {...props}>
@@ -22,7 +21,7 @@ export const UIContainer: React.FC<ContainerProps> = ({
   );
 };
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

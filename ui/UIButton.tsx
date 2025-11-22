@@ -9,7 +9,7 @@ import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 type ButtonProps = TouchableOpacityProps & {
   loading?: boolean;
   children: React.ReactNode;
-} & UnistylesVariants<typeof stylesheet>;
+} & UnistylesVariants<typeof styles>;
 
 export const UIButton: React.FC<ButtonProps> = ({
   variant,
@@ -20,11 +20,10 @@ export const UIButton: React.FC<ButtonProps> = ({
   style,
   ...props
 }) => {
-  stylesheet.useVariants({
+  styles.useVariants({
     variant: variant || "primary",
     size: size || "medium",
   });
-  const styles = stylesheet;
 
   return (
     <TouchableOpacity
@@ -44,7 +43,7 @@ export const UIButton: React.FC<ButtonProps> = ({
   );
 };
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   button: {
     borderRadius: theme.borderRadius.md,
     alignItems: "center",

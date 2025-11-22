@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, View, ViewStyle } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { UIText } from "./UIText";
 
@@ -9,6 +9,8 @@ type UIPickerProps = {
   values: string[];
   currentPickerValue: string;
   pick: (value: string) => void;
+  style?: ViewStyle;
+  hideLabel?: boolean;
 };
 
 export const UIPicker = ({
@@ -16,14 +18,17 @@ export const UIPicker = ({
   values,
   currentPickerValue,
   pick,
+  style,
+  hideLabel = false
 }: UIPickerProps) => {
   const [isVisiblePicker, setIsVisiblePicker] = useState<boolean>(false);
   const { theme } = useUnistyles();
   return (
-    <View style={[styles.container]}>
-      <UIText style={styles.label}>{label}</UIText>
+    <View style={[ styles.container,style,]}>
+      {hideLabel ? null : <UIText style={styles.label}>{label}</UIText>
+}
       <Pressable
-        style={styles.picker}
+        style={styles.picker({ hideLabel })}
         onPress={() => setIsVisiblePicker((prev) => !prev)}
       >
         <UIText>{currentPickerValue}</UIText>
@@ -34,7 +39,7 @@ export const UIPicker = ({
         />
       </Pressable>
       {isVisiblePicker ? (
-        <View style={styles.itemsContainer}>
+        <View style={styles.itemsContainer({ hideLabel })}>
           {values.map((item) => {
             return (
               <Pressable
@@ -60,6 +65,7 @@ export const UIPicker = ({
 const styles = StyleSheet.create((theme) => ({
   container: {
     marginBottom: theme.spacing.md,
+    flex: 1
   },
   label: {
     ...theme.typography.body,
@@ -67,36 +73,36 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.xs,
     fontWeight: "600",
   },
-  picker: {
+  picker: ({ hideLabel }: { hideLabel?: boolean}) => ({
     ...theme.typography.body,
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
-    padding: theme.spacing.md,
+    padding: hideLabel ? theme.spacing.sm: theme.spacing.md,
     color: theme.colors.text,
     borderWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  pickerItem: ({ isSelected }: { isSelected?: boolean }) => ({
+  }),
+  pickerItem: ({ isSelected }: { isSelected?: boolean}) => ({
     ...theme.typography.body,
     backgroundColor: isSelected ? theme.colors.primary : theme.colors.surface,
     padding: theme.spacing.sm,
     color: theme.colors.text,
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "flex-start",
   }),
-  itemsContainer: {
+  itemsContainer: ({ hideLabel }: { hideLabel?: boolean}) => ({
     position: "absolute",
     zIndex: 10,
-    top: 30,
-    width: 200,
+    top: hideLabel? 46: 30,
+    width: '100%',
     shadowColor: theme.colors.white,
     backgroundColor: theme.colors.surface,
     padding: theme.spacing.xs,
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
-  },
+  }),
 }));
