@@ -36,14 +36,7 @@ export default function ProfileScreen() {
     },
   ];
 
-  const quickActions = [
-    {
-      icon: "add-circle",
-      label: "Sell vehicle",
-      color: theme.colors.primary,
-    },
-    { icon: "create", label: "Edit Profile", color: theme.colors.text },
-  ];
+ 
 
   const menuItems = [
     {
@@ -64,18 +57,7 @@ export default function ProfileScreen() {
       subtitle: "Preferences & privacy",
       color: theme.colors.textSecondary,
     },
-    {
-      icon: "help-circle-outline",
-      label: "Help & Support",
-      subtitle: "Get assistance",
-      color: theme.colors.textSecondary,
-    },
-    {
-      icon: "information-circle-outline",
-      label: "About",
-      subtitle: "App version & info",
-      color: theme.colors.textSecondary,
-    },
+   
   ];
 
   return (
@@ -95,16 +77,7 @@ export default function ProfileScreen() {
                   style={styles.avatar}
                   source={{ uri: user?.user_metadata?.avatar_url }}
                 />
-                <TouchableOpacity
-                  style={styles.editAvatarButton}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name="camera"
-                    size={16}
-                    color={theme.colors.white}
-                  />
-                </TouchableOpacity>
+                
               </View>
 
               <View style={styles.profileInfo}>
@@ -185,42 +158,35 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Quick Actions */}
+         
           <View style={styles.quickActionsSection}>
-            <View style={styles.quickActionsContainer}>
-              {quickActions.map((action, index) => (
                 <TouchableOpacity
-                  key={index}
                   activeOpacity={0.7}
                   style={[
                     styles.quickActionButton,
-                    index === 0 && styles.quickActionPrimary,
+                     styles.quickActionPrimary,
                   ]}
                   onPress={() => {
-                    if (action.label === "Sell vehicle") {
                       router.push("/sell-vehicle");
-                    } else if (action.label === "Edit Profile") {
-                      router.push("/edit-profile");
-                    }
+                    
                   }}
                 >
                   <Ionicons
-                    name={action.icon as any}
+                    name="add-circle"
                     size={22}
-                    color={index === 0 ? theme.colors.white : theme.colors.text}
+                    color={theme.colors.text}
                   />
                   <UIText
                     size="sm"
-                    color={index === 0 ? "white" : "text"}
+                    color={ "white"}
                     weight="semibold"
                     style={styles.quickActionLabel}
                   >
-                    {action.label}
+                    Sell vehicle
                   </UIText>
                 </TouchableOpacity>
-              ))}
+            
             </View>
-          </View>
 
           <View style={styles.menuSection}>
             <UICard variant="outlined" style={styles.menuCard}>

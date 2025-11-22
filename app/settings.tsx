@@ -3,7 +3,7 @@ import { useThemeContext } from "@/contexts/ThemeContext";
 import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -24,10 +24,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { isDarkMode, toggleTheme } = useThemeContext();
 
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [emailNotifications, setEmailNotifications] = useState(true);
-  const [pushNotifications, setPushNotifications] = useState(true);
-  const [autoSave, setAutoSave] = useState(true);
+  
 
   const accountSettings: SettingItem[] = [
     {
@@ -53,29 +50,7 @@ export default function SettingsScreen() {
     },
   ];
 
-  const notificationSettings: SettingItem[] = [
-    {
-      icon: "notifications-outline",
-      label: "Push Notifications",
-      subtitle: "Receive notifications on your device",
-      type: "toggle",
-      color: theme.colors.primary,
-    },
-    {
-      icon: "mail-outline",
-      label: "Email Notifications",
-      subtitle: "Receive updates via email",
-      type: "toggle",
-      color: theme.colors.primary,
-    },
-    {
-      icon: "chatbubbles-outline",
-      label: "Message Notifications",
-      subtitle: "New messages and inquiries",
-      type: "toggle",
-      color: theme.colors.primary,
-    },
-  ];
+  
 
   const appSettings: SettingItem[] = [
     {
@@ -93,13 +68,7 @@ export default function SettingsScreen() {
       type: "value",
       color: theme.colors.textSecondary,
     },
-    {
-      icon: "save-outline",
-      label: "Auto-save Drafts",
-      subtitle: "Automatically save listing drafts",
-      type: "toggle",
-      color: theme.colors.textSecondary,
-    },
+    
   ];
 
   const supportSettings: SettingItem[] = [
@@ -178,30 +147,10 @@ export default function SettingsScreen() {
         </View>
         {item.type === "toggle" && (
           <Switch
-            value={
-              item.label === "Push Notifications"
-                ? pushNotifications
-                : item.label === "Email Notifications"
-                ? emailNotifications
-                : item.label === "Message Notifications"
-                ? notificationsEnabled
-                : item.label === "Dark Mode"
-                ? isDarkMode
-                : item.label === "Auto-save Drafts"
-                ? autoSave
-                : false
-            }
+            value={item.label === "Dark Mode" ? isDarkMode : false}
             onValueChange={(value) => {
-              if (item.label === "Push Notifications") {
-                setPushNotifications(value);
-              } else if (item.label === "Email Notifications") {
-                setEmailNotifications(value);
-              } else if (item.label === "Message Notifications") {
-                setNotificationsEnabled(value);
-              } else if (item.label === "Dark Mode") {
+              if (item.label === "Dark Mode") {
                 toggleTheme();
-              } else if (item.label === "Auto-save Drafts") {
-                setAutoSave(value);
               }
             }}
             trackColor={{
@@ -209,24 +158,8 @@ export default function SettingsScreen() {
               true: theme.colors.primary + "40",
             }}
             thumbColor={
-              item.label === "Push Notifications"
-                ? pushNotifications
-                  ? theme.colors.primary
-                  : theme.colors.textSecondary
-                : item.label === "Email Notifications"
-                ? emailNotifications
-                  ? theme.colors.primary
-                  : theme.colors.textSecondary
-                : item.label === "Message Notifications"
-                ? notificationsEnabled
-                  ? theme.colors.primary
-                  : theme.colors.textSecondary
-                : item.label === "Dark Mode"
+              item.label === "Dark Mode"
                 ? isDarkMode
-                  ? theme.colors.primary
-                  : theme.colors.textSecondary
-                : item.label === "Auto-save Drafts"
-                ? autoSave
                   ? theme.colors.primary
                   : theme.colors.textSecondary
                 : theme.colors.textSecondary
@@ -293,19 +226,7 @@ export default function SettingsScreen() {
             )}
           </UICard>
 
-          {/* Notifications */}
-          <UICard variant="outlined" style={styles.settingsCard}>
-            <UIText
-              size="sm"
-              color="textSecondary"
-              style={styles.sectionHeader}
-            >
-              NOTIFICATIONS
-            </UIText>
-            {notificationSettings.map((item, index) =>
-              renderSettingItem(item, index, notificationSettings)
-            )}
-          </UICard>
+          {/* Notifications removed */}
 
           {/* App Settings */}
           <UICard variant="outlined" style={styles.settingsCard}>

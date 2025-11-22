@@ -59,10 +59,7 @@ function RootLayoutNav() {
             name="sell-vehicle"
             options={{ presentation: "fullScreenModal", headerShown: false }}
           />
-          <Stack.Screen
-            name="edit-profile"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
-          />
+
           <Stack.Screen
             name="settings"
             options={{ presentation: "fullScreenModal", headerShown: false }}
