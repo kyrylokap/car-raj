@@ -24,8 +24,6 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { isDarkMode, toggleTheme } = useThemeContext();
 
-  
-
   const accountSettings: SettingItem[] = [
     {
       icon: "person-outline",
@@ -50,8 +48,6 @@ export default function SettingsScreen() {
     },
   ];
 
-  
-
   const appSettings: SettingItem[] = [
     {
       icon: "moon-outline",
@@ -68,7 +64,6 @@ export default function SettingsScreen() {
       type: "value",
       color: theme.colors.textSecondary,
     },
-    
   ];
 
   const supportSettings: SettingItem[] = [
@@ -172,6 +167,7 @@ export default function SettingsScreen() {
               {item.value}
             </UIText>
             <Ionicons
+              hitSlop={14}
               name="chevron-forward"
               size={18}
               color={theme.colors.textSecondary}
@@ -181,6 +177,7 @@ export default function SettingsScreen() {
         {item.type === "navigation" && (
           <Ionicons
             name="chevron-forward"
+            hitSlop={14}
             size={18}
             color={theme.colors.textSecondary}
           />
@@ -195,6 +192,7 @@ export default function SettingsScreen() {
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
+          hitSlop={14}
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>

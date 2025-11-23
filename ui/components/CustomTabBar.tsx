@@ -23,11 +23,11 @@ const tabs: TabItem[] = [
     label: "Search",
   },
   {
-    name: "two",
+    name: "chats",
     route: "/(tabs)/chats",
     icon: "chatbubbles-outline",
     activeIcon: "chatbubbles",
-    label: "Messages",
+    label: "Chats",
   },
   {
     name: "profile",
@@ -44,21 +44,15 @@ export const CustomTabBar: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isActive = (route: string) => {
-    if (route === "/(tabs)/") {
-      return (
-        pathname === "/" || pathname === "/(tabs)" || pathname === "/(tabs)/"
-      );
-    }
-    return pathname === route || pathname.startsWith(route);
+    return route.endsWith(pathname);
   };
 
   const handlePress = (route: string) => {
     router.push(route as any);
   };
 
-  // Mock badge count for messages tab
   const getBadgeCount = (tabName: string) => {
-    if (tabName === "two") return 3;
+    if (tabName === "chats") return 3;
     return null;
   };
 
@@ -86,11 +80,7 @@ export const CustomTabBar: React.FC = () => {
                     name={active ? tab.activeIcon : tab.icon}
                     size={26}
                     color={
-                      active && tab.name === "index"
-                        ? theme.colors.primary
-                        : active
-                        ? theme.colors.text
-                        : theme.colors.textSecondary
+                      active ? theme.colors.primary : theme.colors.textSecondary
                     }
                     style={styles.icon}
                   />
@@ -104,13 +94,7 @@ export const CustomTabBar: React.FC = () => {
                 </View>
                 <UIText
                   size="xxs"
-                  color={
-                    active && tab.name === "index"
-                      ? "primary"
-                      : active
-                      ? "text"
-                      : "textSecondary"
-                  }
+                  color={active ? "primary" : "textSecondary"}
                   weight={active ? "semibold" : "normal"}
                   style={styles.label}
                 >

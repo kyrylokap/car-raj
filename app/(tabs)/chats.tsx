@@ -1,112 +1,32 @@
+import { useUser } from "@/api/auth";
+import { ChatWithDetails, useCarTitle, useUserChats } from "@/api/chat";
 import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import React, { useCallback } from "react";
+import { FlatList, Pressable, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-type Chat = {
-  id: string;
-  userName: string;
-  lastMessage: string;
-  timestamp: string;
-  unreadCount: number;
-  avatar: string;
-  carTitle: string;
-};
-
-const mockChats: Chat[] = [
-  {
-    id: "1",
-    userName: "John Smith",
-    lastMessage: "Is the car still available?",
-    timestamp: "2 min ago",
-    unreadCount: 2,
-    avatar: "https://via.placeholder.com/50",
-    carTitle: "BMW 320d 2020",
-  },
-  {
-    id: "2",
-    userName: "Anna Kowalska",
-    lastMessage: "Can we schedule a viewing?",
-    timestamp: "1 hour ago",
-    unreadCount: 0,
-    avatar: "https://via.placeholder.com/50",
-    carTitle: "Mercedes C-Class 2021",
-  },
-  {
-    id: "3",
-    userName: "Michael Brown",
-    lastMessage: "Thanks for the quick response!",
-    timestamp: "3 hours ago",
-    unreadCount: 1,
-    avatar: "https://via.placeholder.com/50",
-    carTitle: "Audi A4 2019",
-  },
-];
-
 export default function MessengerScreen() {
   const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
-  const router = useRouter();
+  const user = useUser();
+  const userId = user?.id;
 
-  const renderChatItem = ({ item }: { item: Chat }) => (
-    <TouchableOpacity
-      onPress={() => router.push(`/chat/${item.id}`)}
-      activeOpacity={0.7}
-    >
-      <UICard variant="outlined" style={styles.chatCard}>
-        <View style={styles.chatAvatar}>
-          <View style={styles.avatarPlaceholder}>
-            <UIText size="lg" color="textSecondary">
-              {item.userName.charAt(0)}
-            </UIText>
-          </View>
-          {item.unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <UIText size="xs" color="white" style={styles.unreadText}>
-                {item.unreadCount}
-              </UIText>
-            </View>
-          )}
-        </View>
-        <View style={styles.chatContent}>
-          <View style={styles.chatHeader}>
-            <UIText size="lg" style={styles.chatUserName}>
-              {item.userName}
-            </UIText>
-            <UIText size="xs" color="textSecondary">
-              {item.timestamp}
-            </UIText>
-          </View>
-          <UIText size="sm" color="textSecondary" numberOfLines={1}>
-            {item.lastMessage}
-          </UIText>
-          <UIText size="xs" color="primary" style={styles.carTitle}>
-            {item.carTitle}
-          </UIText>
-        </View>
-        <Ionicons
-          name="chevron-forward"
-          size={20}
-          color={theme.colors.textSecondary}
-        />
-      </UICard>
-    </TouchableOpacity>
-  );
+  const { data: chats } = useUserChats(userId);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <UIContainer>
         <View style={styles.header}>
           <UIText size="xxl" style={styles.headerTitle}>
-            Messages
+            Chats
           </UIText>
         </View>
         <FlatList
-          data={mockChats}
-          renderItem={renderChatItem}
+          data={chats}
+          renderItem={({ item }) => <ChatListItem item={item} />}
           keyExtractor={(item) => item.id}
           contentContainerStyle={[
             styles.listContent,
@@ -131,7 +51,61 @@ export default function MessengerScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const ChatListItem = ({ item: chat }: { item: ChatWithDetails }) => {
+  const { data: carTitle } = useCarTitle(chat.car_id);
+  const router = useRouter();
+  const { theme } = useUnistyles();
+  const handleNaviateToCar = useCallback(() => {
+    router.push(`/car/${chat.car_id}`);
+  }, [chat]);
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        router.push(`/chat/${chat.id}`);
+      }}
+      activeOpacity={0.7}
+    >
+      <UICard variant="outlined" style={styles.chatCard}>
+        <Image
+          style={styles.avatarPlaceholder}
+          source={{ uri: chat.other_details?.image_url! }}
+        />
+
+        <View style={styles.chatContent}>
+          <UIText size="sm" color="primary" style={styles.carTitle}>
+            {carTitle}
+          </UIText>
+          <UIText size="lg" style={styles.chatUserName}>
+            {chat.other_details?.fullname}
+          </UIText>
+        </View>
+        <View style={styles.buttonsContainer}>
+          <Pressable hitSlop={14} onPress={handleNaviateToCar}>
+            <Ionicons
+              name="car-outline"
+              size={24}
+              color={theme.colors.primary}
+            />
+          </Pressable>
+          <Pressable hitSlop={14}>
+            <Ionicons
+              name="chevron-forward"
+              size={24}
+              color={theme.colors.textSecondary}
+            />
+          </Pressable>
+        </View>
+      </UICard>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create((theme) => ({
+  buttonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 24,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -147,11 +121,11 @@ const stylesheet = StyleSheet.create((theme) => ({
   },
   listContent: {
     padding: theme.spacing.md,
+    gap: theme.spacing.md,
   },
   chatCard: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: theme.spacing.md,
     padding: theme.spacing.md,
     gap: theme.spacing.md,
   },

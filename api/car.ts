@@ -1,5 +1,10 @@
 import { Database } from "@/src/lib/database.types";
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system/legacy";
 
@@ -7,89 +12,82 @@ import mime from "mime";
 import { useUser } from "./auth";
 import { supabase } from "./supabase";
 
-export type Car = {
-  brand: string;
-  color?: string | null;
-  created_at?: string;
-  description?: string | null;
-  fuel?: Database["public"]["Enums"]["car_fuel_type"] | null;
-  id?: string;
-  location?: string | null;
-  mileage?: number | null;
-  model: string;
-  price?: number | null;
-  status?: Database["public"]["Enums"]["car_status"] | null;
-  transmission?: Database["public"]["Enums"]["car_transmission"] | null;
-  vin?: string | null;
-  year?: number | null;
-  user_id?: string;
-};
-
+export type Car = Partial<Database["public"]["Tables"]["car"]["Row"]>;
 
 export type Filter = {
-  brand: string ;
+  brand: string;
   model: string;
   minPrice: string;
   maxPrice: string;
   minYear: string;
   maxYear: string;
-  fuelType: Database["public"]["Enums"]["car_fuel_type"] | '';
+  fuelType: Database["public"]["Enums"]["car_fuel_type"] | "";
   location: string;
   minMileage: string;
   maxMileage: string;
-  transmission: Database["public"]["Enums"]["car_transmission"] | '';
-  sortBy: 'price_asc' | 'price_desc' | 'newest' | 'oldest' | '';
+  transmission: Database["public"]["Enums"]["car_transmission"] | "";
+  sortBy: "price_asc" | "price_desc" | "newest" | "oldest" | "";
 };
 
 export function useSearchCarWithFilters(filters?: Filter) {
   return useQuery({
     queryKey: ["searchCars", filters],
     queryFn: async () => {
-      if(!filters) {
+      if (!filters) {
         const { data, error } = await supabase.from("car").select("*");
         if (error) throw error;
         return data;
       }
-      const { brand, model, minPrice, maxPrice, minYear, maxYear, fuelType,location, transmission } = filters;
+      const {
+        brand,
+        model,
+        minPrice,
+        maxPrice,
+        minYear,
+        maxYear,
+        fuelType,
+        location,
+        transmission,
+      } = filters;
       let query = supabase.from("car").select("*");
 
-      if (brand !== '') {
+      if (brand !== "") {
         query = query.ilike("brand", `%${brand}%`);
       }
-      if (model!== '') {
+      if (model !== "") {
         query = query.ilike("model", `%${model}%`);
       }
-      if (minPrice !== '') {
+      if (minPrice !== "") {
         query = query.gte("price", Number.parseInt(minPrice, 10));
       }
-      if (maxPrice !== '') {
+      if (maxPrice !== "") {
         query = query.lte("price", Number.parseInt(maxPrice, 10));
       }
-      if (minYear !== '') {
+      if (minYear !== "") {
         query = query.gte("year", Number.parseInt(minYear, 10));
       }
-      if (maxYear !=='') {
+      if (maxYear !== "") {
         query = query.lte("year", Number.parseInt(maxYear, 10));
       }
-      if (fuelType !== '') {
+      if (fuelType !== "") {
         query = query.eq("fuel", fuelType);
       }
 
-      if (location !== '') {
+      if (location !== "") {
         query = query.ilike("location", `%${location}%`);
       }
-      if (transmission !== '') {
-        query = query.eq('transmission', transmission);
+      if (transmission !== "") {
+        query = query.eq("transmission", transmission);
       }
 
-      if (filters.sortBy === 'price_asc') {
-        query = query.order('price', { ascending: true });
-      } else if (filters.sortBy === 'price_desc') {
-        query = query.order('price', { ascending: false });
-      }else if (filters.sortBy === 'newest') {
-        query = query.order('created_at', { ascending: false });
-      } else if (filters.sortBy === 'oldest') {
-        query = query.order('created_at', { ascending: true });
+      if (filters.sortBy === "price_asc") {
+        query = query.order("price", { ascending: true });
+      } else if (filters.sortBy === "price_desc") {
+        query = query.order("price", { ascending: false });
+      } else if (filters.sortBy === "newest") {
+        query = query.order("created_at", { ascending: false });
+      } else if (filters.sortBy === "oldest") {
+        query = query.order("created_at", { ascending: true });
       }
 
       const { data, error } = await query;
@@ -101,24 +99,41 @@ export function useSearchCarWithFilters(filters?: Filter) {
 }
 
 export async function fetchCarsPage(filters?: Filter, limit = 5, offset = 0) {
-  const { brand, model, minPrice, maxPrice, minYear, maxYear, fuelType, location, transmission, sortBy } = (filters || {}) as Filter;
+  const {
+    brand,
+    model,
+    minPrice,
+    maxPrice,
+    minYear,
+    maxYear,
+    fuelType,
+    location,
+    transmission,
+    sortBy,
+  } = (filters || {}) as Filter;
 
   let query = supabase.from("car").select("*");
 
   if (filters) {
-    if (brand !== '') query = query.ilike("brand", `%${brand}%`);
-    if (model !== '') query = query.ilike("model", `%${model}%`);
-    if (minPrice !== '') query = query.gte("price", Number.parseInt(minPrice, 10));
-    if (maxPrice !== '') query = query.lte("price", Number.parseInt(maxPrice, 10));
-    if (minYear !== '') query = query.gte("year", Number.parseInt(minYear, 10));
-    if (maxYear !== '') query = query.lte("year", Number.parseInt(maxYear, 10));
-    if (fuelType !== '') query = query.eq("fuel", fuelType);
-    if (location !== '') query = query.ilike("location", `%${location}%`);
-    if (transmission !== '') query = query.eq('transmission', transmission);
-    if (sortBy === 'price_asc') query = query.order('price', { ascending: true });
-    else if (sortBy === 'price_desc') query = query.order('price', { ascending: false });
-    else if (sortBy === 'newest') query = query.order('created_at', { ascending: false });
-    else if (sortBy === 'oldest') query = query.order('created_at', { ascending: true });
+    if (brand !== "") query = query.ilike("brand", `%${brand}%`);
+    if (model !== "") query = query.ilike("model", `%${model}%`);
+    if (minPrice !== "")
+      query = query.gte("price", Number.parseInt(minPrice, 10));
+    if (maxPrice !== "")
+      query = query.lte("price", Number.parseInt(maxPrice, 10));
+    if (minYear !== "") query = query.gte("year", Number.parseInt(minYear, 10));
+    if (maxYear !== "") query = query.lte("year", Number.parseInt(maxYear, 10));
+    if (fuelType !== "") query = query.eq("fuel", fuelType);
+    if (location !== "") query = query.ilike("location", `%${location}%`);
+    if (transmission !== "") query = query.eq("transmission", transmission);
+    if (sortBy === "price_asc")
+      query = query.order("price", { ascending: true });
+    else if (sortBy === "price_desc")
+      query = query.order("price", { ascending: false });
+    else if (sortBy === "newest")
+      query = query.order("created_at", { ascending: false });
+    else if (sortBy === "oldest")
+      query = query.order("created_at", { ascending: true });
   }
 
   query = query.range(offset, offset + limit - 1);
@@ -255,7 +270,7 @@ async function insertCar(car: Car, userId: string) {
 
   const { data, error } = await supabase
     .from("car")
-    .insert(carWithUserId)
+    .insert(carWithUserId as Database["public"]["Tables"]["car"]["Insert"])
     .select();
 
   if (error) throw error;

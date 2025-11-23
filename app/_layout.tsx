@@ -48,7 +48,7 @@ function RootLayoutNav() {
             options={{ presentation: "fullScreenModal", headerShown: false }}
           />
           <Stack.Screen
-            name="user/[userId]/cars"
+            name="user/[userId]/user-cars"
             options={{ presentation: "fullScreenModal", headerShown: false }}
           />
           <Stack.Screen

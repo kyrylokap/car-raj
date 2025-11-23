@@ -1,4 +1,6 @@
+import { useUser } from "@/api/auth";
 import { useCarById, useCarImages } from "@/api/car";
+import { getOrCreateChatForCar } from "@/api/chat";
 import { useChangeFavorite, useIsCarFavorite } from "@/api/favorites";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
 import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
@@ -24,6 +26,8 @@ export default function CarDetailsScreen() {
 
   const [isCarFavorite, setIsCarFavorite] = useState<boolean>(isFavorite!);
   const { data: car, isLoading } = useCarById(carId);
+  const user = useUser();
+  const currentUserId = user?.id;
   const {
     data: carImages,
     isLoading: imagesIsLoading,
@@ -42,8 +46,14 @@ export default function CarDetailsScreen() {
             <TouchableOpacity
               onPress={() => router.back()}
               style={styles.backButton}
+              hitSlop={14}
             >
-              <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+              <Ionicons
+                name="arrow-back"
+                hitSlop={14}
+                size={24}
+                color={theme.colors.text}
+              />
             </TouchableOpacity>
           </View>
           <View style={styles.emptyState}>
@@ -94,11 +104,17 @@ export default function CarDetailsScreen() {
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
+          hitSlop={14}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          <Ionicons
+            name="arrow-back"
+            hitSlop={14}
+            size={24}
+            color={theme.colors.text}
+          />
         </TouchableOpacity>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity style={styles.headerButton} hitSlop={14}>
             <Ionicons
               name="share-outline"
               size={24}
@@ -108,6 +124,7 @@ export default function CarDetailsScreen() {
           <TouchableOpacity
             style={styles.headerButton}
             onPress={onPressFavorite}
+            hitSlop={14}
           >
             <Ionicons
               name={isCarFavorite ? "heart" : "heart-outline"}
@@ -191,8 +208,20 @@ export default function CarDetailsScreen() {
             <UIButton
               variant="outline"
               style={styles.contactButton}
-              onPress={() => {
-                router.push(`/chat/${carId}`);
+              onPress={async () => {
+                if (currentUserId === car?.user_id) {
+                  return;
+                }
+                try {
+                  const chat = await getOrCreateChatForCar(
+                    carId,
+                    car!.user_id,
+                    currentUserId!
+                  );
+                  router.push(`/chat/${chat.id}`);
+                } catch (err) {
+                  console.error("Failed to open chat", err);
+                }
               }}
             >
               <Ionicons
@@ -256,7 +285,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   headerActions: {
     flexDirection: "row",
-    gap: theme.spacing.sm,
+    gap: theme.spacing.xl,
   },
   headerButton: {
     padding: theme.spacing.xs,

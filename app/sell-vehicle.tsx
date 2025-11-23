@@ -151,6 +151,7 @@ export default function CreateListingScreen() {
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
+          hitSlop={14}
         >
           <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
         </TouchableOpacity>
@@ -221,25 +222,25 @@ export default function CreateListingScreen() {
               onChangeText={(text) => handleInputChange("color", text)}
             />
             <View style={styles.row}>
-            <UIPicker 
-              label="Fuel Type"
-              values={fuelTypes}
-              pick={(value) => {
-                handleInputChange("fuel", value);
-              }}
-              currentPickerValue={formData.fuel}
-            />
+              <UIPicker
+                label="Fuel Type"
+                values={fuelTypes}
+                pick={(value) => {
+                  handleInputChange("fuel", value);
+                }}
+                currentPickerValue={formData.fuel}
+              />
 
-            <UIPicker
-              label="Transmission"
-              values={transmissions}
-              pick={(value) => {
-                handleInputChange("transmission", value);
-              }}
-              currentPickerValue={formData.transmission}
-            />
+              <UIPicker
+                label="Transmission"
+                values={transmissions}
+                pick={(value) => {
+                  handleInputChange("transmission", value);
+                }}
+                currentPickerValue={formData.transmission}
+              />
             </View>
-            
+
             <UIInput
               label="VIN"
               placeholder="Vehicle Identification Number"

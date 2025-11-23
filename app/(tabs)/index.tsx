@@ -4,20 +4,26 @@ import { CarItem } from "@/ui/components/CarItem";
 import { UIPicker } from "@/ui/UIPicker";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 const sortingTypes = [
-  {id:'price_asc',label: 'From lowest price'}, 
-  {id: 'price_desc',label: 'From highest price'}, 
-  {id: 'oldest', label: 'Oldest first'}, 
-  {id: 'newest',label: 'Newest first' }
+  { id: "price_asc", label: "From lowest price" },
+  { id: "price_desc", label: "From highest price" },
+  { id: "oldest", label: "Oldest first" },
+  { id: "newest", label: "Newest first" },
 ];
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
-
 
 export default function SearchScreen() {
   const { theme, rt } = useUnistyles();
@@ -35,17 +41,20 @@ export default function SearchScreen() {
     minMileage: "",
     maxMileage: "",
     transmission: "",
-    sortBy: ""
+    sortBy: "",
   };
 
   const [draftFilters, setDraftFilters] = useState<Filter>(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState<Filter | undefined>(
-    undefined,
+    undefined
   );
 
   useEffect(() => {
     if (draftFilters.sortBy !== (appliedFilters?.sortBy ?? "")) {
-      setAppliedFilters((prev) => ({ ...(prev || defaultFilters), sortBy: draftFilters.sortBy }));
+      setAppliedFilters((prev) => ({
+        ...(prev || defaultFilters),
+        sortBy: draftFilters.sortBy,
+      }));
     }
   }, [draftFilters.sortBy]);
 
@@ -57,7 +66,6 @@ export default function SearchScreen() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteSearchCars(appliedFilters, 5);
-
   const cars = infiniteData?.pages.flat() ?? [];
   const nandleChangeFilters = () => {
     setAppliedFilters(draftFilters);
@@ -69,7 +77,9 @@ export default function SearchScreen() {
       <UIContainer>
         <View style={styles.header}>
           {(() => {
-            const currentSortLabel = sortingTypes.find((s) => s.id === draftFilters.sortBy)?.label || "Sort by";
+            const currentSortLabel =
+              sortingTypes.find((s) => s.id === draftFilters.sortBy)?.label ||
+              "Sort by";
             return (
               <UIPicker
                 style={styles.sortPicker}
@@ -79,7 +89,10 @@ export default function SearchScreen() {
                 currentPickerValue={currentSortLabel}
                 pick={(label) => {
                   const found = sortingTypes.find((s) => s.label === label);
-                  setDraftFilters({ ...draftFilters, sortBy: found ? (found.id as Filter["sortBy"]) : "" });
+                  setDraftFilters({
+                    ...draftFilters,
+                    sortBy: found ? (found.id as Filter["sortBy"]) : "",
+                  });
                 }}
               />
             );
@@ -100,146 +113,168 @@ export default function SearchScreen() {
         </View>
 
         {showFilters && (
-          <Modal style={{flex: 1}} transparent={true} animationType="slide" visible={showFilters}>
+          <Modal
+            style={{ flex: 1 }}
+            transparent={true}
+            animationType="slide"
+            visible={showFilters}
+          >
             <SafeAreaView style={styles.modalOverlay}>
               <View style={styles.modalContainer}>
                 <View style={styles.modalHeader}>
                   <UIText size="lg" style={styles.filtersTitle}>
                     Filters
                   </UIText>
-                  <TouchableOpacity onPress={() => setShowFilters(false)} style={styles.modalClose}>
-                    <Ionicons name="close" size={22} color={theme.colors.text} />
+                  <TouchableOpacity
+                    onPress={() => setShowFilters(false)}
+                    style={styles.modalClose}
+                    hitSlop={14}
+                  >
+                    <Ionicons
+                      name="close"
+                      size={22}
+                      color={theme.colors.text}
+                    />
                   </TouchableOpacity>
                 </View>
                 <ScrollView contentContainerStyle={styles.modalContent}>
                   <UICard variant="elevated" style={styles.filtersCard}>
-            <UIInput
-              label="Brand"
-              placeholder="e.g., BMW, Mercedes"
-              value={draftFilters.brand}
-              onChangeText={(text) => setDraftFilters({ ...draftFilters, brand: text })}
-            />
-            <UIInput
-              label="Model"
-              placeholder="e.g., 320d, C-Class"
-              value={draftFilters.model}
-              onChangeText={(text) => setDraftFilters({ ...draftFilters, model: text })}
-            />
-            <View style={styles.row}>
-              <UIInput
-                label="Min Price"
-                placeholder="eg. 0"
-                value={draftFilters.minPrice}
-                onChangeText={(text) =>
-                  setDraftFilters({ ...draftFilters, minPrice: text })
-                }
-                containerStyle={styles.halfInput}
-                keyboardType="numeric"
-              />
-              <UIInput
-                label="Max Price"
-                placeholder="eg. 500000"
-                value={draftFilters.maxPrice}
-                onChangeText={(text) =>
-                  setDraftFilters({ ...draftFilters, maxPrice: text })
-                }
-                containerStyle={styles.halfInput}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.row}>
-              <UIInput
-                label="Min Year"
-                placeholder="eg. 1990"
-                value={draftFilters.minYear}
-                onChangeText={(text) =>
-                  setDraftFilters({ ...draftFilters, minYear: text })
-                }
-                containerStyle={styles.halfInput}
-                keyboardType="numeric"
-              />
-              <UIInput
-                label="Max Year"
-                placeholder={`eg. ${new Date().getFullYear()}`}
-                value={draftFilters.maxYear}
-                onChangeText={(text) =>
-                  setDraftFilters({ ...draftFilters, maxYear: text })
-                }
-                containerStyle={styles.halfInput}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.row}>
-              <UIInput
-                label="Min Mileage"
-                placeholder="eg. 0"
-                value={draftFilters.minMileage}
-                onChangeText={(text) =>
-                  setDraftFilters({ ...draftFilters, minMileage: text })
-                }
-                containerStyle={styles.halfInput}
-                keyboardType="numeric"
-              />
-              <UIInput
-                label="Max mileage"
-                placeholder="eg. 340000"
-                value={draftFilters.maxMileage}
-                onChangeText={(text) =>
-                  setDraftFilters({ ...draftFilters, maxMileage: text })
-                }
-                containerStyle={styles.halfInput}
-                keyboardType="numeric"
-              />
-            </View>
-            
-            <View style={styles.row}>
+                    <UIInput
+                      label="Brand"
+                      placeholder="e.g., BMW, Mercedes"
+                      value={draftFilters.brand}
+                      onChangeText={(text) =>
+                        setDraftFilters({ ...draftFilters, brand: text })
+                      }
+                    />
+                    <UIInput
+                      label="Model"
+                      placeholder="e.g., 320d, C-Class"
+                      value={draftFilters.model}
+                      onChangeText={(text) =>
+                        setDraftFilters({ ...draftFilters, model: text })
+                      }
+                    />
+                    <View style={styles.row}>
+                      <UIInput
+                        label="Min Price"
+                        placeholder="eg. 0"
+                        value={draftFilters.minPrice}
+                        onChangeText={(text) =>
+                          setDraftFilters({ ...draftFilters, minPrice: text })
+                        }
+                        containerStyle={styles.halfInput}
+                        keyboardType="numeric"
+                      />
+                      <UIInput
+                        label="Max Price"
+                        placeholder="eg. 500000"
+                        value={draftFilters.maxPrice}
+                        onChangeText={(text) =>
+                          setDraftFilters({ ...draftFilters, maxPrice: text })
+                        }
+                        containerStyle={styles.halfInput}
+                        keyboardType="numeric"
+                      />
+                    </View>
+                    <View style={styles.row}>
+                      <UIInput
+                        label="Min Year"
+                        placeholder="eg. 1990"
+                        value={draftFilters.minYear}
+                        onChangeText={(text) =>
+                          setDraftFilters({ ...draftFilters, minYear: text })
+                        }
+                        containerStyle={styles.halfInput}
+                        keyboardType="numeric"
+                      />
+                      <UIInput
+                        label="Max Year"
+                        placeholder={`eg. ${new Date().getFullYear()}`}
+                        value={draftFilters.maxYear}
+                        onChangeText={(text) =>
+                          setDraftFilters({ ...draftFilters, maxYear: text })
+                        }
+                        containerStyle={styles.halfInput}
+                        keyboardType="numeric"
+                      />
+                    </View>
+                    <View style={styles.row}>
+                      <UIInput
+                        label="Min Mileage"
+                        placeholder="eg. 0"
+                        value={draftFilters.minMileage}
+                        onChangeText={(text) =>
+                          setDraftFilters({ ...draftFilters, minMileage: text })
+                        }
+                        containerStyle={styles.halfInput}
+                        keyboardType="numeric"
+                      />
+                      <UIInput
+                        label="Max mileage"
+                        placeholder="eg. 340000"
+                        value={draftFilters.maxMileage}
+                        onChangeText={(text) =>
+                          setDraftFilters({ ...draftFilters, maxMileage: text })
+                        }
+                        containerStyle={styles.halfInput}
+                        keyboardType="numeric"
+                      />
+                    </View>
 
-            <UIPicker
-              label="Fuel Type"
-              values={fuelTypes}
-              currentPickerValue={draftFilters.fuelType}
-              pick={(value) => {
-                setDraftFilters({ ...draftFilters, fuelType: value as Filter["fuelType"] })
-              }}
-            />
-            <UIPicker
-              label="Transmission"
-              values={transmissions}
-              currentPickerValue={draftFilters.transmission}
-              pick={(value) => {
-                setDraftFilters({ ...draftFilters, transmission: value as Filter["transmission"] })
-              }}
-            />
-            </View>
-            <UIInput
-              label="Location"
-              placeholder="City"
-              value={draftFilters.location}
-              onChangeText={(text) =>
-                setDraftFilters({ ...draftFilters, location: text })
-              }
-            />
-            <View style={styles.filterActions}>
-              <UIButton
-                variant="outline"
-                onPress={() => {
-                  setDraftFilters(defaultFilters);
-                  setAppliedFilters(undefined);
-                }}
-                style={styles.resetButton}
-              >
-                <UIText weight="semibold">Reset</UIText>
-              </UIButton>
-              <UIButton
-                variant="primary"
-                onPress={nandleChangeFilters}
-                style={styles.applyButton}
-              >
-                <UIText color="white" weight="semibold">
-                  Apply Filters
-                </UIText>
-              </UIButton>
-            </View>
+                    <View style={styles.row}>
+                      <UIPicker
+                        label="Fuel Type"
+                        values={fuelTypes}
+                        currentPickerValue={draftFilters.fuelType}
+                        pick={(value) => {
+                          setDraftFilters({
+                            ...draftFilters,
+                            fuelType: value as Filter["fuelType"],
+                          });
+                        }}
+                      />
+                      <UIPicker
+                        label="Transmission"
+                        values={transmissions}
+                        currentPickerValue={draftFilters.transmission}
+                        pick={(value) => {
+                          setDraftFilters({
+                            ...draftFilters,
+                            transmission: value as Filter["transmission"],
+                          });
+                        }}
+                      />
+                    </View>
+                    <UIInput
+                      label="Location"
+                      placeholder="City"
+                      value={draftFilters.location}
+                      onChangeText={(text) =>
+                        setDraftFilters({ ...draftFilters, location: text })
+                      }
+                    />
+                    <View style={styles.filterActions}>
+                      <UIButton
+                        variant="outline"
+                        onPress={() => {
+                          setDraftFilters(defaultFilters);
+                          setAppliedFilters(undefined);
+                        }}
+                        style={styles.resetButton}
+                      >
+                        <UIText weight="semibold">Reset</UIText>
+                      </UIButton>
+                      <UIButton
+                        variant="primary"
+                        onPress={nandleChangeFilters}
+                        style={styles.applyButton}
+                      >
+                        <UIText color="white" weight="semibold">
+                          Apply Filters
+                        </UIText>
+                      </UIButton>
+                    </View>
                   </UICard>
                 </ScrollView>
               </View>
@@ -274,7 +309,13 @@ export default function SearchScreen() {
             return (
               <View style={styles.emptyListWrapper}>
                 <UIText style={styles.emptyListText}>No cars found.</UIText>
-                <UIText size="sm" style={{ marginTop: theme.spacing.xs, color: theme.colors.textSecondary }}>
+                <UIText
+                  size="sm"
+                  style={{
+                    marginTop: theme.spacing.xs,
+                    color: theme.colors.textSecondary,
+                  }}
+                >
                   Try adjusting filters or press Reset.
                 </UIText>
               </View>
@@ -286,11 +327,12 @@ export default function SearchScreen() {
           <View style={styles.loadingOverlay} pointerEvents="none">
             <View style={styles.loadingCard}>
               <ActivityIndicator size="large" color={theme.colors.primary} />
-              <UIText style={{ marginTop: theme.spacing.sm }}>Loading cars...</UIText>
+              <UIText style={{ marginTop: theme.spacing.sm }}>
+                Loading cars...
+              </UIText>
             </View>
           </View>
         )}
-        
       </UIContainer>
     </SafeAreaView>
   );
@@ -299,7 +341,7 @@ export default function SearchScreen() {
 const stylesheet = StyleSheet.create((theme) => ({
   emptyListContainer: {
     flex: 1,
-    alignSelf:'center',
+    alignSelf: "center",
     marginTop: theme.spacing.lg,
   },
   emptyListWrapper: {
@@ -433,7 +475,6 @@ const stylesheet = StyleSheet.create((theme) => ({
     paddingTop: theme.spacing.sm,
   },
   sortPicker: {
-    
     marginRight: theme.spacing.sm,
     justifyContent: "center",
   },

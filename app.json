@@ -38,7 +38,8 @@
         {
           "photosPermission": "Auto Raj need permission for photos"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

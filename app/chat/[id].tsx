@@ -1,11 +1,23 @@
+import { useUser } from "@/api/auth";
+import {
+  getChatById,
+  useCarTitle,
+  useDeleteChat,
+  useUserProfile,
+} from "@/api/chat";
+import useChatMessages, { Message } from "@/api/message";
 import { UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
+
 import {
+  ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
-  Platform,
+  Pressable,
   TextInput,
   TouchableOpacity,
   View,
@@ -13,133 +25,95 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-type Message = {
-  id: string;
-  text: string;
-  senderId: string;
-  timestamp: string;
-  isOwn: boolean;
-};
-
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    text: "Hello! Is the car still available?",
-    senderId: "other",
-    timestamp: "10:30",
-    isOwn: false,
-  },
-  {
-    id: "2",
-    text: "Yes, it is! Would you like to schedule a viewing?",
-    senderId: "me",
-    timestamp: "10:32",
-    isOwn: true,
-  },
-  {
-    id: "3",
-    text: "That would be great! When are you available?",
-    senderId: "other",
-    timestamp: "10:33",
-    isOwn: false,
-  },
-  {
-    id: "4",
-    text: "I can do tomorrow afternoon or this weekend. What works for you?",
-    senderId: "me",
-    timestamp: "10:35",
-    isOwn: true,
-  },
-];
-
 export default function ChatScreen() {
-  const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
+  const { theme } = useUnistyles();
   const router = useRouter();
   const params = useLocalSearchParams();
   const chatId = params.id as string;
-  const [messages, setMessages] = useState(mockMessages);
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef<FlatList>(null);
+  const user = useUser();
+  const userId = user?.id;
+  const { mutate: deleteChat, error: deletingError } = useDeleteChat({
+    chatId,
+  });
+  const { data: chat } = useQuery({
+    queryKey: ["chat", chatId],
+    queryFn: () => getChatById(chatId),
+    enabled: !!chatId,
+  });
 
-  const sendMessage = () => {
-    if (inputText.trim()) {
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        text: inputText,
-        senderId: "me",
-        timestamp: new Date().toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        isOwn: true,
-      };
-      setMessages([...messages, newMessage]);
+  const chattingUserId =
+    chat?.owner_id === userId ? chat?.customer_id : chat?.owner_id;
+  const { data: owner } = useUserProfile(chattingUserId!);
+  const { data: carTitle } = useCarTitle(chat?.car_id ?? null);
+  const {
+    messages,
+    sendMessage,
+    hasNextPage,
+    fetchNextPage,
+    isLoadingMessages,
+    sendTyping,
+    userTyping,
+  } = useChatMessages({ chatId });
+  const handleSendMessage = async () => {
+    if (!inputText.trim() || !userId) return;
+    try {
+      await sendMessage({ text: inputText });
       setInputText("");
       setTimeout(() => {
-        flatListRef.current?.scrollToEnd({ animated: true });
+        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
       }, 100);
+    } catch (err) {
+      console.error("Send failed", err);
     }
   };
 
-  const renderMessage = ({ item }: { item: Message }) => (
-    <View
-      style={[
-        styles.messageContainer,
-        item.isOwn ? styles.messageOwn : styles.messageOther,
-      ]}
-    >
-      <View
-        style={[
-          styles.messageBubble,
-          item.isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther,
-        ]}
-      >
-        <UIText
-          style={[styles.messageText, item.isOwn && styles.messageTextOwn]}
-        >
-          {item.text}
-        </UIText>
-        <UIText
-          size="xxs"
-          style={[
-            styles.messageTimestamp,
-            item.isOwn && styles.messageTimestampOwn,
-          ]}
-        >
-          {item.timestamp}
-        </UIText>
-      </View>
-    </View>
-  );
+  const handleChangeInput = (text: string) => {
+    setInputText(text);
+    sendTyping();
+  };
+
+  const handleLeaveChat = useCallback(() => {
+    router.back();
+    if (messages.length === 0) {
+      deleteChat();
+      return;
+    }
+  }, [chatId, messages.length, router]);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleLeaveChat}
           style={styles.backButton}
+          hitSlop={14}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          <Ionicons
+            hitSlop={14}
+            name="arrow-back"
+            size={24}
+            color={theme.colors.text}
+          />
         </TouchableOpacity>
-        <TouchableOpacity
+        <Pressable
           style={styles.headerInfo}
-          onPress={() => router.push(`/user/${chatId}/cars`)}
-          activeOpacity={0.7}
+          onPress={() => router.push(`/user/${chattingUserId ?? ""}/user-cars`)}
         >
-          <View style={styles.headerAvatar}>
-            <UIText size="lg" color="white">
-              J
-            </UIText>
-          </View>
+          <Image
+            style={styles.headerAvatar}
+            source={{ uri: owner?.image_url! }}
+          />
+
           <View style={styles.headerText}>
-            <UIText size="lg">John Smith</UIText>
+            <UIText size="lg">{owner?.fullname || "Owner"}</UIText>
             <UIText size="xs" color="textSecondary">
-              BMW 320d 2020
+              {carTitle ?? "—"}
             </UIText>
           </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.moreButton}>
+        </Pressable>
+        <TouchableOpacity hitSlop={14} style={styles.moreButton}>
           <Ionicons
             name="ellipsis-vertical"
             size={24}
@@ -150,59 +124,120 @@ export default function ChatScreen() {
 
       <KeyboardAvoidingView
         style={styles.content}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        // behavior={Platform.OS === "ios" ? "padding" : "height"}
+        // keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
           data={messages}
-          renderItem={renderMessage}
+          renderItem={({ item }) => (
+            <MessageItem item={item} userId={userId!} />
+          )}
+          inverted
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.messagesList}
           showsVerticalScrollIndicator={false}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({ animated: true })
-          }
+          onEndReached={() => {
+            if (hasNextPage) fetchNextPage();
+          }}
+          onEndReachedThreshold={0.8}
         />
+        <ActivityIndicator
+          animating={isLoadingMessages}
+          size={26}
+          color={theme.colors.primary}
+          style={styles.activityIndicator}
+        />
+        <View>
+          <UIText size="sm" color="primary" style={styles.typingText}>
+            {userTyping ? "Typing..." : ""}
+          </UIText>
 
-        <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.attachButton}>
-            <Ionicons name="attach" size={24} color={theme.colors.primary} />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            placeholder="Type a message..."
-            placeholderTextColor={theme.colors.textSecondary}
-            value={inputText}
-            onChangeText={setInputText}
-            multiline
-            maxLength={500}
-          />
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              inputText.trim() && styles.sendButtonActive,
-            ]}
-            onPress={sendMessage}
-            disabled={!inputText.trim()}
-          >
-            <Ionicons
-              name="send"
-              size={20}
-              color={
-                inputText.trim()
-                  ? theme.colors.white
-                  : theme.colors.textSecondary
-              }
+          <View style={styles.inputContainer}>
+            <Pressable style={styles.attachButton}>
+              <Ionicons name="attach" size={24} color={theme.colors.primary} />
+            </Pressable>
+            <TextInput
+              style={styles.input}
+              placeholder="Type a message..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={inputText}
+              onChangeText={handleChangeInput}
+              multiline
+              maxLength={500}
             />
-          </TouchableOpacity>
+            <Pressable
+              style={[
+                styles.sendButton,
+                inputText.trim() && styles.sendButtonActive,
+              ]}
+              onPress={handleSendMessage}
+              disabled={!inputText.trim()}
+            >
+              <Ionicons
+                name="send"
+                size={20}
+                color={
+                  inputText.trim()
+                    ? theme.colors.white
+                    : theme.colors.textSecondary
+                }
+              />
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const MessageItem = ({ item, userId }: { item: Message; userId: string }) => {
+  const isOwn = item.sender_id === userId;
+  const time = item.created_at
+    ? new Date(item.created_at).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
+  return (
+    <View
+      style={[
+        styles.messageContainer,
+        isOwn ? styles.messageOwn : styles.messageOther,
+      ]}
+    >
+      <View
+        style={[
+          styles.messageBubble,
+          isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther,
+        ]}
+      >
+        <UIText style={[styles.messageText, isOwn && styles.messageTextOwn]}>
+          {item.text}
+        </UIText>
+        <UIText
+          size="xxs"
+          style={[styles.messageTimestamp, isOwn && styles.messageTimestampOwn]}
+        >
+          {time}
+        </UIText>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create((theme) => ({
+  activityIndicator: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    right: 10,
+  },
+  typingText: {
+    marginLeft: 16,
+    height: 20,
+    marginBottom: 2,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -288,7 +323,7 @@ const stylesheet = StyleSheet.create((theme) => ({
   },
   inputContainer: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    alignItems: "center",
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
     borderTopWidth: 1,
@@ -306,7 +341,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
-    maxHeight: 100,
+    maxHeight: 70,
     color: theme.colors.text,
   },
   sendButton: {

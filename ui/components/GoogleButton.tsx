@@ -21,11 +21,29 @@ export const GoogleButton = () => {
       if (!userInfo?.idToken) throw new Error("No ID token");
       console.log(userInfo);
 
-      const signInResponse = await supabase.auth.signInWithIdToken({
+      const { data: signInResponse } = await supabase.auth.signInWithIdToken({
         provider: "google",
         token: userInfo.idToken,
       });
-      console.log(signInResponse);
+      console.log(signInResponse.user);
+
+      try {
+        const { data: userData, error: userErr } =
+          await supabase.auth.getUser();
+        if (userErr) console.log(userErr);
+        const supaUser = userData?.user;
+        if (supaUser) {
+          const fullname =
+            userInfo?.user?.name ?? supaUser.user_metadata?.full_name ?? null;
+          const image_url =
+            userInfo?.user?.photo ?? supaUser.user_metadata?.avatar_url ?? null;
+          await supabase
+            .from("user_details")
+            .upsert({ id: supaUser.id, fullname, image_url });
+        }
+      } catch (err) {
+        console.log("Failed to upsert user_details:", err);
+      }
 
       router.replace("/");
     } catch (err) {

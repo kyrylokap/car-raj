@@ -36,8 +36,6 @@ export default function ProfileScreen() {
     },
   ];
 
- 
-
   const menuItems = [
     {
       icon: "car-outline",
@@ -57,7 +55,6 @@ export default function ProfileScreen() {
       subtitle: "Preferences & privacy",
       color: theme.colors.textSecondary,
     },
-   
   ];
 
   return (
@@ -77,7 +74,6 @@ export default function ProfileScreen() {
                   style={styles.avatar}
                   source={{ uri: user?.user_metadata?.avatar_url }}
                 />
-                
               </View>
 
               <View style={styles.profileInfo}>
@@ -158,35 +154,25 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-         
           <View style={styles.quickActionsSection}>
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={[
-                    styles.quickActionButton,
-                     styles.quickActionPrimary,
-                  ]}
-                  onPress={() => {
-                      router.push("/sell-vehicle");
-                    
-                  }}
-                >
-                  <Ionicons
-                    name="add-circle"
-                    size={22}
-                    color={theme.colors.text}
-                  />
-                  <UIText
-                    size="sm"
-                    color={ "white"}
-                    weight="semibold"
-                    style={styles.quickActionLabel}
-                  >
-                    Sell vehicle
-                  </UIText>
-                </TouchableOpacity>
-            
-            </View>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={[styles.quickActionButton, styles.quickActionPrimary]}
+              onPress={() => {
+                router.push("/sell-vehicle");
+              }}
+            >
+              <Ionicons name="add-circle" size={22} color={theme.colors.text} />
+              <UIText
+                size="sm"
+                color={"white"}
+                weight="semibold"
+                style={styles.quickActionLabel}
+              >
+                Sell vehicle
+              </UIText>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.menuSection}>
             <UICard variant="outlined" style={styles.menuCard}>
@@ -234,6 +220,7 @@ export default function ProfileScreen() {
                   </View>
                   <Ionicons
                     name="chevron-forward"
+                    hitSlop={14}
                     size={18}
                     color={theme.colors.textSecondary}
                     style={styles.menuChevron}

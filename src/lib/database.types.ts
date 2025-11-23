@@ -68,6 +68,35 @@ export type Database = {
         }
         Relationships: []
       }
+      chat: {
+        Row: {
+          car_id: string | null
+          customer_id: string | null
+          id: string
+          owner_id: string | null
+        }
+        Insert: {
+          car_id?: string | null
+          customer_id?: string | null
+          id?: string
+          owner_id?: string | null
+        }
+        Update: {
+          car_id?: string | null
+          customer_id?: string | null
+          id?: string
+          owner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "car"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           car_id: string
@@ -96,6 +125,62 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      message: {
+        Row: {
+          chat_id: string | null
+          created_at: string
+          id: string
+          sender_id: string | null
+          text: string
+        }
+        Insert: {
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          text: string
+        }
+        Update: {
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          sender_id?: string | null
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chat"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_details: {
+        Row: {
+          created_at: string
+          fullname: string | null
+          id: string
+          image_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          fullname?: string | null
+          id: string
+          image_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          fullname?: string | null
+          id?: string
+          image_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
