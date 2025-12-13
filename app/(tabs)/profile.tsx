@@ -23,12 +23,6 @@ export default function ProfileScreen() {
       color: theme.colors.primary,
     },
     {
-      label: "Messages",
-      value: "34",
-      icon: "chatbubbles-outline",
-      color: theme.colors.primary,
-    },
-    {
       label: "Sold",
       value: "8",
       icon: "checkmark-circle-outline",
@@ -316,7 +310,7 @@ const stylesheet = StyleSheet.create((theme) => ({
   statsContainer: {
     flexDirection: "row",
     paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.sm,
+    gap: theme.spacing.lg,
   },
   statCardWrapper: {
     flex: 1,

@@ -2,6 +2,7 @@ import { useUser } from "@/api/auth";
 import { useCarById, useCarImages } from "@/api/car";
 import { getOrCreateChatForCar } from "@/api/chat";
 import { useChangeFavorite, useIsCarFavorite } from "@/api/favorites";
+import { useUserPhoneNumber } from "@/api/userProfile";
 import { UIButton, UICard, UIContainer, UIText } from "@/ui";
 import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,6 +10,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
   ScrollView,
   TouchableOpacity,
   View,
@@ -26,6 +28,8 @@ export default function CarDetailsScreen() {
 
   const [isCarFavorite, setIsCarFavorite] = useState<boolean>(isFavorite!);
   const { data: car, isLoading } = useCarById(carId);
+  const { data } = useUserPhoneNumber(car?.user_id);
+
   const user = useUser();
   const currentUserId = user?.id;
   const {
@@ -235,7 +239,12 @@ export default function CarDetailsScreen() {
             <UIButton
               variant="primary"
               style={styles.callButton}
-              onPress={() => {}}
+              onPress={() => {
+                const phoneNumber = `tel:${data}`;
+                Linking.openURL(phoneNumber).catch((err) =>
+                  console.error("Error:", err)
+                );
+              }}
             >
               <Ionicons
                 name="call-outline"

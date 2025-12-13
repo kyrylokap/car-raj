@@ -1,9 +1,10 @@
 import { handleSignOut } from "@/api/auth";
 import { useThemeContext } from "@/contexts/ThemeContext";
 import { UICard, UIContainer, UIText } from "@/ui";
+import { PhoneNumberModal } from "@/ui/components/PhoneNumberModal";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -23,14 +24,15 @@ export default function SettingsScreen() {
   const styles = stylesheet;
   const router = useRouter();
   const { isDarkMode, toggleTheme } = useThemeContext();
-
+  const [phoneModalVisible, setPhoneModalVisible] = useState<boolean>(false);
   const accountSettings: SettingItem[] = [
     {
-      icon: "person-outline",
-      label: "Account",
-      subtitle: "Manage your account",
+      icon: "phone-portrait",
+      label: "Phone number",
+      subtitle: "Allow customers call you",
       type: "navigation",
       color: theme.colors.primary,
+      onPress: () => setPhoneModalVisible(true),
     },
     {
       icon: "lock-closed-outline",
@@ -188,6 +190,10 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <PhoneNumberModal
+        visible={phoneModalVisible}
+        close={() => setPhoneModalVisible(false)}
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}

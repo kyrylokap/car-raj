@@ -59,7 +59,7 @@ const FormData = z.object({
 
 type ListingForm = z.infer<typeof FormData>;
 
-export default function CreateListingScreen() {
+export default function SellCarScreen() {
   const { theme, rt } = useUnistyles();
   const sellCar = useAddCar();
   const styles = stylesheet;

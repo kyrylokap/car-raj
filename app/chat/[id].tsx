@@ -113,13 +113,6 @@ export default function ChatScreen() {
             </UIText>
           </View>
         </Pressable>
-        <TouchableOpacity hitSlop={14} style={styles.moreButton}>
-          <Ionicons
-            name="ellipsis-vertical"
-            size={24}
-            color={theme.colors.text}
-          />
-        </TouchableOpacity>
       </View>
 
       <KeyboardAvoidingView

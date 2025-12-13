@@ -66,7 +66,15 @@ export type Database = {
           vin?: string | null
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "car_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_details"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       chat: {
         Row: {
@@ -93,6 +101,20 @@ export type Database = {
             columns: ["car_id"]
             isOneToOne: false
             referencedRelation: "car"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_customer_id_fkey1"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "user_details"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_owner_id_fkey1"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "user_details"
             referencedColumns: ["id"]
           },
         ]
@@ -122,6 +144,13 @@ export type Database = {
             columns: ["car_id"]
             isOneToOne: false
             referencedRelation: "car"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_user_id_fkey1"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_details"
             referencedColumns: ["id"]
           },
         ]
@@ -156,6 +185,13 @@ export type Database = {
             referencedRelation: "chat"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "message_sender_id_fkey1"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "user_details"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_details: {
@@ -164,6 +200,7 @@ export type Database = {
           fullname: string | null
           id: string
           image_url: string | null
+          phone_number: string | null
           updated_at: string
         }
         Insert: {
@@ -171,6 +208,7 @@ export type Database = {
           fullname?: string | null
           id: string
           image_url?: string | null
+          phone_number?: string | null
           updated_at?: string
         }
         Update: {
@@ -178,6 +216,7 @@ export type Database = {
           fullname?: string | null
           id?: string
           image_url?: string | null
+          phone_number?: string | null
           updated_at?: string
         }
         Relationships: []
