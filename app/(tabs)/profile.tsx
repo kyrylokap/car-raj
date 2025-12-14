@@ -86,20 +86,6 @@ export default function ProfileScreen() {
                 <UIText size="sm" color="textSecondary" style={styles.email}>
                   {user?.email}
                 </UIText>
-                <View style={styles.locationRow}>
-                  <Ionicons
-                    name="location"
-                    size={14}
-                    color={theme.colors.textSecondary}
-                  />
-                  <UIText
-                    size="sm"
-                    color="textSecondary"
-                    style={styles.location}
-                  >
-                    Warsaw, Poland
-                  </UIText>
-                </View>
               </View>
             </View>
           </View>

@@ -17,6 +17,7 @@ import {
   ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
+  Platform,
   Pressable,
   TextInput,
   TouchableOpacity,
@@ -117,11 +118,12 @@ export default function ChatScreen() {
 
       <KeyboardAvoidingView
         style={styles.content}
-        // behavior={Platform.OS === "ios" ? "padding" : "height"}
-        // keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
       >
         <FlatList
           ref={flatListRef}
+          keyboardShouldPersistTaps="handled"
           data={messages}
           renderItem={({ item }) => (
             <MessageItem item={item} userId={userId!} />

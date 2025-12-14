@@ -14,7 +14,7 @@ export default function MessengerScreen() {
   const user = useUser();
   const userId = user?.id;
 
-  const { data: chats } = useUserChats(userId);
+  const { data: chats, refetch, isRefetching } = useUserChats(userId);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -26,6 +26,8 @@ export default function MessengerScreen() {
         </View>
         <FlatList
           data={chats}
+          onRefresh={() => refetch()}
+          refreshing={isRefetching}
           renderItem={({ item }) => <ChatListItem item={item} />}
           keyExtractor={(item) => item.id}
           contentContainerStyle={[

@@ -53,14 +53,19 @@ export const GoogleButton = () => {
 
   return (
     <UIButton variant="ghost" style={styles.button} onPress={handleGoogleLogin}>
-      <Ionicons name="logo-google" color="white" size={24} />
+      <Ionicons name="logo-google" color={styles.icon.color} size={24} />
       <UIText size="lg">Continue with Google</UIText>
     </UIButton>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   button: {
     gap: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.text,
   },
-});
+  icon: {
+    color: theme.colors.text,
+  },
+}));

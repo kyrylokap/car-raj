@@ -1,6 +1,5 @@
-import { UIButton, UICard, UIInput, UIText } from "@/ui";
+import { UICard, UIText } from "@/ui";
 import { GoogleButton } from "@/ui/components/GoogleButton";
-import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -11,15 +10,15 @@ export default function AuthScreen() {
         <UIText size="xxl" weight="bold" style={styles.topText}>
           Sign in
         </UIText>
-        <UIInput label="Email" />
+        {/* <UIInput label="Email" />
         <UIInput label="Password" />
         <View style={styles.googleAuthButtonContainer}>
           <UIButton variant="secondary">
             <UIText size="lg">Sign in</UIText>
-          </UIButton>
+          </UIButton> */}
 
-          <GoogleButton />
-        </View>
+        <GoogleButton />
+        {/* </View> */}
       </UICard>
     </SafeAreaView>
   );
