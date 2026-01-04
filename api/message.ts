@@ -1,10 +1,11 @@
 import { Database } from "@/src/lib/database.types";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "./auth";
+import { db } from "./firebase";
 import { supabase } from "./supabase";
-
 export type Message = Database["public"]["Tables"]["message"]["Row"];
 export type MessageInsert = Database["public"]["Tables"]["message"]["Insert"];
 
@@ -130,7 +131,11 @@ export default function useChatMessages({ chatId }: { chatId: string }) {
   const sendMessage = async ({ text }: { text: string }) => {
     const { data, error } = await supabase
       .from("message")
-      .insert([{ text, sender_id: userId, chat_id: chatId }]);
+      .insert([{ text, sender_id: userId, chat_id: chatId }])
+      .select()
+      .single();
+
+    await sendMessageFirebase({ text, message_id: data?.id! });
 
     if (error) {
       console.error("insert message error", error);
@@ -139,27 +144,21 @@ export default function useChatMessages({ chatId }: { chatId: string }) {
     return data;
   };
 
-  //   const sendBroadcast = async (payload) => {
-  //     if (!channelRef.current) throw new Error('Not subscribed to channel');
-  //     channelRef.current.send({
-  //       type: 'broadcast',
-  //       event: 'message_created',
-  //       payload,
-  //     });
-  //   };
-
-  // const updateMessage = async ({messageId, updatedText}:{messageId: string, updatedText: string}) => {
-  //     const { data, error } = await supabase
-  //       .from('message')
-  //       .update({text: updatedText})
-  //       .eq('id', messageId);
-
-  //     if (error) {
-  //       console.error('update message error', error);
-  //       throw error;
-  //     }
-  //     return data;
-  //   };
+  const sendMessageFirebase = async ({
+    text,
+    message_id,
+  }: {
+    text: string;
+    message_id: string;
+  }) => {
+    const data = await addDoc(collection(db, "messages"), {
+      id: message_id,
+      chat_id: chatId,
+      text,
+      sender_id: userId,
+      created_at: serverTimestamp(),
+    });
+  };
   return {
     messages,
     sendMessage,
