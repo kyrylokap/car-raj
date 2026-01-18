@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useCarById, useCarImages } from "../../api/car";
@@ -19,7 +19,8 @@ import { UIButton, UICard, UIContainer, UIText } from "../../ui";
 import { ImagesCarousel } from "../../ui/components/ImagesCarousel";
 
 export default function CarDetailsScreen() {
-  const { theme, rt } = useUnistyles();
+  const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -44,7 +45,7 @@ export default function CarDetailsScreen() {
   };
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView style={styles.safeArea} edges={[]}>
         <UIContainer>
           <View style={styles.header}>
             <TouchableOpacity
@@ -103,7 +104,7 @@ export default function CarDetailsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} >
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -137,7 +138,7 @@ export default function CarDetailsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: rt.insets.bottom + theme.spacing.xl },
+          
         ]}
       >
         <View style={{ padding: 20 }}>
@@ -295,6 +296,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: theme.spacing.xl,
   },
   imageContainer: {
     width: "100%",

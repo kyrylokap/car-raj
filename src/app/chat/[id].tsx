@@ -84,7 +84,7 @@ export default function ChatScreen() {
   }, [chatId, messages.length, router]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} >
       <View style={styles.header}>
         <TouchableOpacity
           onPress={handleLeaveChat}

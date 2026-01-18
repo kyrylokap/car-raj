@@ -22,7 +22,7 @@ export default function UserProfileWithCarsScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={[]}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}

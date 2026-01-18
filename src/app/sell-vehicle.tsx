@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import * as z from "zod";
 import { Car, useAddCar } from "../api/car";
@@ -60,7 +60,8 @@ const FormData = z.object({
 type ListingForm = z.infer<typeof FormData>;
 
 export default function SellCarScreen() {
-  const { theme, rt } = useUnistyles();
+  const { theme } = useUnistyles();
+  const insets = useSafeAreaInsets();
   const sellCar = useAddCar();
   const styles = stylesheet;
   const router = useRouter();
@@ -146,8 +147,8 @@ export default function SellCarScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.safeArea} edges={[]}>
+      <View style={[styles.header, { paddingTop: insets.top + theme.spacing.md }]}>
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -165,7 +166,7 @@ export default function SellCarScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: rt.insets.bottom + 100 },
+          { paddingBottom: insets.bottom + 100 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -330,7 +331,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+    paddingBottom: theme.spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
     backgroundColor: theme.colors.background,

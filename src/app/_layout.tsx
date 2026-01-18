@@ -11,7 +11,9 @@ import "react-native-reanimated";
 import { ThemeProvider as ThemeContextProvider } from "../contexts/ThemeContext";
 
 import { useUser } from "../api/auth";
+import { useNotifications } from "../api/useNotifications";
 import { useThemeContext } from "../contexts/ThemeContext";
+
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
@@ -29,6 +31,9 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const { isDarkMode } = useThemeContext();
   const user = useUser();
+
+  useNotifications();
+
   if (user === undefined) {
     return null;
   }
@@ -45,33 +50,33 @@ function RootLayoutNav() {
 
           <Stack.Screen
             name="car/[id]"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
+            options={{ presentation: "modal", headerShown: false }}
           />
           <Stack.Screen
             name="user/[userId]/user-cars"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
+            options={{ presentation: "modal", headerShown: false }}
           />
           <Stack.Screen
             name="my-vehicles"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
+            options={{ presentation: "modal", headerShown: false }}
           />
           <Stack.Screen
             name="sell-vehicle"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
+            options={{ presentation: "modal", headerShown: false }}
           />
 
           <Stack.Screen
             name="settings"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
+            options={{ presentation: "modal", headerShown: false }}
           />
           <Stack.Screen
             name="favorites"
-            options={{ presentation: "fullScreenModal", headerShown: false }}
+            options={{ presentation: "modal", headerShown: false }}
           />
         </Stack.Protected>
         <Stack.Screen
           name="auth"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
+          options={{ presentation: "modal", headerShown: false }}
         />
       </Stack>
     </ThemeProvider>

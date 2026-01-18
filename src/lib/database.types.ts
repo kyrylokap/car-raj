@@ -201,6 +201,7 @@ export type Database = {
           id: string
           image_url: string | null
           phone_number: string | null
+          push_token: string | null
           updated_at: string
         }
         Insert: {
@@ -209,6 +210,7 @@ export type Database = {
           id: string
           image_url?: string | null
           phone_number?: string | null
+          push_token?: string | null
           updated_at?: string
         }
         Update: {
@@ -217,6 +219,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           phone_number?: string | null
+          push_token?: string | null
           updated_at?: string
         }
         Relationships: []
