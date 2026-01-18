@@ -8,8 +8,12 @@ import { UIButton } from "../UIButton";
 import { UIText } from "../UIText";
 export const GoogleButton = () => {
   useEffect(() => {
+    const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID;
+    const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_IOS_ID;
+   
     GoogleSignin.configure({
-      webClientId: process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID,
+      webClientId,
+      ...(iosClientId && { iosClientId }),
       scopes: ["profile", "email"],
     });
   }, []);
