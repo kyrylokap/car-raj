@@ -1,7 +1,7 @@
-import { UIContainer, UIText } from "@/ui";
 import { Link, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { UIContainer, UIText } from "../ui";
 
 export default function NotFoundScreen() {
   const { theme } = useUnistyles();

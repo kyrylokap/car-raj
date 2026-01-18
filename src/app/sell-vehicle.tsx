@@ -1,7 +1,3 @@
-import { Car, useAddCar } from "@/api/car";
-import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
-import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
-import { UIPicker } from "@/ui/UIPicker";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -9,6 +5,10 @@ import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import * as z from "zod";
+import { Car, useAddCar } from "../api/car";
+import { UIButton, UICard, UIContainer, UIInput, UIText } from "../ui";
+import { ImagesCarousel } from "../ui/components/ImagesCarousel";
+import { UIPicker } from "../ui/UIPicker";
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];

@@ -1,7 +1,7 @@
-import { CustomTabBar } from "@/ui/components/CustomTabBar";
 import { Tabs } from "expo-router";
 import React from "react";
 import { View } from "react-native";
+import { CustomTabBar } from "../../ui/components/CustomTabBar";
 
 export default function TabLayout() {
   return (

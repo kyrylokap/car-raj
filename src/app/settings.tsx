@@ -1,13 +1,13 @@
-import { handleSignOut } from "@/api/auth";
-import { useThemeContext } from "@/contexts/ThemeContext";
-import { UICard, UIContainer, UIText } from "@/ui";
-import { PhoneNumberModal } from "@/ui/components/PhoneNumberModal";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { handleSignOut } from "../api/auth";
+import { useThemeContext } from "../contexts/ThemeContext";
+import { UICard, UIContainer, UIText } from "../ui";
+import { PhoneNumberModal } from "../ui/components/PhoneNumberModal";
 
 type SettingItem = {
   icon: string;

@@ -1,8 +1,4 @@
-import { Filter, useInfiniteSearchCars } from "@/api/car";
-import { UIButton, UICard, UIContainer, UIInput, UIText } from "@/ui";
-import { CarItem } from "@/ui/components/CarItem";
-import { UIPicker } from "@/ui/UIPicker";
-import { Ionicons } from "@expo/vector-icons";
+  import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -15,6 +11,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Filter, useInfiniteSearchCars } from "../../api/car";
+import { UIButton, UICard, UIContainer, UIInput, UIText } from "../../ui";
+import { CarItem } from "../../ui/components/CarItem";
+import { UIPicker } from "../../ui/UIPicker";
 
 const sortingTypes = [
   { id: "price_asc", label: "From lowest price" },

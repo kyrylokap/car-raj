@@ -1,4 +1,3 @@
-import { ThemeProvider as ThemeContextProvider } from "@/contexts/ThemeContext";
 import "@/unistyles";
 import {
   DarkTheme,
@@ -9,9 +8,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
+import { ThemeProvider as ThemeContextProvider } from "../contexts/ThemeContext";
 
-import { useUser } from "@/api/auth";
-import { useThemeContext } from "@/contexts/ThemeContext";
+import { useUser } from "../api/auth";
+import { useThemeContext } from "../contexts/ThemeContext";
 const queryClient = new QueryClient();
 
 export default function RootLayout() {

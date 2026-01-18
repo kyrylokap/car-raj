@@ -1,7 +1,7 @@
-import { supabase } from "@/api/supabase";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
 
 export function useUser() {
   const [user, setUser] = useState<User | null | undefined>(undefined);

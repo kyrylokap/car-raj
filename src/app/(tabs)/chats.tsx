@@ -1,6 +1,3 @@
-import { useUser } from "@/api/auth";
-import { ChatWithDetails, useCarTitle, useUserChats } from "@/api/chat";
-import { UICard, UIContainer, UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -8,6 +5,9 @@ import React, { useCallback } from "react";
 import { FlatList, Pressable, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useUser } from "../../api/auth";
+import { ChatWithDetails, useCarTitle, useUserChats } from "../../api/chat";
+import { UICard, UIContainer, UIText } from "../../ui";
 
 export default function MessengerScreen() {
   const { theme, rt } = useUnistyles();

@@ -1,17 +1,17 @@
-import { useUser } from "@/api/auth";
-import {
-  getChatById,
-  useCarTitle,
-  useDeleteChat,
-  useUserProfile,
-} from "@/api/chat";
-import useChatMessages, { Message } from "@/api/message";
-import { UIText } from "@/ui";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useRef, useState } from "react";
+import { useUser } from "../../api/auth";
+import {
+  getChatById,
+  useCarTitle,
+  useDeleteChat,
+  useUserProfile,
+} from "../../api/chat";
+import useChatMessages, { Message } from "../../api/message";
+import { UIText } from "../../ui";
 
 import {
   ActivityIndicator,

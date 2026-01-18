@@ -1,10 +1,3 @@
-import { useUser } from "@/api/auth";
-import { useCarById, useCarImages } from "@/api/car";
-import { getOrCreateChatForCar } from "@/api/chat";
-import { useChangeFavorite, useIsCarFavorite } from "@/api/favorites";
-import { useUserPhoneNumber } from "@/api/userProfile";
-import { UIButton, UICard, UIContainer, UIText } from "@/ui";
-import { ImagesCarousel } from "@/ui/components/ImagesCarousel";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -17,6 +10,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useUser } from "../../api/auth";
+import { useCarById, useCarImages } from "../../api/car";
+import { getOrCreateChatForCar } from "../../api/chat";
+import { useChangeFavorite, useIsCarFavorite } from "../../api/favorites";
+import { useUserPhoneNumber } from "../../api/userProfile";
+import { UIButton, UICard, UIContainer, UIText } from "../../ui";
+import { ImagesCarousel } from "../../ui/components/ImagesCarousel";
 
 export default function CarDetailsScreen() {
   const { theme, rt } = useUnistyles();

@@ -1,9 +1,9 @@
-import { Car, useCarFirstImage } from "@/api/car";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Car, useCarFirstImage } from "../../api/car";
 import { UICard } from "../UICard";
 import { UIText } from "../UIText";
 

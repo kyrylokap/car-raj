@@ -1,9 +1,9 @@
-import { supabase } from "@/api/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native-unistyles";
+import { supabase } from "../../api/supabase";
 import { UIButton } from "../UIButton";
 import { UIText } from "../UIText";
 export const GoogleButton = () => {

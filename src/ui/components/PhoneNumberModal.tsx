@@ -1,7 +1,7 @@
-import { useUpdatePhoneNumber } from "@/api/userProfile";
 import { useState } from "react";
 import { Modal, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { useUpdatePhoneNumber } from "../../api/userProfile";
 import { UIButton } from "../UIButton";
 import { UIInput } from "../UIInput";
 import { UIText } from "../UIText";

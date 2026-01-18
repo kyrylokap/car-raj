@@ -1,6 +1,6 @@
-import { supabase } from "@/api/supabase";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "./auth";
+import { supabase } from "./supabase";
 export function useChangeFavorite() {
   const user = useUser();
   const queryClient = useQueryClient();

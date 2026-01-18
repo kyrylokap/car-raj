@@ -1,7 +1,7 @@
-import { UICard, UIText } from "@/ui";
-import { GoogleButton } from "@/ui/components/GoogleButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
+import { UICard, UIText } from "../ui";
+import { GoogleButton } from "../ui/components/GoogleButton";
 
 export default function AuthScreen() {
   return (
