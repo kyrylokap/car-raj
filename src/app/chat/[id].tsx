@@ -149,9 +149,7 @@ export default function ChatScreen() {
           </UIText>
 
           <View style={styles.inputContainer}>
-            <Pressable style={styles.attachButton}>
-              <Ionicons name="attach" size={24} color={theme.colors.primary} />
-            </Pressable>
+            
             <TextInput
               style={styles.input}
               placeholder="Type a message..."
@@ -334,9 +332,9 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.body,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.full,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    maxHeight: 70,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.lg,
+    maxHeight: 80,
     color: theme.colors.text,
   },
   sendButton: {

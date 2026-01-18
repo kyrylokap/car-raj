@@ -118,13 +118,7 @@ export default function CarDetailsScreen() {
           />
         </TouchableOpacity>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.headerButton} hitSlop={14}>
-            <Ionicons
-              name="share-outline"
-              size={24}
-              color={theme.colors.text}
-            />
-          </TouchableOpacity>
+          
           <TouchableOpacity
             style={styles.headerButton}
             onPress={onPressFavorite}

@@ -22,12 +22,12 @@ export default function ProfileScreen() {
       icon: "car-outline",
       color: theme.colors.primary,
     },
-    {
-      label: "Sold",
-      value: "8",
-      icon: "checkmark-circle-outline",
-      color: theme.colors.primary,
-    },
+    // {
+    //   label: "Sold",
+    //   value: "8",
+    //   icon: "checkmark-circle-outline",
+    //   color: theme.colors.primary,
+    // },
   ];
 
   const menuItems = [

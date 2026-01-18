@@ -51,6 +51,26 @@ export async function getChatsForUser(
   return prepared;
 }
 
+export async function getChatsCount(userId: string) {
+  const { data, error } = await supabase
+    .from("chat")
+    .select("*", { count: "exact" })
+    .eq("customer_id", userId);
+  if (error) throw error;
+  return data?.length || 0;
+}
+export function useChatsCount() {
+  const user = useUser();
+  const userId = user?.id;
+  return useQuery({
+    queryKey: ["chatsCount", userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      return await getChatsCount(userId);
+    },
+  });
+}
+
 export function useUserChats(userId?: string) {
   return useQuery<ChatWithDetails[], Error>({
     queryKey: ["userChats", userId],

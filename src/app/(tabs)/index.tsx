@@ -68,7 +68,7 @@ export default function SearchScreen() {
     isFetchingNextPage,
   } = useInfiniteSearchCars(appliedFilters, 5);
   const cars = infiniteData?.pages.flat() ?? [];
-  const nandleChangeFilters = () => {
+  const handleChangeFilters = () => {
     setAppliedFilters(draftFilters);
     setShowFilters(false);
   };
@@ -113,16 +113,15 @@ export default function SearchScreen() {
           </TouchableOpacity>
         </View>
 
-        {showFilters && (
           <Modal
             style={{ flex: 1 }}
             transparent={true}
             animationType="slide"
             visible={showFilters}
           >
-            <SafeAreaView style={styles.modalOverlay}>
+            <SafeAreaView style={styles.modalOverlay} edges={["top"]}>
               <View style={styles.modalContainer}>
-                <View style={styles.modalHeader}>
+                <View style={[styles.modalHeader, { paddingTop: rt.insets.top + theme.spacing.sm }]}>
                   <UIText size="lg" style={styles.filtersTitle}>
                     Filters
                   </UIText>
@@ -275,7 +274,7 @@ export default function SearchScreen() {
                         </UIButton>
                         <UIButton
                           variant="primary"
-                          onPress={nandleChangeFilters}
+                          onPress={handleChangeFilters}
                           style={styles.applyButton}
                         >
                           <UIText color="white" weight="semibold">
@@ -289,7 +288,6 @@ export default function SearchScreen() {
               </View>
             </SafeAreaView>
           </Modal>
-        )}
         <FlatList
           data={cars}
           renderItem={({ item }) => {
@@ -363,8 +361,6 @@ const stylesheet = StyleSheet.create((theme) => ({
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.45)",
-    justifyContent: "flex-start",
-    padding: 0,
   },
   modalContainer: {
     flex: 1,

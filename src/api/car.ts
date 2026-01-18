@@ -110,6 +110,8 @@ export async function fetchCarsPage(filters?: Filter, limit = 5, offset = 0) {
     location,
     transmission,
     sortBy,
+    minMileage,
+    maxMileage,
   } = (filters || {}) as Filter;
 
   let query = supabase.from("car").select("*");
@@ -134,6 +136,9 @@ export async function fetchCarsPage(filters?: Filter, limit = 5, offset = 0) {
       query = query.order("created_at", { ascending: false });
     else if (sortBy === "oldest")
       query = query.order("created_at", { ascending: true });
+    
+    if (minMileage !== "") query = query.gte("mileage", Number.parseInt(minMileage, 10));
+    if (maxMileage !== "") query = query.lte("mileage", Number.parseInt(maxMileage, 10));
   }
 
   query = query.range(offset, offset + limit - 1);

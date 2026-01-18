@@ -4,6 +4,7 @@ import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useChatsCount } from "../../api/chat";
 import { UIText } from "../UIText";
 
 type TabItem = {
@@ -43,6 +44,7 @@ export const CustomTabBar: React.FC = () => {
   const styles = stylesheet;
   const router = useRouter();
   const pathname = usePathname();
+  const { data: chatsCount } = useChatsCount();
   const isActive = (route: string) => {
     return route.endsWith(pathname);
   };
@@ -52,7 +54,7 @@ export const CustomTabBar: React.FC = () => {
   };
 
   const getBadgeCount = (tabName: string) => {
-    if (tabName === "chats") return 3;
+    if (tabName === "chats") return chatsCount;
     return null;
   };
 
@@ -84,7 +86,7 @@ export const CustomTabBar: React.FC = () => {
                     }
                     style={styles.icon}
                   />
-                  {badgeCount !== null && badgeCount > 0 && (
+                  {badgeCount !== undefined && badgeCount !== null && badgeCount > 0 && (
                     <View style={styles.badge}>
                       <UIText size="xxs" color="white" weight="bold">
                         {badgeCount > 9 ? "9+" : badgeCount}
