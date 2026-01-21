@@ -1,154 +1,34 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Alert, ScrollView, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import * as z from "zod";
-import { Car, useAddCar } from "../api/car";
+import { useSellVehicleForm } from "../hooks/useSellVehicleForm";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "../ui";
 import { ImagesCarousel } from "../ui/components/ImagesCarousel";
 import { UIPicker } from "../ui/UIPicker";
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
-const FormData = z.object({
-  images: z.string().refine(
-    (val) => {
-      const num = Number(val);
-      return !isNaN(num) && num >= 4 && num <= 10;
-    },
-    { message: "*Please, choose between 4-10 images" }
-  ),
-  brand: z.string().nonempty({ message: "*Please, provide valid brand" }),
-  model: z.string().nonempty({ message: "*Please, provide valid model" }),
-  year: z
-    .string()
-    .nonempty({ message: "*Please, provide valid year" })
-    .refine(
-      (val) => {
-        const num = Number(val);
-        return !isNaN(num) && num >= 1990 && num <= new Date().getFullYear();
-      },
-      { message: "*Year must be a number between 1990 and current year" }
-    ),
-  price: z
-    .string()
-    .nonempty({ message: "*Please, provide valid price" })
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 1, {
-      message: "*Price must be a valid number",
-    }),
-  mileage: z
-    .string()
-    .nonempty({ message: "*Please, provide valid mileage" })
-    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
-      message: "*Mileage must be a valid number",
-    }),
-  fuel: z.enum(fuelTypes),
-  location: z.string().min(3, { message: "*Please, provide valid location" }),
-  description: z.string().optional().default(""),
-  vin: z
-    .string()
-    .length(17, { message: "*VIN number must contain exactly 17 characters" })
-    .regex(/^[A-HJ-NPR-Z0-9]+$/, {
-      message: "*Please, provide valid VIN number",
-    }),
-  transmission: z.enum(transmissions),
-  color: z.string().min(2, { message: "*Please, provide valid car color" }),
-});
-
-type ListingForm = z.infer<typeof FormData>;
 
 export default function SellCarScreen() {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
-  const sellCar = useAddCar();
   const styles = stylesheet;
   const router = useRouter();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [images, setImages] = useState<string[]>([]);
-
-  const [formData, setFormData] = useState<ListingForm>({
-    brand: "",
-    model: "",
-    year: "",
-    price: "",
-    mileage: "",
-    fuel: "Petrol",
-    location: "",
-    description: "",
-    vin: "",
-    transmission: "Manual",
-    color: "",
-    images: images.length.toString(),
-  });
-
-  const handleInputChange = (field: keyof ListingForm, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value as any }));
-
-    const singleFieldSchema = FormData.pick({ [field]: true });
-    const result = singleFieldSchema.safeParse({ [field]: value });
-
-    setErrors((prev) => ({
-      ...prev,
-      [field]: result.success
-        ? ""
-        : result.error.flatten().fieldErrors[field]?.[0] || "",
-    }));
-  };
-
-  const handleSubmit = () => {
-    const result = FormData.safeParse(formData);
-
-    if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      const flattened = result.error.flatten().fieldErrors;
-
-      for (const key of Object.keys(flattened)) {
-        const messages = flattened[key as keyof typeof flattened];
-        if (messages && messages.length > 0) {
-          fieldErrors[key] = messages[0];
-        }
-      }
-
-      setErrors(fieldErrors);
-      return;
-    }
-
-    if (images.length < 4) {
-      setErrors({ images: "Please add at least 4 images" });
-      console.log(errors);
-      return;
-    }
-
-    setErrors({});
-    const car: Car = {
-      brand: result.data.brand,
-      model: result.data.model,
-      year: Number(result.data.year),
-      price: Number(result.data.price),
-      mileage: Number(result.data.mileage),
-      fuel: result.data.fuel as Car["fuel"],
-      transmission: result.data.transmission as Car["transmission"],
-      location: result.data.location,
-      description: result.data.description,
-      vin: result.data.vin,
-      color: result.data.color,
-    };
-
-    sellCar.mutate({ car, images });
-    router.back();
-    Alert.alert("Success", "You added new car to marketplace!", [
-      {
-        text: "Ok",
-        style: "cancel",
-      },
-    ]);
-  };
+  const {
+    formData,
+    errors,
+    images,
+    setImages,
+    handleInputChange,
+    handleSubmit,
+  } = useSellVehicleForm();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
-      <View style={[styles.header, { paddingTop: insets.top + theme.spacing.md }]}>
+      <View style={[styles.header]}>
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
@@ -328,6 +208,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.background,
   },
   header: {
+    paddingTop:  theme.spacing.md ,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
@@ -343,7 +224,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     flex: 1,
   },
   headerRight: {
-    width: 40,
+    width: theme.scale(40),
   },
   scrollContent: {
     flexGrow: 1,
@@ -351,14 +232,14 @@ const stylesheet = StyleSheet.create((theme) => ({
   imageCard: {
     marginBottom: theme.spacing.md,
     padding: theme.spacing.md,
-    gap: 10,
+    gap: theme.scale(10),
   },
   sectionTitle: {
     marginBottom: theme.spacing.md,
   },
   imageUploadButton: {
-    padding: 10,
-    borderWidth: 2,
+    padding: theme.scale(10),
+    borderWidth: theme.scale(2),
     borderColor: theme.colors.border,
     borderStyle: "dashed",
     borderRadius: theme.borderRadius.md,
@@ -403,7 +284,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
   },
   descriptionInput: {
-    minHeight: 120,
+    minHeight: theme.verticalScale(120),
     textAlignVertical: "top",
   },
   actionButtons: {

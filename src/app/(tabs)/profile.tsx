@@ -67,6 +67,10 @@ export default function ProfileScreen() {
                 <Image
                   style={styles.avatar}
                   source={{ uri: user?.user_metadata?.avatar_url }}
+                  cachePolicy="memory-disk"
+                  transition={200}
+                  contentFit="cover"
+                  priority="high"
                 />
               </View>
 
@@ -236,31 +240,31 @@ const stylesheet = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.md,
   },
   avatar: {
-    width: 110,
-    height: 110,
+    width: theme.scale(110),
+    height: theme.scale(110),
     borderRadius: theme.borderRadius.full,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 4,
+    borderWidth: theme.scale(4),
     borderColor: `${theme.colors.primary}20`,
   },
   editAvatarButton: {
     position: "absolute",
     bottom: 0,
     right: 0,
-    width: 36,
-    height: 36,
+    width: theme.scale(36),
+    height: theme.scale(36),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 3,
+    borderWidth: theme.scale(3),
     borderColor: theme.colors.background,
     shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: theme.scale(2) },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: theme.scale(4),
+    elevation: theme.scale(4),
   },
   profileInfo: {
     alignItems: "center",
@@ -276,7 +280,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     textAlign: "center",
   },
   verifiedBadge: {
-    marginTop: 2,
+    marginTop: theme.scale(2),
   },
   email: {
     marginBottom: theme.spacing.xs,
@@ -288,7 +292,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     marginTop: theme.spacing.xs,
   },
   location: {
-    marginTop: 1,
+    marginTop: theme.scale(1),
   },
   statsSection: {
     marginBottom: theme.spacing.lg,
@@ -305,11 +309,11 @@ const stylesheet = StyleSheet.create((theme) => ({
     alignItems: "center",
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.xs,
-    minHeight: 110,
+    minHeight: theme.verticalScale(110),
   },
   statIconContainer: {
-    width: 36,
-    height: 36,
+    width: theme.scale(36),
+    height: theme.scale(36),
     borderRadius: theme.borderRadius.md,
     alignItems: "center",
     justifyContent: "center",
@@ -344,7 +348,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     borderColor: theme.colors.primary,
   },
   quickActionLabel: {
-    marginTop: 1,
+    marginTop: theme.scale(1),
   },
   menuSection: {
     marginBottom: theme.spacing.lg,
@@ -359,15 +363,15 @@ const stylesheet = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.md,
-    borderBottomWidth: 1,
+    borderBottomWidth: theme.scale(1),
     borderBottomColor: theme.colors.borderLight,
   },
   menuItemLast: {
     borderBottomWidth: 0,
   },
   menuIconContainer: {
-    width: 40,
-    height: 40,
+    width: theme.scale(40),
+    height: theme.scale(40),
     borderRadius: theme.borderRadius.md,
     alignItems: "center",
     justifyContent: "center",
@@ -376,10 +380,10 @@ const stylesheet = StyleSheet.create((theme) => ({
     flex: 1,
   },
   menuLabel: {
-    marginBottom: 2,
+    marginBottom: theme.scale(2),
   },
   menuSubtitle: {
-    marginTop: 2,
+    marginTop: theme.scale(2),
   },
   menuChevron: {
     marginLeft: theme.spacing.xs,

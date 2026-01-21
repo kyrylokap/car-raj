@@ -45,7 +45,7 @@ const styles = StyleSheet.create((theme) => ({
   input: {
     ...theme.typography.body,
     backgroundColor: theme.colors.surface,
-    borderWidth: 1,
+    borderWidth: theme.scale(1),
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
     paddingHorizontal: theme.spacing.md,

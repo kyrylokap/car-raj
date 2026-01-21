@@ -31,36 +31,36 @@ const styles = StyleSheet.create((theme) => ({
     variants: {
       size: {
         xxs: {
-          fontSize: 10,
-          lineHeight: 14,
+          fontSize: theme.scale(10),
+          lineHeight: theme.verticalScale(14),
         },
         xs: {
-          fontSize: 12,
-          lineHeight: 16,
+          fontSize: theme.scale(12),
+          lineHeight: theme.verticalScale(16),
         },
         sm: {
-          fontSize: 14,
-          lineHeight: 20,
+          fontSize: theme.scale(14),
+          lineHeight: theme.verticalScale(20),
         },
         md: {
-          fontSize: 16,
-          lineHeight: 24,
+          fontSize: theme.scale(16),
+          lineHeight: theme.verticalScale(24),
         },
         default: {
-          fontSize: 16,
-          lineHeight: 24,
+          fontSize: theme.scale(16),
+          lineHeight: theme.verticalScale(24),
         },
         lg: {
-          fontSize: 20,
-          lineHeight: 28,
+          fontSize: theme.scale(20),
+          lineHeight: theme.verticalScale(28),
         },
         xl: {
-          fontSize: 24,
-          lineHeight: 32,
+          fontSize: theme.scale(24),
+          lineHeight: theme.verticalScale(32),
         },
         xxl: {
-          fontSize: 32,
-          lineHeight: 40,
+          fontSize: theme.scale(32),
+          lineHeight: theme.verticalScale(40),
         },
       },
       color: {

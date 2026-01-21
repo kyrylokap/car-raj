@@ -35,7 +35,7 @@ export const UIPicker = ({
         <Ionicons
           name={`chevron-${isVisiblePicker ? "up" : "down"}`}
           color={theme.colors.primary}
-          size={24}
+          size={theme.scale(24)}
         />
       </Pressable>
       {isVisiblePicker ? (
@@ -80,7 +80,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.md,
     padding: hideLabel ? theme.spacing.sm: theme.spacing.md,
     color: theme.colors.text,
-    borderWidth: 1,
+    borderWidth: theme.scale(1),
     flexDirection: "row",
     justifyContent: "space-between",
   }),
@@ -96,12 +96,12 @@ const styles = StyleSheet.create((theme) => ({
   itemsContainer: ({ hideLabel }: { hideLabel?: boolean}) => ({
     position: "absolute",
     zIndex: 10,
-    top: hideLabel? 46: 30,
+    top: hideLabel ? theme.scale(46) : theme.scale(30),
     width: '100%',
     shadowColor: theme.colors.white,
     backgroundColor: theme.colors.surface,
     padding: theme.spacing.xs,
-    borderWidth: 1,
+    borderWidth: theme.scale(1),
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
   }),

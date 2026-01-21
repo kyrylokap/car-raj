@@ -1,4 +1,13 @@
+import { Dimensions } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+const BASE_WIDTH = 390;
+const BASE_HEIGHT = 844;
+
+const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size * 0.9;
+const verticalScale = (size: number) => (SCREEN_HEIGHT / BASE_HEIGHT) * size * 0.9;
 
 export const breakpoints = {
   xs: 0,
@@ -75,6 +84,8 @@ export const lightTheme = {
       lineHeight: 16,
     },
   },
+  scale,
+  verticalScale,
 } as const;
 
 export const darkTheme = {
@@ -144,6 +155,8 @@ export const darkTheme = {
       lineHeight: 16,
     },
   },
+  scale,
+  verticalScale,
 } as const;
 
 type AppThemes = {

@@ -37,6 +37,13 @@ export const CarItem = ({ item }: { item: Car }) => {
           <Image
             source={{ uri: firstImageUrl! }}
             style={styles.carImageContainer}
+            contentFit="cover"
+            cachePolicy="memory-disk"
+            transition={100}
+            placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
+            priority="high"
+            recyclingKey={item.id}
+            allowDownscaling={true}
           />
         )}
 
@@ -68,7 +75,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   carImageContainer: {
     width: "100%",
-    height: 200,
+    height: theme.verticalScale(200),
     marginBottom: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
   },

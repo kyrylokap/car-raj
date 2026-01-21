@@ -345,7 +345,8 @@ export function useCarImages({
       return await getCarImages({ userId, carId });
     },
     enabled: userId !== undefined && carId !== undefined,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
 
@@ -381,7 +382,7 @@ async function getCarImages({
     const path = `${folderPath}/${f.name}`;
     const { data: signedData, error: signedError } = await supabase.storage
       .from(bucket)
-      .createSignedUrl(path, 60 * 60);
+      .createSignedUrl(path, 60 * 60 * 24 * 7);
 
     if (signedError) {
       console.error("Failed to create signed URL for", path, signedError);
@@ -408,6 +409,7 @@ export function useCarFirstImage({
       const images = await getCarImages({ userId, carId });
       return images.length > 0 ? images[0] : null;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 30,
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }

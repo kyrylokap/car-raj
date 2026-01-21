@@ -67,7 +67,6 @@ export const CustomTabBar: React.FC = () => {
       <View style={styles.tabBar}>
         {tabs.map((tab) => {
           const active = isActive(tab.route);
-          const badgeCount = getBadgeCount(tab.name);
 
           return (
             <TouchableOpacity
@@ -86,13 +85,7 @@ export const CustomTabBar: React.FC = () => {
                     }
                     style={styles.icon}
                   />
-                  {badgeCount !== undefined && badgeCount !== null && badgeCount > 0 && (
-                    <View style={styles.badge}>
-                      <UIText size="xxs" color="white" weight="bold">
-                        {badgeCount > 9 ? "9+" : badgeCount}
-                      </UIText>
-                    </View>
-                  )}
+                  
                 </View>
                 <UIText
                   size="xxs"
@@ -128,7 +121,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.xs,
     paddingTop: theme.spacing.xs,
     paddingBottom: theme.spacing.xs,
-    minHeight: 49,
+    minHeight: theme.verticalScale(49),
   },
   tabItem: {
     flex: 1,
@@ -140,13 +133,13 @@ const stylesheet = StyleSheet.create((theme) => ({
   tabItemContent: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
+    gap: theme.scale(4),
   },
   iconWrapper: {
     alignItems: "center",
     justifyContent: "center",
-    width: 28,
-    height: 28,
+    width: theme.scale(28),
+    height: theme.scale(28),
     position: "relative",
   },
   icon: {
@@ -157,16 +150,16 @@ const stylesheet = StyleSheet.create((theme) => ({
   },
   badge: {
     position: "absolute",
-    top: -6,
-    right: -10,
+    top: theme.scale(-6),
+    right: theme.scale(-10),
     backgroundColor: theme.colors.error,
     borderRadius: theme.borderRadius.full,
-    minWidth: 18,
-    height: 18,
-    paddingHorizontal: 5,
+    minWidth: theme.scale(18),
+    height: theme.scale(18),
+    paddingHorizontal: theme.scale(5),
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
+    borderWidth: theme.scale(2),
     borderColor: theme.colors.tabBar,
   },
 }));

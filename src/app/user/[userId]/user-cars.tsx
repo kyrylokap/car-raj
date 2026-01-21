@@ -39,6 +39,12 @@ export default function UserProfileWithCarsScreen() {
           <Image
             style={styles.headerAvatar}
             source={{ uri: userDetails?.image_url! }}
+            cachePolicy="memory-disk"
+            transition={100}
+            contentFit="cover"
+            priority="normal"
+            recyclingKey={userDetails?.id}
+            allowDownscaling={true}
           />
           <View style={styles.headerText}>
             <UIText size="lg">{userDetails?.fullname}</UIText>
@@ -61,6 +67,11 @@ export default function UserProfileWithCarsScreen() {
           { paddingBottom: rt.insets.bottom + 100 },
         ]}
         showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        initialNumToRender={10}
+        updateCellsBatchingPeriod={50}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons

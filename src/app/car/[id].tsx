@@ -1,66 +1,45 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
-  Linking,
   ScrollView,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useUser } from "../../api/auth";
-import { useCarById, useCarImages } from "../../api/car";
-import { getOrCreateChatForCar } from "../../api/chat";
-import { useChangeFavorite, useIsCarFavorite } from "../../api/favorites";
-import { useUserPhoneNumber } from "../../api/userProfile";
+import { useCarDetails } from "../../hooks/useCarDetails";
+import { useCarImages } from "../../api/car";
 import { UIButton, UICard, UIContainer, UIText } from "../../ui";
 import { ImagesCarousel } from "../../ui/components/ImagesCarousel";
 
 export default function CarDetailsScreen() {
   const { theme } = useUnistyles();
-  const insets = useSafeAreaInsets();
   const router = useRouter();
   const params = useLocalSearchParams();
-
   const carId = params.id as string;
-  const { data: isFavorite } = useIsCarFavorite(carId);
 
-  const [isCarFavorite, setIsCarFavorite] = useState<boolean>(isFavorite!);
-  const { data: car, isLoading } = useCarById(carId);
-  const { data } = useUserPhoneNumber(car?.user_id);
+  const {
+    car,
+    isLoading,
+    isCarFavorite,
+    currentUserId,
+    handleToggleFavorite,
+    handleContactSeller,
+    handleCall,
+    getSpecsWithIcons,
+  } = useCarDetails(carId);
 
-  const user = useUser();
-  const currentUserId = user?.id;
   const {
     data: carImages,
     isLoading: imagesIsLoading,
     isFetching: imagesIsFetching,
   } = useCarImages({ userId: car?.user_id!, carId });
-  const { mutate: pressFavorite } = useChangeFavorite();
-  const onPressFavorite = () => {
-    pressFavorite(carId);
-    setIsCarFavorite((prev) => !prev);
-  };
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safeArea} edges={[]}>
         <UIContainer>
-          <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              style={styles.backButton}
-              hitSlop={14}
-            >
-              <Ionicons
-                name="arrow-back"
-                hitSlop={14}
-                size={24}
-                color={theme.colors.text}
-              />
-            </TouchableOpacity>
-          </View>
           <View style={styles.emptyState}>
             <ActivityIndicator />
           </View>
@@ -69,42 +48,10 @@ export default function CarDetailsScreen() {
     );
   }
 
-  const createdTime = new Date(car!.created_at).toLocaleString("en-GB", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  const specsWithIcons = [
-    { icon: "car-outline", label: "Brand", value: car?.brand },
-    { icon: "pricetag-outline", label: "Model", value: car?.model },
-    { icon: "calendar-outline", label: "Year", value: car?.year },
-
-    {
-      icon: "speedometer-outline",
-      label: "Mileage",
-      value: car?.mileage ? `${car.mileage} km` : "-",
-    },
-    {
-      icon: "cash-outline",
-      label: "Price",
-      value: car?.price ? `${car.price.toLocaleString()} PLN` : "-",
-    },
-    { icon: "flash-outline", label: "Fuel Type", value: car?.fuel },
-    {
-      icon: "options-outline",
-      label: "Transmission",
-      value: car?.transmission,
-    },
-    { icon: "color-palette-outline", label: "Color", value: car?.color },
-    { icon: "location-outline", label: "Location", value: car?.location },
-    { icon: "time-outline", label: "Created", value: createdTime },
-  ];
+  const specsWithIcons = getSpecsWithIcons();
 
   return (
-    <SafeAreaView style={styles.safeArea} >
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}
@@ -119,10 +66,9 @@ export default function CarDetailsScreen() {
           />
         </TouchableOpacity>
         <View style={styles.headerActions}>
-          
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={onPressFavorite}
+            onPress={handleToggleFavorite}
             hitSlop={14}
           >
             <Ionicons
@@ -207,21 +153,7 @@ export default function CarDetailsScreen() {
             <UIButton
               variant="outline"
               style={styles.contactButton}
-              onPress={async () => {
-                if (currentUserId === car?.user_id) {
-                  return;
-                }
-                try {
-                  const chat = await getOrCreateChatForCar(
-                    carId,
-                    car!.user_id,
-                    currentUserId!
-                  );
-                  router.push(`/chat/${chat.id}`);
-                } catch (err) {
-                  console.error("Failed to open chat", err);
-                }
-              }}
+              onPress={handleContactSeller}
             >
               <Ionicons
                 name="chatbubble-outline"
@@ -234,12 +166,7 @@ export default function CarDetailsScreen() {
             <UIButton
               variant="primary"
               style={styles.callButton}
-              onPress={() => {
-                const phoneNumber = `tel:${data}`;
-                Linking.openURL(phoneNumber).catch((err) =>
-                  console.error("Error:", err)
-                );
-              }}
+              onPress={handleCall}
             >
               <Ionicons
                 name="call-outline"
@@ -345,7 +272,7 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.md,
   },
   description: {
-    lineHeight: 22,
+    lineHeight: theme.verticalScale(22),
   },
   specsCard: {
     marginBottom: theme.spacing.md,

@@ -2,11 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import { useEffect } from "react";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { supabase } from "../../api/supabase";
 import { UIButton } from "../UIButton";
 import { UIText } from "../UIText";
 export const GoogleButton = () => {
+  const { theme } = useUnistyles();
   useEffect(() => {
     const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID;
     const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_IOS_ID;
@@ -57,7 +58,7 @@ export const GoogleButton = () => {
 
   return (
     <UIButton variant="ghost" style={styles.button} onPress={handleGoogleLogin}>
-      <Ionicons name="logo-google" color={styles.icon.color} size={24} />
+      <Ionicons name="logo-google" color={styles.icon.color} size={theme.scale(24)} />
       <UIText size="lg">Continue with Google</UIText>
     </UIButton>
   );
@@ -65,8 +66,8 @@ export const GoogleButton = () => {
 
 const styles = StyleSheet.create((theme) => ({
   button: {
-    gap: 10,
-    borderWidth: 1,
+    gap: theme.scale(10),
+    borderWidth: theme.scale(1),
     borderColor: theme.colors.text,
   },
   icon: {

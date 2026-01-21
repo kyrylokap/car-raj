@@ -2,42 +2,52 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useRef, useState } from "react";
-import { useUser } from "../../api/auth";
-import {
-  getChatById,
-  useCarTitle,
-  useDeleteChat,
-  useUserProfile,
-} from "../../api/chat";
-import useChatMessages, { Message } from "../../api/message";
-import { UIText } from "../../ui";
-
+import React from "react";
 import {
   ActivityIndicator,
   FlatList,
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
+import { Message } from "../../api/message";
+import { useChatScreen } from "../../hooks/useChatScreen";
+import { UIInput, UIText } from "../../ui";
 
 export default function ChatScreen() {
   const { theme } = useUnistyles();
   const router = useRouter();
   const params = useLocalSearchParams();
   const chatId = params.id as string;
-  const [inputText, setInputText] = useState("");
-  const flatListRef = useRef<FlatList>(null);
-  const user = useUser();
-  const userId = user?.id;
-  const { mutate: deleteChat, error: deletingError } = useDeleteChat({
-    chatId,
-  });
+  const [inputHeight, setInputHeight] = React.useState(theme.verticalScale(56));
+
+  const {
+    inputText,
+    flatListRef,
+    userId,
+    messages,
+    hasNextPage,
+    fetchNextPage,
+    isLoadingMessages,
+    userTyping,
+    handleSendMessage,
+    handleChangeInput,
+    handleLeaveChat,
+  } = useChatScreen(chatId);
+
+  const handleContentSizeChange = (event: any) => {
+    const { height } = event.nativeEvent.contentSize;
+    const minHeight = theme.verticalScale(56);
+    const maxHeight = theme.verticalScale(120);
+    const newHeight = Math.min(Math.max(height + theme.spacing.md * 2, minHeight), maxHeight);
+    setInputHeight(newHeight);
+  };
+
   const { data: chat } = useQuery({
     queryKey: ["chat", chatId],
     queryFn: () => getChatById(chatId),
@@ -48,40 +58,6 @@ export default function ChatScreen() {
     chat?.owner_id === userId ? chat?.customer_id : chat?.owner_id;
   const { data: owner } = useUserProfile(chattingUserId!);
   const { data: carTitle } = useCarTitle(chat?.car_id ?? null);
-  const {
-    messages,
-    sendMessage,
-    hasNextPage,
-    fetchNextPage,
-    isLoadingMessages,
-    sendTyping,
-    userTyping,
-  } = useChatMessages({ chatId });
-  const handleSendMessage = async () => {
-    if (!inputText.trim() || !userId) return;
-    try {
-      await sendMessage({ text: inputText });
-      setInputText("");
-      setTimeout(() => {
-        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-      }, 100);
-    } catch (err) {
-      console.error("Send failed", err);
-    }
-  };
-
-  const handleChangeInput = (text: string) => {
-    setInputText(text);
-    sendTyping();
-  };
-
-  const handleLeaveChat = useCallback(() => {
-    router.back();
-    if (messages.length === 0) {
-      deleteChat();
-      return;
-    }
-  }, [chatId, messages.length, router]);
 
   return (
     <SafeAreaView style={styles.container} >
@@ -105,11 +81,17 @@ export default function ChatScreen() {
           <Image
             style={styles.headerAvatar}
             source={{ uri: owner?.image_url! }}
+            cachePolicy="memory-disk"
+            transition={200}
+            contentFit="cover"
+            priority="high"
           />
 
           <View style={styles.headerText}>
-            <UIText size="lg">{owner?.fullname || "Owner"}</UIText>
-            <UIText size="xs" color="textSecondary">
+            <UIText size="lg" numberOfLines={1} ellipsizeMode="tail">
+              {owner?.fullname || "Owner"}
+            </UIText>
+            <UIText size="xs" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
               {carTitle ?? "—"}
             </UIText>
           </View>
@@ -136,6 +118,11 @@ export default function ChatScreen() {
             if (hasNextPage) fetchNextPage();
           }}
           onEndReachedThreshold={0.8}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={15}
+          windowSize={10}
+          initialNumToRender={15}
+          updateCellsBatchingPeriod={50}
         />
         <ActivityIndicator
           animating={isLoadingMessages}
@@ -149,16 +136,19 @@ export default function ChatScreen() {
           </UIText>
 
           <View style={styles.inputContainer}>
-            
-            <TextInput
-              style={styles.input}
-              placeholder="Type a message..."
-              placeholderTextColor={theme.colors.textSecondary}
-              value={inputText}
-              onChangeText={handleChangeInput}
-              multiline
-              maxLength={500}
-            />
+            <View style={[styles.inputWrapper, { maxHeight: theme.verticalScale(120), overflow: "hidden" }]}>
+              <UIInput
+                placeholder="Type a message..."
+                value={inputText}
+                onChangeText={handleChangeInput}
+                multiline
+                maxLength={500}
+                scrollEnabled={true}
+                onContentSizeChange={handleContentSizeChange}
+                containerStyle={{ marginBottom: 0 }}
+                style={[styles.input, { height: inputHeight }]}
+              />
+            </View>
             <Pressable
               style={[
                 styles.sendButton,
@@ -169,7 +159,7 @@ export default function ChatScreen() {
             >
               <Ionicons
                 name="send"
-                size={20}
+                size={theme.scale(20)}
                 color={
                   inputText.trim()
                     ? theme.colors.white
@@ -239,7 +229,8 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+    paddingVertical: theme.spacing.lg,
+    minHeight: theme.verticalScale(70),
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
     backgroundColor: theme.colors.background,
@@ -254,8 +245,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   headerAvatar: {
-    width: 40,
-    height: 40,
+    width: theme.scale(40),
+    height: theme.scale(40),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
@@ -263,6 +254,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   headerText: {
     flex: 1,
+    minWidth: 0,
+    justifyContent: "center",
+    gap: theme.spacing.xs,
   },
   moreButton: {
     padding: theme.spacing.xs,
@@ -307,7 +301,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   messageTimestamp: {
     color: theme.colors.textSecondary,
-    fontSize: 10,
+    fontSize: theme.scale(10),
     alignSelf: "flex-end",
   },
   messageTimestampOwn: {
@@ -327,19 +321,19 @@ const styles = StyleSheet.create((theme) => ({
   attachButton: {
     padding: theme.spacing.sm,
   },
-  input: {
+  inputWrapper: {
     flex: 1,
-    ...theme.typography.body,
-    backgroundColor: theme.colors.surface,
+    marginBottom: 0,
+  },
+  input: {
     borderRadius: theme.borderRadius.full,
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.lg,
-    maxHeight: 80,
-    color: theme.colors.text,
+    minHeight: theme.verticalScale(56),
+    textAlignVertical: "top",
+    includeFontPadding: false,
   },
   sendButton: {
-    width: 40,
-    height: 40,
+    width: theme.scale(40),
+    height: theme.scale(40),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.surface,
     alignItems: "center",

@@ -1,5 +1,5 @@
-  import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,7 +11,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Filter, useInfiniteSearchCars } from "../../api/car";
+import { useInfiniteSearchCars } from "../../api/car";
+import { useSearchFilters } from "../../hooks/useSearchFilters";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "../../ui";
 import { CarItem } from "../../ui/components/CarItem";
 import { UIPicker } from "../../ui/UIPicker";
@@ -30,34 +31,14 @@ export default function SearchScreen() {
   const { theme, rt } = useUnistyles();
   const styles = stylesheet;
   const [showFilters, setShowFilters] = useState(false);
-  const defaultFilters: Filter = {
-    brand: "",
-    model: "",
-    minPrice: "",
-    maxPrice: "",
-    minYear: "",
-    maxYear: "",
-    fuelType: "",
-    location: "",
-    minMileage: "",
-    maxMileage: "",
-    transmission: "",
-    sortBy: "",
-  };
 
-  const [draftFilters, setDraftFilters] = useState<Filter>(defaultFilters);
-  const [appliedFilters, setAppliedFilters] = useState<Filter | undefined>(
-    undefined
-  );
-
-  useEffect(() => {
-    if (draftFilters.sortBy !== (appliedFilters?.sortBy ?? "")) {
-      setAppliedFilters((prev) => ({
-        ...(prev || defaultFilters),
-        sortBy: draftFilters.sortBy,
-      }));
-    }
-  }, [draftFilters.sortBy]);
+  const {
+    draftFilters,
+    appliedFilters,
+    handleChangeFilters: applyFilters,
+    handleResetFilters,
+    updateDraftFilter,
+  } = useSearchFilters();
 
   const {
     data: infiniteData,
@@ -68,8 +49,9 @@ export default function SearchScreen() {
     isFetchingNextPage,
   } = useInfiniteSearchCars(appliedFilters, 5);
   const cars = infiniteData?.pages.flat() ?? [];
+
   const handleChangeFilters = () => {
-    setAppliedFilters(draftFilters);
+    applyFilters();
     setShowFilters(false);
   };
 
@@ -90,10 +72,10 @@ export default function SearchScreen() {
                 currentPickerValue={currentSortLabel}
                 pick={(label) => {
                   const found = sortingTypes.find((s) => s.label === label);
-                  setDraftFilters({
-                    ...draftFilters,
-                    sortBy: found ? (found.id as Filter["sortBy"]) : "",
-                  });
+                  updateDraftFilter(
+                    "sortBy",
+                    found ? (found.id as any) : ""
+                  );
                 }}
               />
             );
@@ -144,26 +126,20 @@ export default function SearchScreen() {
                         label="Brand"
                         placeholder="e.g., BMW, Mercedes"
                         value={draftFilters.brand}
-                        onChangeText={(text) =>
-                          setDraftFilters({ ...draftFilters, brand: text })
-                        }
+                        onChangeText={(text) => updateDraftFilter("brand", text)}
                       />
                       <UIInput
                         label="Model"
                         placeholder="e.g., 320d, C-Class"
                         value={draftFilters.model}
-                        onChangeText={(text) =>
-                          setDraftFilters({ ...draftFilters, model: text })
-                        }
+                        onChangeText={(text) => updateDraftFilter("model", text)}
                       />
                       <View style={styles.row}>
                         <UIInput
                           label="Min Price"
                           placeholder="eg. 0"
                           value={draftFilters.minPrice}
-                          onChangeText={(text) =>
-                            setDraftFilters({ ...draftFilters, minPrice: text })
-                          }
+                          onChangeText={(text) => updateDraftFilter("minPrice", text)}
                           containerStyle={styles.halfInput}
                           keyboardType="numeric"
                         />
@@ -171,9 +147,7 @@ export default function SearchScreen() {
                           label="Max Price"
                           placeholder="eg. 500000"
                           value={draftFilters.maxPrice}
-                          onChangeText={(text) =>
-                            setDraftFilters({ ...draftFilters, maxPrice: text })
-                          }
+                          onChangeText={(text) => updateDraftFilter("maxPrice", text)}
                           containerStyle={styles.halfInput}
                           keyboardType="numeric"
                         />
@@ -183,9 +157,7 @@ export default function SearchScreen() {
                           label="Min Year"
                           placeholder="eg. 1990"
                           value={draftFilters.minYear}
-                          onChangeText={(text) =>
-                            setDraftFilters({ ...draftFilters, minYear: text })
-                          }
+                          onChangeText={(text) => updateDraftFilter("minYear", text)}
                           containerStyle={styles.halfInput}
                           keyboardType="numeric"
                         />
@@ -193,9 +165,7 @@ export default function SearchScreen() {
                           label="Max Year"
                           placeholder={`eg. ${new Date().getFullYear()}`}
                           value={draftFilters.maxYear}
-                          onChangeText={(text) =>
-                            setDraftFilters({ ...draftFilters, maxYear: text })
-                          }
+                          onChangeText={(text) => updateDraftFilter("maxYear", text)}
                           containerStyle={styles.halfInput}
                           keyboardType="numeric"
                         />
@@ -205,12 +175,7 @@ export default function SearchScreen() {
                           label="Min Mileage"
                           placeholder="eg. 0"
                           value={draftFilters.minMileage}
-                          onChangeText={(text) =>
-                            setDraftFilters({
-                              ...draftFilters,
-                              minMileage: text,
-                            })
-                          }
+                          onChangeText={(text) => updateDraftFilter("minMileage", text)}
                           containerStyle={styles.halfInput}
                           keyboardType="numeric"
                         />
@@ -218,12 +183,7 @@ export default function SearchScreen() {
                           label="Max mileage"
                           placeholder="eg. 340000"
                           value={draftFilters.maxMileage}
-                          onChangeText={(text) =>
-                            setDraftFilters({
-                              ...draftFilters,
-                              maxMileage: text,
-                            })
-                          }
+                          onChangeText={(text) => updateDraftFilter("maxMileage", text)}
                           containerStyle={styles.halfInput}
                           keyboardType="numeric"
                         />
@@ -235,10 +195,7 @@ export default function SearchScreen() {
                           values={fuelTypes}
                           currentPickerValue={draftFilters.fuelType}
                           pick={(value) => {
-                            setDraftFilters({
-                              ...draftFilters,
-                              fuelType: value as Filter["fuelType"],
-                            });
+                            updateDraftFilter("fuelType", value as any);
                           }}
                         />
                         <UIPicker
@@ -246,10 +203,7 @@ export default function SearchScreen() {
                           values={transmissions}
                           currentPickerValue={draftFilters.transmission}
                           pick={(value) => {
-                            setDraftFilters({
-                              ...draftFilters,
-                              transmission: value as Filter["transmission"],
-                            });
+                            updateDraftFilter("transmission", value as any);
                           }}
                         />
                       </View>
@@ -257,17 +211,12 @@ export default function SearchScreen() {
                         label="Location"
                         placeholder="City"
                         value={draftFilters.location}
-                        onChangeText={(text) =>
-                          setDraftFilters({ ...draftFilters, location: text })
-                        }
+                        onChangeText={(text) => updateDraftFilter("location", text)}
                       />
                       <View style={styles.filterActions}>
                         <UIButton
                           variant="outline"
-                          onPress={() => {
-                            setDraftFilters(defaultFilters);
-                            setAppliedFilters(undefined);
-                          }}
+                          onPress={handleResetFilters}
                           style={styles.resetButton}
                         >
                           <UIText weight="semibold">Reset</UIText>
@@ -305,6 +254,11 @@ export default function SearchScreen() {
               fetchNextPage();
             }
           }}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          initialNumToRender={10}
+          updateCellsBatchingPeriod={50}
           ListFooterComponent={() =>
             isFetchingNextPage ? (
               <View style={{ padding: theme.spacing.md, alignItems: "center" }}>
@@ -437,10 +391,10 @@ const stylesheet = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.sm,
   },
   filterButton: {
-    width: 48,
-    height: 48,
+    width: theme.scale(48),
+    height: theme.scale(48),
     borderRadius: theme.borderRadius.md,
-    borderWidth: 1,
+    borderWidth: theme.scale(1),
     borderColor: theme.colors.primary,
     backgroundColor: "transparent",
     alignItems: "center",

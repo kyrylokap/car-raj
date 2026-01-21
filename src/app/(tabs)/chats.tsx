@@ -35,6 +35,11 @@ export default function MessengerScreen() {
             { paddingBottom: rt.insets.bottom + 100 },
           ]}
           showsVerticalScrollIndicator={false}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          windowSize={10}
+          initialNumToRender={10}
+          updateCellsBatchingPeriod={50}
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Ionicons
@@ -71,6 +76,12 @@ const ChatListItem = ({ item: chat }: { item: ChatWithDetails }) => {
         <Image
           style={styles.avatarPlaceholder}
           source={{ uri: chat.other_details?.image_url! }}
+          cachePolicy="memory-disk"
+          transition={100}
+          contentFit="cover"
+          priority="normal"
+          recyclingKey={chat.other_details?.id}
+          allowDownscaling={true}
         />
 
         <View style={styles.chatContent}>
@@ -106,7 +117,7 @@ const styles = StyleSheet.create((theme) => ({
   buttonsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 24,
+    gap: theme.scale(24),
   },
   safeArea: {
     flex: 1,
@@ -135,8 +146,8 @@ const styles = StyleSheet.create((theme) => ({
     position: "relative",
   },
   avatarPlaceholder: {
-    width: 56,
-    height: 56,
+    width: theme.scale(56),
+    height: theme.scale(56),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
@@ -144,15 +155,15 @@ const styles = StyleSheet.create((theme) => ({
   },
   unreadBadge: {
     position: "absolute",
-    top: -4,
-    right: -4,
+    top: theme.scale(-4),
+    right: theme.scale(-4),
     backgroundColor: theme.colors.error,
     borderRadius: theme.borderRadius.full,
-    minWidth: 20,
-    height: 20,
+    minWidth: theme.scale(20),
+    height: theme.scale(20),
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 6,
+    paddingHorizontal: theme.scale(6),
   },
   unreadText: {
     color: theme.colors.white,

@@ -74,6 +74,8 @@ export const ImagesCarousel = ({
     });
   };
 
+ 
+
   return (
     <UICard style={styles.imageCard}>
       {pathName.includes("sell-vehicle") ? (
@@ -120,7 +122,13 @@ export const ImagesCarousel = ({
                 <Image
                   style={styles.imagePlaceholder}
                   source={{ uri: imageUrl }}
-                  contentFit="contain"
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  transition={100}
+                  placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
+                  priority="high"
+                  recyclingKey={imageUrl}
+                  allowDownscaling={true}
                 />
               </Pressable>
             )}
@@ -156,6 +164,9 @@ export const ImagesCarousel = ({
                 contentFit="contain"
                 source={{ uri: selectedImage }}
                 style={{ width: "100%", height: "100%" }}
+                cachePolicy="memory-disk"
+                transition={200}
+                priority="high"
               />
             )}
           </TouchableOpacity>
@@ -167,8 +178,8 @@ export const ImagesCarousel = ({
 
 const styles = StyleSheet.create((theme) => ({
   imageUploadButton: {
-    padding: 10,
-    borderWidth: 2,
+    padding: theme.scale(10),
+    borderWidth: theme.scale(2),
     borderColor: theme.colors.border,
     borderStyle: "dashed",
     borderRadius: theme.borderRadius.md,
@@ -185,22 +196,22 @@ const styles = StyleSheet.create((theme) => ({
   imageCard: {
     marginBottom: theme.spacing.md,
     padding: theme.spacing.md,
-    gap: 10,
+    gap: theme.scale(10),
   },
   trashContainer: {
     backgroundColor: "rgba(0,0,0,0.5)",
-    width: 34,
-    height: 34,
+    width: theme.scale(34),
+    height: theme.scale(34),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: theme.spacing.sm,
     position: "absolute",
-    top: 8,
-    right: 12,
+    top: theme.scale(8),
+    right: theme.scale(12),
   },
   imageContainer: {
     width: "100%",
-    height: 240,
+    height: theme.verticalScale(240),
     backgroundColor: theme.colors.surface,
     justifyContent: "center",
   },
@@ -212,13 +223,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   currentImageText: {
     position: "absolute",
-    bottom: 8,
-    right: 12,
+    bottom: theme.scale(8),
+    right: theme.scale(12),
     backgroundColor: "rgba(0,0,0,0.5)",
     color: "#fff",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontSize: 14,
+    paddingHorizontal: theme.scale(8),
+    paddingVertical: theme.scale(4),
+    borderRadius: theme.scale(12),
+    fontSize: theme.scale(14),
   },
 }));

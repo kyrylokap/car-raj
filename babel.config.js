@@ -3,12 +3,12 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
+      "babel-plugin-react-compiler",
       [
         "react-native-unistyles/plugin",
         {
           root: "./",
         },
-        "react-native-worklets/plugin",
       ],
       "react-native-reanimated/plugin",
     ],
