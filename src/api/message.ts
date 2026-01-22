@@ -1,6 +1,6 @@
 import { Database } from "@/src/lib/database.types";
 import { RealtimeChannel } from "@supabase/supabase-js";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { useUser } from "./auth";
@@ -50,6 +50,7 @@ export function useInfiniteMessages(pageSize = 15, chatId?: string | null) {
 }
 
 export default function useChatMessages({ chatId }: { chatId: string }) {
+  const queryClient = useQueryClient();
   const {
     data: messagesData,
     fetchNextPage,
@@ -66,7 +67,10 @@ export default function useChatMessages({ chatId }: { chatId: string }) {
   useEffect(() => {
     if (!messagesData) return;
     const allMessages = messagesData.pages.flat();
-    setMessages(allMessages);
+    const uniqueMessages = Array.from(
+      new Map(allMessages.map((msg) => [msg.id, msg])).values()
+    );
+    setMessages(uniqueMessages);
   }, [messagesData]);
 
   useEffect(() => {
@@ -135,12 +139,17 @@ export default function useChatMessages({ chatId }: { chatId: string }) {
       .select()
       .single();
 
-    await sendMessageFirebase({ text, message_id: data?.id! });
-
     if (error) {
       console.error("insert message error", error);
       throw error;
     }
+
+    await sendMessageFirebase({ text, message_id: data?.id! });
+
+    if (userId) {
+      queryClient.invalidateQueries({ queryKey: ["userChats", userId] });
+    }
+
     return data;
   };
 

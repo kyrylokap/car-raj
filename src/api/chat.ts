@@ -10,6 +10,7 @@ export type UserDetailsRow =
 
 export type ChatWithDetails = Chat & {
   other_details?: UserDetailsRow | null;
+  last_message_time?: string | null;
 };
 
 export async function getChatsForUser(
@@ -22,6 +23,29 @@ export async function getChatsForUser(
 
   if (error) throw error;
   if (!data || data.length === 0) return [];
+
+  const chatIds = data.map((c) => c.id);
+
+  const { data: lastMessages, error: messagesError } = await supabase
+    .from("message")
+    .select("chat_id, created_at")
+    .in("chat_id", chatIds)
+    .order("created_at", { ascending: false });
+
+  if (messagesError) {
+    console.error("Error fetching last messages:", messagesError);
+  }
+
+  const lastMessageMap: Record<string, string> = {};
+  if (lastMessages) {
+    const seenChats = new Set<string>();
+    for (const msg of lastMessages) {
+      if (msg.chat_id && !seenChats.has(msg.chat_id)) {
+        lastMessageMap[msg.chat_id] = msg.created_at;
+        seenChats.add(msg.chat_id);
+      }
+    }
+  }
 
   const ids = new Set<string>();
   data.forEach((c) => {
@@ -46,7 +70,14 @@ export async function getChatsForUser(
       }
       return chat.customer_id ? detailsMap[chat.customer_id] ?? null : null;
     })(),
+    last_message_time: lastMessageMap[chat.id] || null,
   }));
+
+  prepared.sort((a, b) => {
+    const timeA = a.last_message_time ? new Date(a.last_message_time).getTime() : 0;
+    const timeB = b.last_message_time ? new Date(b.last_message_time).getTime() : 0;
+    return timeB - timeA;
+  });
 
   return prepared;
 }

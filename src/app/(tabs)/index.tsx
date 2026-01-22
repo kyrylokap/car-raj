@@ -101,7 +101,7 @@ export default function SearchScreen() {
             animationType="slide"
             visible={showFilters}
           >
-            <SafeAreaView style={styles.modalOverlay} edges={["top"]}>
+            <View style={styles.modalOverlay} >
               <View style={styles.modalContainer}>
                 <View style={[styles.modalHeader, { paddingTop: rt.insets.top + theme.spacing.sm }]}>
                   <UIText size="lg" style={styles.filtersTitle}>
@@ -235,7 +235,7 @@ export default function SearchScreen() {
                   </KeyboardAvoidingView>
                 </ScrollView>
               </View>
-            </SafeAreaView>
+            </View>
           </Modal>
         <FlatList
           data={cars}
