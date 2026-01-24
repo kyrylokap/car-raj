@@ -12,7 +12,6 @@ import { UICard, UIContainer, UIText } from "../../ui";
 export default function ProfileScreen() {
   const { theme, rt } = useUnistyles();
   const user = useUser();
-  const styles = stylesheet;
   const router = useRouter();
   const { data: userCarsCount } = useUserCarsCount();
   const stats = [
@@ -22,12 +21,6 @@ export default function ProfileScreen() {
       icon: "car-outline",
       color: theme.colors.primary,
     },
-    // {
-    //   label: "Sold",
-    //   value: "8",
-    //   icon: "checkmark-circle-outline",
-    //   color: theme.colors.primary,
-    // },
   ];
 
   const menuItems = [
@@ -94,7 +87,6 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          {/* Stats Section */}
           <View style={styles.statsSection}>
             <View style={styles.statsContainer}>
               {stats.map((stat, index) => (
@@ -219,7 +211,7 @@ export default function ProfileScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

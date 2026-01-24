@@ -39,45 +39,30 @@ function RootLayoutNav() {
   }
   return (
     <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Protected guard={!!user}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" />
           <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-          <Stack.Screen
-            name="chat/[id]"
-            options={{ presentation: "modal", headerShown: false }}
-          />
+          <Stack.Screen name="chat/[id]" options={{ presentation: "modal" }} />
 
-          <Stack.Screen
-            name="car/[id]"
-            options={{ presentation: "modal", headerShown: false }}
-          />
+          <Stack.Screen name="car/[id]" options={{ presentation: "modal" }} />
           <Stack.Screen
             name="user/[userId]/user-cars"
-            options={{ presentation: "modal", headerShown: false }}
+            options={{ presentation: "modal" }}
           />
           <Stack.Screen
             name="my-vehicles"
-            options={{ presentation: "modal", headerShown: false }}
+            options={{ presentation: "modal" }}
           />
           <Stack.Screen
             name="sell-vehicle"
-            options={{ presentation: "modal", headerShown: false }}
+            options={{ presentation: "modal" }}
           />
 
-          <Stack.Screen
-            name="settings"
-            options={{ presentation: "modal", headerShown: false }}
-          />
-          <Stack.Screen
-            name="favorites"
-            options={{ presentation: "modal", headerShown: false }}
-          />
+          <Stack.Screen name="settings" options={{ presentation: "modal" }} />
+          <Stack.Screen name="favorites" options={{ presentation: "modal" }} />
         </Stack.Protected>
-        <Stack.Screen
-          name="auth"
-          options={{ presentation: "modal", headerShown: false }}
-        />
+        <Stack.Screen name="auth" options={{ presentation: "modal" }} />
       </Stack>
     </ThemeProvider>
   );

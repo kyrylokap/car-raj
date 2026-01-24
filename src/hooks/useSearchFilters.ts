@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Filter } from "../api/car";
 
 const defaultFilters: Filter = {
@@ -19,7 +19,7 @@ const defaultFilters: Filter = {
 export function useSearchFilters() {
   const [draftFilters, setDraftFilters] = useState<Filter>(defaultFilters);
   const [appliedFilters, setAppliedFilters] = useState<Filter | undefined>(
-    undefined
+    undefined,
   );
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useSearchFilters() {
     }
   }, [draftFilters.sortBy]);
 
-  const handleChangeFilters = () => {
+  const applyFilters = () => {
     setAppliedFilters(draftFilters);
   };
 
@@ -42,7 +42,7 @@ export function useSearchFilters() {
 
   const updateDraftFilter = <K extends keyof Filter>(
     key: K,
-    value: Filter[K]
+    value: Filter[K],
   ) => {
     setDraftFilters((prev) => ({ ...prev, [key]: value }));
   };
@@ -50,7 +50,7 @@ export function useSearchFilters() {
   return {
     draftFilters,
     appliedFilters,
-    handleChangeFilters,
+    applyFilters,
     handleResetFilters,
     updateDraftFilter,
   };

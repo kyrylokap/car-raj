@@ -5,8 +5,6 @@ import { StyleSheet } from "react-native-unistyles";
 import { UIContainer, UIText } from "../ui";
 
 export default function ModalScreen() {
-  const styles = stylesheet;
-
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <UIContainer>
@@ -22,7 +20,7 @@ export default function ModalScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

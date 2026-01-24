@@ -11,15 +11,11 @@ import { UIText } from "../../../ui";
 import { CarItem } from "../../../ui/components/CarItem";
 
 export default function UserProfileWithCarsScreen() {
-  const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
+  const { theme } = useUnistyles();
   const router = useRouter();
   const params = useLocalSearchParams();
-  const { data: userDetails, isLoading: userDetailsIsLoading } =
-    useUserDetailsById(params.userId as string);
-  const { data: userCars, isLoading: userCarsIsLoading } = useUserCars(
-    params.userId as string
-  );
+  const { data: userDetails } = useUserDetailsById(params.userId as string);
+  const { data: userCars } = useUserCars(params.userId as string);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
@@ -27,6 +23,7 @@ export default function UserProfileWithCarsScreen() {
         <TouchableOpacity
           onPress={() => router.back()}
           style={styles.backButton}
+          hitSlop={14}
         >
           <Ionicons
             name="arrow-back"
@@ -62,10 +59,7 @@ export default function UserProfileWithCarsScreen() {
           return <CarItem item={item} />;
         }}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingBottom: rt.insets.bottom + 100 },
-        ]}
+        contentContainerStyle={[styles.listContent]}
         showsVerticalScrollIndicator={false}
         removeClippedSubviews={true}
         maxToRenderPerBatch={10}
@@ -89,7 +83,7 @@ export default function UserProfileWithCarsScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

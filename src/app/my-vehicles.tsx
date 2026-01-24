@@ -11,7 +11,6 @@ import { CarItem } from "../ui/components/CarItem";
 
 export default function MyListingsScreen() {
   const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
   const router = useRouter();
   const user = useUser();
   const { data: cars } = useUserCars(user?.id!);
@@ -83,7 +82,7 @@ export default function MyListingsScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

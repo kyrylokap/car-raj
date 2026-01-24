@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useCarDetails } from "../../hooks/useCarDetails";
 import { useCarImages } from "../../api/car";
+import { useCarDetails } from "../../hooks/useCarDetails";
 import { UIButton, UICard, UIContainer, UIText } from "../../ui";
 import { ImagesCarousel } from "../../ui/components/ImagesCarousel";
 
@@ -24,7 +24,6 @@ export default function CarDetailsScreen() {
     car,
     isLoading,
     isCarFavorite,
-    currentUserId,
     handleToggleFavorite,
     handleContactSeller,
     handleCall,
@@ -82,10 +81,7 @@ export default function CarDetailsScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.scrollContent,
-          
-        ]}
+        contentContainerStyle={[styles.scrollContent]}
       >
         <View style={{ padding: 20 }}>
           <UIText size="xxl" style={styles.carTitle}>

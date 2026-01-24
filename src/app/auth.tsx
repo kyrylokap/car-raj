@@ -10,15 +10,8 @@ export default function AuthScreen() {
         <UIText size="xxl" weight="bold" style={styles.topText}>
           Sign in
         </UIText>
-        {/* <UIInput label="Email" />
-        <UIInput label="Password" />
-        <View style={styles.googleAuthButtonContainer}>
-          <UIButton variant="secondary">
-            <UIText size="lg">Sign in</UIText>
-          </UIButton> */}
 
         <GoogleButton />
-        {/* </View> */}
       </UICard>
     </SafeAreaView>
   );

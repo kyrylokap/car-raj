@@ -21,7 +21,6 @@ type SettingItem = {
 
 export default function SettingsScreen() {
   const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
   const router = useRouter();
   const { isDarkMode, toggleTheme } = useThemeContext();
   const [phoneModalVisible, setPhoneModalVisible] = useState<boolean>(false);
@@ -100,7 +99,7 @@ export default function SettingsScreen() {
   const renderSettingItem = (
     item: SettingItem,
     index: number,
-    array: SettingItem[]
+    array: SettingItem[],
   ) => {
     const isLast = index === array.length - 1;
 
@@ -226,7 +225,7 @@ export default function SettingsScreen() {
               ACCOUNT
             </UIText>
             {accountSettings.map((item, index) =>
-              renderSettingItem(item, index, accountSettings)
+              renderSettingItem(item, index, accountSettings),
             )}
           </UICard>
 
@@ -242,7 +241,7 @@ export default function SettingsScreen() {
               APP SETTINGS
             </UIText>
             {appSettings.map((item, index) =>
-              renderSettingItem(item, index, appSettings)
+              renderSettingItem(item, index, appSettings),
             )}
           </UICard>
 
@@ -256,7 +255,7 @@ export default function SettingsScreen() {
               SUPPORT & LEGAL
             </UIText>
             {supportSettings.map((item, index) =>
-              renderSettingItem(item, index, supportSettings)
+              renderSettingItem(item, index, supportSettings),
             )}
           </UICard>
 
@@ -281,7 +280,7 @@ export default function SettingsScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

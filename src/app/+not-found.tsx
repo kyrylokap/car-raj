@@ -1,12 +1,9 @@
 import { Link, Stack } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { UIContainer, UIText } from "../ui";
 
 export default function NotFoundScreen() {
-  const { theme } = useUnistyles();
-  const styles = stylesheet;
-
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
@@ -26,7 +23,7 @@ export default function NotFoundScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

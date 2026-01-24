@@ -1,16 +1,27 @@
 import { Database } from "@/src/lib/database.types";
+import { RealtimeChannel } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef } from "react";
 import { useUser } from "./auth";
 import { supabase } from "./supabase";
 import { fetchUserDetailsByIds } from "./userProfile";
 
 export type Chat = Database["public"]["Tables"]["chat"]["Row"];
+export type MessageRow = Database["public"]["Tables"]["message"]["Row"];
 export type UserDetailsRow =
   Database["public"]["Tables"]["user_details"]["Row"];
 
+export type LastMessagePreview = Pick<
+  MessageRow,
+  "id" | "text" | "created_at" | "sender_id" | "chat_id"
+>;
+
 export type ChatWithDetails = Chat & {
   other_details?: UserDetailsRow | null;
+  last_message?: LastMessagePreview | null;
   last_message_time?: string | null;
+  last_message_text?: string | null;
+  last_message_sender_id?: string | null;
 };
 
 export async function getChatsForUser(
@@ -18,34 +29,24 @@ export async function getChatsForUser(
 ): Promise<ChatWithDetails[]> {
   const { data, error } = await supabase
     .from("chat")
-    .select("*")
+    .select(
+      `
+      *,
+      last_message:message!message_chat_id_fkey (
+        id,
+        chat_id,
+        text,
+        created_at,
+        sender_id
+      )
+    `
+    )
+    .order("created_at", { foreignTable: "message", ascending: false })
+    .limit(1, { foreignTable: "message" })
     .or(`owner_id.eq.${userId},customer_id.eq.${userId}`);
 
   if (error) throw error;
   if (!data || data.length === 0) return [];
-
-  const chatIds = data.map((c) => c.id);
-
-  const { data: lastMessages, error: messagesError } = await supabase
-    .from("message")
-    .select("chat_id, created_at")
-    .in("chat_id", chatIds)
-    .order("created_at", { ascending: false });
-
-  if (messagesError) {
-    console.error("Error fetching last messages:", messagesError);
-  }
-
-  const lastMessageMap: Record<string, string> = {};
-  if (lastMessages) {
-    const seenChats = new Set<string>();
-    for (const msg of lastMessages) {
-      if (msg.chat_id && !seenChats.has(msg.chat_id)) {
-        lastMessageMap[msg.chat_id] = msg.created_at;
-        seenChats.add(msg.chat_id);
-      }
-    }
-  }
 
   const ids = new Set<string>();
   data.forEach((c) => {
@@ -62,20 +63,34 @@ export async function getChatsForUser(
     });
   }
 
-  const prepared: ChatWithDetails[] = (data || []).map((chat) => ({
-    ...chat,
-    other_details: ((): UserDetailsRow | null => {
-      if (chat.customer_id === userId) {
-        return chat.owner_id ? detailsMap[chat.owner_id] ?? null : null;
-      }
-      return chat.customer_id ? detailsMap[chat.customer_id] ?? null : null;
-    })(),
-    last_message_time: lastMessageMap[chat.id] || null,
-  }));
+  const prepared: ChatWithDetails[] = (data || []).map((chat: any) => {
+    const embeddedLastMessage: LastMessagePreview | null =
+      Array.isArray(chat?.last_message) && chat.last_message.length > 0
+        ? chat.last_message[0]
+        : null;
+
+    return {
+      ...chat,
+      last_message: embeddedLastMessage,
+      other_details: ((): UserDetailsRow | null => {
+        if (chat.customer_id === userId) {
+          return chat.owner_id ? detailsMap[chat.owner_id] ?? null : null;
+        }
+        return chat.customer_id ? detailsMap[chat.customer_id] ?? null : null;
+      })(),
+      last_message_time: embeddedLastMessage?.created_at ?? null,
+      last_message_text: embeddedLastMessage?.text ?? null,
+      last_message_sender_id: embeddedLastMessage?.sender_id ?? null,
+    };
+  });
 
   prepared.sort((a, b) => {
-    const timeA = a.last_message_time ? new Date(a.last_message_time).getTime() : 0;
-    const timeB = b.last_message_time ? new Date(b.last_message_time).getTime() : 0;
+    const timeA = a.last_message_time
+      ? new Date(a.last_message_time).getTime()
+      : 0;
+    const timeB = b.last_message_time
+      ? new Date(b.last_message_time).getTime()
+      : 0;
     return timeB - timeA;
   });
 
@@ -103,7 +118,10 @@ export function useChatsCount() {
 }
 
 export function useUserChats(userId?: string) {
-  return useQuery<ChatWithDetails[], Error>({
+  const queryClient = useQueryClient();
+  const channelRefs = useRef<RealtimeChannel[]>([]);
+
+  const query = useQuery<ChatWithDetails[], Error>({
     queryKey: ["userChats", userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -112,6 +130,96 @@ export function useUserChats(userId?: string) {
     enabled: !!userId,
     staleTime: 1000 * 60 * 1,
   });
+
+  const chatIdsKey = useMemo(() => {
+    const ids = (query.data ?? []).map((c) => c.id).sort();
+    return ids.join("|");
+  }, [query.data]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const chats = queryClient.getQueryData<ChatWithDetails[]>([
+      "userChats",
+      userId,
+    ]);
+    const chatIds = (chats ?? []).map((c) => c.id);
+    if (chatIds.length === 0) return;
+
+    // Cleanup any previous subscriptions first.
+    channelRefs.current.forEach((ch) => supabase.removeChannel(ch));
+    channelRefs.current = [];
+
+    const channels = chatIds.map((chatId) => {
+      const channel = supabase.channel(`chat:${chatId}:last_message`);
+
+      channel.on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "message",
+          filter: `chat_id=eq.${chatId}`,
+        },
+        (payload) => {
+          const newMsg: any = payload.new;
+
+          queryClient.setQueryData<ChatWithDetails[]>(
+            ["userChats", userId],
+            (prev) => {
+              if (!prev) return prev;
+              const idx = prev.findIndex((c) => c.id === newMsg.chat_id);
+              if (idx === -1) return prev;
+
+              const updated = [...prev];
+              const old = updated[idx];
+
+              const lastMessage: LastMessagePreview = {
+                id: newMsg.id,
+                chat_id: newMsg.chat_id,
+                text: newMsg.text,
+                created_at: newMsg.created_at,
+                sender_id: newMsg.sender_id,
+              };
+
+              updated[idx] = {
+                ...old,
+                last_message: lastMessage,
+                last_message_time: newMsg.created_at ?? old.last_message_time,
+                last_message_text: newMsg.text ?? old.last_message_text,
+                last_message_sender_id:
+                  newMsg.sender_id ?? old.last_message_sender_id,
+              };
+
+              updated.sort((a, b) => {
+                const timeA = a.last_message_time
+                  ? new Date(a.last_message_time).getTime()
+                  : 0;
+                const timeB = b.last_message_time
+                  ? new Date(b.last_message_time).getTime()
+                  : 0;
+                return timeB - timeA;
+              });
+
+              return updated;
+            }
+          );
+        }
+      );
+
+      channel.subscribe();
+      return channel;
+    });
+
+    channelRefs.current = channels;
+
+    return () => {
+      channelRefs.current.forEach((ch) => supabase.removeChannel(ch));
+      channelRefs.current = [];
+    };
+  }, [userId, chatIdsKey, queryClient]);
+
+  return query;
 }
 
 export async function getChatById(chatId: string): Promise<Chat | null> {

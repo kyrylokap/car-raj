@@ -11,7 +11,7 @@ export const GoogleButton = () => {
   useEffect(() => {
     const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID;
     const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_IOS_ID;
-   
+
     GoogleSignin.configure({
       webClientId,
       ...(iosClientId && { iosClientId }),
@@ -58,7 +58,11 @@ export const GoogleButton = () => {
 
   return (
     <UIButton variant="ghost" style={styles.button} onPress={handleGoogleLogin}>
-      <Ionicons name="logo-google" color={styles.icon.color} size={theme.scale(24)} />
+      <Ionicons
+        name="logo-google"
+        color={styles.icon.color}
+        size={theme.scale(24)}
+      />
       <UIText size="lg">Continue with Google</UIText>
     </UIButton>
   );

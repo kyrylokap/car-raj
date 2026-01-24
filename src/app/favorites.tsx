@@ -10,7 +10,6 @@ import { CarItem } from "../ui/components/CarItem";
 
 export default function FavoritesScreen() {
   const { theme, rt } = useUnistyles();
-  const styles = stylesheet;
   const router = useRouter();
   const { data: cars } = useUserFavorites();
 
@@ -67,7 +66,7 @@ export default function FavoritesScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

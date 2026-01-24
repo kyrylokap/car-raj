@@ -44,7 +44,10 @@ export default function ChatScreen() {
     const { height } = event.nativeEvent.contentSize;
     const minHeight = theme.verticalScale(56);
     const maxHeight = theme.verticalScale(120);
-    const newHeight = Math.min(Math.max(height + theme.spacing.md * 2, minHeight), maxHeight);
+    const newHeight = Math.min(
+      Math.max(height + theme.spacing.md * 2, minHeight),
+      maxHeight,
+    );
     setInputHeight(newHeight);
   };
 
@@ -60,7 +63,7 @@ export default function ChatScreen() {
   const { data: carTitle } = useCarTitle(chat?.car_id ?? null);
 
   return (
-    <SafeAreaView style={styles.container} >
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={handleLeaveChat}
@@ -91,7 +94,12 @@ export default function ChatScreen() {
             <UIText size="lg" numberOfLines={1} ellipsizeMode="tail">
               {owner?.fullname || "Owner"}
             </UIText>
-            <UIText size="xs" color="textSecondary" numberOfLines={1} ellipsizeMode="tail">
+            <UIText
+              size="xs"
+              color="textSecondary"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               {carTitle ?? "—"}
             </UIText>
           </View>
@@ -136,7 +144,12 @@ export default function ChatScreen() {
           </UIText>
 
           <View style={styles.inputContainer}>
-            <View style={[styles.inputWrapper, { maxHeight: theme.verticalScale(120), overflow: "hidden" }]}>
+            <View
+              style={[
+                styles.inputWrapper,
+                { maxHeight: theme.verticalScale(120), overflow: "hidden" },
+              ]}
+            >
               <UIInput
                 placeholder="Type a message..."
                 value={inputText}

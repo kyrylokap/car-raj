@@ -39,9 +39,8 @@ const tabs: TabItem[] = [
   },
 ];
 
-export const CustomTabBar: React.FC = () => {
+export const CustomTabBar = () => {
   const { theme } = useUnistyles();
-  const styles = stylesheet;
   const router = useRouter();
   const pathname = usePathname();
   const { data: chatsCount } = useChatsCount();
@@ -85,14 +84,8 @@ export const CustomTabBar: React.FC = () => {
                     }
                     style={styles.icon}
                   />
-                  
                 </View>
-                <UIText
-                  size="xxs"
-                  color={active ? "primary" : "textSecondary"}
-                  weight={active ? "semibold" : "normal"}
-                  style={styles.label}
-                >
+                <UIText size="xs" style={styles.label(active)}>
                   {tab.label}
                 </UIText>
               </View>
@@ -104,7 +97,7 @@ export const CustomTabBar: React.FC = () => {
   );
 };
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
     bottom: 0,
@@ -145,9 +138,10 @@ const stylesheet = StyleSheet.create((theme) => ({
   icon: {
     position: "relative",
   },
-  label: {
+  label: (active: boolean) => ({
     marginTop: 0,
-  },
+    color: active ? theme.colors.primary : theme.colors.textSecondary,
+  }),
   badge: {
     position: "absolute",
     top: theme.scale(-6),

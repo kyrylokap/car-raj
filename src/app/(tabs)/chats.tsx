@@ -1,13 +1,12 @@
+import { ChatListItem } from "@/src/ui/components/ChatListItem";
 import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React, { useCallback } from "react";
-import { FlatList, Pressable, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
-import { ChatWithDetails, useCarTitle, useUserChats } from "../../api/chat";
-import { UICard, UIContainer, UIText } from "../../ui";
+import { useUserChats } from "../../api/chat";
+import { UIContainer, UIText } from "../../ui";
 
 export default function MessengerScreen() {
   const { theme, rt } = useUnistyles();
@@ -58,67 +57,7 @@ export default function MessengerScreen() {
   );
 }
 
-const ChatListItem = ({ item: chat }: { item: ChatWithDetails }) => {
-  const { data: carTitle } = useCarTitle(chat.car_id);
-  const router = useRouter();
-  const { theme } = useUnistyles();
-  const handleNaviateToCar = useCallback(() => {
-    router.push(`/car/${chat.car_id}`);
-  }, [chat]);
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        router.push(`/chat/${chat.id}`);
-      }}
-      activeOpacity={0.7}
-    >
-      <UICard variant="outlined" style={styles.chatCard}>
-        <Image
-          style={styles.avatarPlaceholder}
-          source={{ uri: chat.other_details?.image_url! }}
-          cachePolicy="memory-disk"
-          transition={100}
-          contentFit="cover"
-          priority="normal"
-          recyclingKey={chat.other_details?.id}
-          allowDownscaling={true}
-        />
-
-        <View style={styles.chatContent}>
-          <UIText size="sm" color="primary" style={styles.carTitle}>
-            {carTitle}
-          </UIText>
-          <UIText size="lg" style={styles.chatUserName}>
-            {chat.other_details?.fullname}
-          </UIText>
-        </View>
-        <View style={styles.buttonsContainer}>
-          <Pressable hitSlop={14} onPress={handleNaviateToCar}>
-            <Ionicons
-              name="car-outline"
-              size={24}
-              color={theme.colors.primary}
-            />
-          </Pressable>
-          <Pressable hitSlop={14}>
-            <Ionicons
-              name="chevron-forward"
-              size={24}
-              color={theme.colors.textSecondary}
-            />
-          </Pressable>
-        </View>
-      </UICard>
-    </TouchableOpacity>
-  );
-};
-
 const styles = StyleSheet.create((theme) => ({
-  buttonsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.scale(24),
-  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -136,54 +75,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing.md,
     gap: theme.spacing.md,
   },
-  chatCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: theme.spacing.md,
-    gap: theme.spacing.md,
-  },
-  chatAvatar: {
-    position: "relative",
-  },
-  avatarPlaceholder: {
-    width: theme.scale(56),
-    height: theme.scale(56),
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  unreadBadge: {
-    position: "absolute",
-    top: theme.scale(-4),
-    right: theme.scale(-4),
-    backgroundColor: theme.colors.error,
-    borderRadius: theme.borderRadius.full,
-    minWidth: theme.scale(20),
-    height: theme.scale(20),
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: theme.scale(6),
-  },
-  unreadText: {
-    color: theme.colors.white,
-    fontWeight: "600",
-  },
-  chatContent: {
-    flex: 1,
-    gap: theme.spacing.xs,
-  },
-  chatHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  chatUserName: {
-    flex: 1,
-  },
-  carTitle: {
-    marginTop: theme.spacing.xs,
-  },
+
   emptyState: {
     flex: 1,
     alignItems: "center",

@@ -2,7 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useSellVehicleForm } from "../hooks/useSellVehicleForm";
 import { UIButton, UICard, UIContainer, UIInput, UIText } from "../ui";
@@ -15,7 +18,6 @@ const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
 export default function SellCarScreen() {
   const { theme } = useUnistyles();
   const insets = useSafeAreaInsets();
-  const styles = stylesheet;
   const router = useRouter();
   const {
     formData,
@@ -199,7 +201,7 @@ export default function SellCarScreen() {
   );
 }
 
-const stylesheet = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   errorText: {
     color: "#eb4f4fff",
   },
@@ -208,7 +210,7 @@ const stylesheet = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.background,
   },
   header: {
-    paddingTop:  theme.spacing.md ,
+    paddingTop: theme.spacing.md,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
