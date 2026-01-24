@@ -376,25 +376,51 @@ async function getCarImages({
     return [];
   }
 
-  const urls: string[] = [];
+  const paths = files
+    .map((f) => f?.name)
+    .filter((name): name is string => !!name)
+    .map((name) => `${folderPath}/${name}`);
 
-  for (const f of files) {
-    const path = `${folderPath}/${f.name}`;
-    const { data: signedData, error: signedError } = await supabase.storage
-      .from(bucket)
-      .createSignedUrl(path, 60 * 60 * 24 * 7);
+  if (paths.length === 0) return [];
 
-    if (signedError) {
-      console.error("Failed to create signed URL for", path, signedError);
-      continue;
-    }
+  const { data: signed, error: signedError } = await supabase.storage
+    .from(bucket)
+    .createSignedUrls(paths, 60 * 60 * 24 * 7);
 
-    if (signedData && signedData.signedUrl) {
-      urls.push(signedData.signedUrl);
-    }
-  }
+  if (signedError) throw signedError;
 
-  return urls;
+  return (signed ?? [])
+    .map((x) => x?.signedUrl)
+    .filter((u): u is string => !!u);
+}
+
+async function getCarFirstImageUrl({
+  userId,
+  carId,
+}: {
+  userId: string;
+  carId: string;
+}): Promise<string | null> {
+  if (!userId || !carId) return null;
+
+  const folderPath = `${userId}/${carId}`;
+  const bucket = "cars_images";
+
+  const { data: files, error: listError } = await supabase.storage
+    .from(bucket)
+    .list(folderPath, { limit: 1, offset: 0 });
+
+  if (listError) throw listError;
+  const firstName = files?.[0]?.name;
+  if (!firstName) return null;
+
+  const path = `${folderPath}/${firstName}`;
+  const { data: signedData, error: signedError } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(path, 60 * 60 * 24 * 7);
+
+  if (signedError) throw signedError;
+  return signedData?.signedUrl ?? null;
 }
 export function useCarFirstImage({
   userId,
@@ -406,8 +432,7 @@ export function useCarFirstImage({
   return useQuery<string | null>({
     queryKey: ["useCarFirstImage", userId, carId],
     queryFn: async () => {
-      const images = await getCarImages({ userId, carId });
-      return images.length > 0 ? images[0] : null;
+      return await getCarFirstImageUrl({ userId, carId });
     },
     staleTime: 1000 * 60 * 30,
     gcTime: 1000 * 60 * 60 * 24,
