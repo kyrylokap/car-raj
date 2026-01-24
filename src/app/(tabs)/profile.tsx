@@ -45,7 +45,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView style={styles.safeArea}>
       <UIContainer>
         <ScrollView
           contentContainerStyle={[

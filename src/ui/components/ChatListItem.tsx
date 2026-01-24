@@ -9,16 +9,24 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { UICard } from "../UICard";
 import { UIText } from "../UIText";
 
-export const ChatListItem = ({ item: chat }: { item: ChatWithDetails }) => {
+export const ChatListItem = ({
+  item: chat,
+  onlineUserIdSet,
+}: {
+  item: ChatWithDetails;
+  onlineUserIdSet?: Set<string>;
+}) => {
   const { data: carTitle } = useCarTitle(chat.car_id);
   const router = useRouter();
   const { theme } = useUnistyles();
-  const handleNaviateToCar = useCallback(() => {
+  const handleNavigateToCar = useCallback(() => {
     router.push(`/car/${chat.car_id}`);
   }, [chat]);
 
   const lastMessageText = chat.last_message_text ?? "";
   const lastMessageTime = formatChatTime(chat.last_message_time);
+  const otherUserId = chat.other_details?.id ?? null;
+  const isOnline = otherUserId ? onlineUserIdSet?.has(otherUserId) : false;
 
   return (
     <TouchableOpacity
@@ -28,16 +36,19 @@ export const ChatListItem = ({ item: chat }: { item: ChatWithDetails }) => {
       activeOpacity={0.7}
     >
       <UICard variant="outlined" style={styles.chatCard}>
-        <Image
-          style={styles.avatarPlaceholder}
-          source={{ uri: chat.other_details?.image_url! }}
-          cachePolicy="memory-disk"
-          transition={100}
-          contentFit="cover"
-          priority="normal"
-          recyclingKey={chat.other_details?.id}
-          allowDownscaling={true}
-        />
+        <View style={styles.avatarContainer}>
+          <Image
+            style={styles.avatarPlaceholder}
+            source={{ uri: chat.other_details?.image_url! }}
+            cachePolicy="memory-disk"
+            transition={100}
+            contentFit="cover"
+            priority="normal"
+            recyclingKey={chat.other_details?.id}
+            allowDownscaling={true}
+          />
+          {isOnline ? <View style={styles.onlineDot} /> : null}
+        </View>
 
         <View style={styles.chatContent}>
           <UIText size="sm" color="primary" style={styles.carTitle}>
@@ -64,7 +75,7 @@ export const ChatListItem = ({ item: chat }: { item: ChatWithDetails }) => {
           </View>
         </View>
         <View style={styles.buttonsContainer}>
-          <Pressable hitSlop={14} onPress={handleNaviateToCar}>
+          <Pressable hitSlop={14} onPress={handleNavigateToCar}>
             <Ionicons
               name="car-outline"
               size={24}
@@ -112,6 +123,20 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
+  },
+  avatarContainer: {
+    position: "relative",
+  },
+  onlineDot: {
+    position: "absolute",
+    right: theme.scale(0),
+    bottom: theme.scale(0),
+    width: theme.scale(12),
+    height: theme.scale(12),
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.success,
+    borderWidth: theme.scale(2),
+    borderColor: theme.colors.card,
   },
   lastMessageContainer: {
     flexDirection: "row",

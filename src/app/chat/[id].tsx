@@ -17,10 +17,13 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
 import { Message } from "../../api/message";
 import { useChatScreen } from "../../hooks/useChatScreen";
+import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
 import { UIInput, UIText } from "../../ui";
 
 export default function ChatScreen() {
   const { theme } = useUnistyles();
+  const { isOnlineByUserId } = useOnlineUsersContext();
+
   const router = useRouter();
   const params = useLocalSearchParams();
   const chatId = params.id as string;
@@ -61,7 +64,7 @@ export default function ChatScreen() {
     chat?.owner_id === userId ? chat?.customer_id : chat?.owner_id;
   const { data: owner } = useUserProfile(chattingUserId!);
   const { data: carTitle } = useCarTitle(chat?.car_id ?? null);
-
+  const isOnline = chattingUserId ? isOnlineByUserId(chattingUserId) : false;
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -94,14 +97,34 @@ export default function ChatScreen() {
             <UIText size="lg" numberOfLines={1} ellipsizeMode="tail">
               {owner?.fullname || "Owner"}
             </UIText>
-            <UIText
-              size="xs"
-              color="textSecondary"
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {carTitle ?? "—"}
-            </UIText>
+            <View style={styles.subRow}>
+              <View
+                style={[
+                  styles.statusDot,
+                  isOnline ? styles.statusDotOnline : styles.statusDotOffline,
+                ]}
+              />
+              <UIText
+                size="xs"
+                color={isOnline ? "success" : "textSecondary"}
+                style={styles.statusText}
+                numberOfLines={1}
+              >
+                {isOnline ? "Online" : "Offline"}
+              </UIText>
+              <UIText size="xs" color="textSecondary">
+                •
+              </UIText>
+              <UIText
+                size="xs"
+                color="textSecondary"
+                style={styles.carTitleText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {carTitle ?? "—"}
+              </UIText>
+            </View>
           </View>
         </Pressable>
       </View>
@@ -270,6 +293,30 @@ const styles = StyleSheet.create((theme) => ({
     minWidth: 0,
     justifyContent: "center",
     gap: theme.spacing.xs,
+  },
+  subRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.xs,
+    minWidth: 0,
+  },
+  statusDot: {
+    width: theme.scale(8),
+    height: theme.scale(8),
+    borderRadius: theme.borderRadius.full,
+  },
+  statusDotOnline: {
+    backgroundColor: theme.colors.success,
+  },
+  statusDotOffline: {
+    backgroundColor: theme.colors.border,
+  },
+  statusText: {
+    flexShrink: 0,
+  },
+  carTitleText: {
+    flex: 1,
+    minWidth: 0,
   },
   moreButton: {
     padding: theme.spacing.xs,

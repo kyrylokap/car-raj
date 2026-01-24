@@ -57,13 +57,20 @@ export const GoogleButton = () => {
   };
 
   return (
-    <UIButton variant="ghost" style={styles.button} onPress={handleGoogleLogin}>
+    <UIButton
+      variant="outline"
+      size="large"
+      style={styles.button}
+      onPress={handleGoogleLogin}
+    >
       <Ionicons
         name="logo-google"
-        color={styles.icon.color}
+        color={theme.colors.text}
         size={theme.scale(24)}
       />
-      <UIText size="lg">Continue with Google</UIText>
+      <UIText size="md" weight="semibold">
+        Continue with Google
+      </UIText>
     </UIButton>
   );
 };
@@ -71,10 +78,8 @@ export const GoogleButton = () => {
 const styles = StyleSheet.create((theme) => ({
   button: {
     gap: theme.scale(10),
-    borderWidth: theme.scale(1),
-    borderColor: theme.colors.text,
-  },
-  icon: {
-    color: theme.colors.text,
+    width: "100%",
+    justifyContent: "center",
+    backgroundColor: theme.colors.card,
   },
 }));

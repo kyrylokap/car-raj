@@ -142,7 +142,9 @@ export default function CarDetailsScreen() {
               Description
             </UIText>
             <UIText color="textSecondary" style={styles.description}>
-              {car?.description}
+              {car?.description && car?.description?.length > 0
+                ? car?.description
+                : "No description"}
             </UIText>
           </UICard>
           <View style={styles.actionButtons}>

@@ -4,6 +4,7 @@ import React from "react";
 import { FlatList, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
 import { useUser } from "../../api/auth";
 import { useUserChats } from "../../api/chat";
 import { UIContainer, UIText } from "../../ui";
@@ -14,6 +15,7 @@ export default function MessengerScreen() {
   const userId = user?.id;
 
   const { data: chats, refetch, isRefetching } = useUserChats(userId);
+  const { onlineUserIdSet } = useOnlineUsersContext();
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -27,7 +29,9 @@ export default function MessengerScreen() {
           data={chats}
           onRefresh={() => refetch()}
           refreshing={isRefetching}
-          renderItem={({ item }) => <ChatListItem item={item} />}
+          renderItem={({ item }) => (
+            <ChatListItem item={item} onlineUserIdSet={onlineUserIdSet} />
+          )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={[
             styles.listContent,
