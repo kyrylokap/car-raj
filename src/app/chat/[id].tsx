@@ -16,8 +16,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
 import { Message } from "../../api/message";
-import { useChatScreen } from "../../hooks/useChatScreen";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
+import { useChatScreen } from "../../hooks/useChatScreen";
 import { UIInput, UIText } from "../../ui";
 
 export default function ChatScreen() {
@@ -25,9 +25,8 @@ export default function ChatScreen() {
   const { isOnlineByUserId } = useOnlineUsersContext();
 
   const router = useRouter();
-  const params = useLocalSearchParams();
-  const chatId = params.id as string;
-  const [inputHeight, setInputHeight] = React.useState(theme.verticalScale(56));
+  const { id } = useLocalSearchParams();
+  const chatId = id as string;
 
   const {
     inputText,
@@ -42,17 +41,6 @@ export default function ChatScreen() {
     handleChangeInput,
     handleLeaveChat,
   } = useChatScreen(chatId);
-
-  const handleContentSizeChange = (event: any) => {
-    const { height } = event.nativeEvent.contentSize;
-    const minHeight = theme.verticalScale(56);
-    const maxHeight = theme.verticalScale(120);
-    const newHeight = Math.min(
-      Math.max(height + theme.spacing.md * 2, minHeight),
-      maxHeight,
-    );
-    setInputHeight(newHeight);
-  };
 
   const { data: chat } = useQuery({
     queryKey: ["chat", chatId],
@@ -180,9 +168,8 @@ export default function ChatScreen() {
                 multiline
                 maxLength={500}
                 scrollEnabled={true}
-                onContentSizeChange={handleContentSizeChange}
                 containerStyle={{ marginBottom: 0 }}
-                style={[styles.input, { height: inputHeight }]}
+                style={[styles.input]}
               />
             </View>
             <Pressable
@@ -387,7 +374,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   input: {
     borderRadius: theme.borderRadius.full,
-    minHeight: theme.verticalScale(56),
+    height: theme.verticalScale(56),
     textAlignVertical: "top",
     includeFontPadding: false,
   },
