@@ -66,7 +66,7 @@ export const GoogleButton = () => {
       <Ionicons
         name="logo-google"
         color={theme.colors.text}
-        size={theme.scale(24)}
+        size={theme.s(24)}
       />
       <UIText size="md" weight="semibold">
         Continue with Google
@@ -77,7 +77,7 @@ export const GoogleButton = () => {
 
 const styles = StyleSheet.create((theme) => ({
   button: {
-    gap: theme.scale(10),
+    gap: theme.s(10),
     width: "100%",
     justifyContent: "center",
     backgroundColor: theme.colors.card,

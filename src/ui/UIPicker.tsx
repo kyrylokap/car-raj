@@ -19,14 +19,13 @@ export const UIPicker = ({
   currentPickerValue,
   pick,
   style,
-  hideLabel = false
+  hideLabel = false,
 }: UIPickerProps) => {
   const [isVisiblePicker, setIsVisiblePicker] = useState<boolean>(false);
   const { theme } = useUnistyles();
   return (
-    <View style={[ styles.container,style,]}>
-      {hideLabel ? null : <UIText style={styles.label}>{label}</UIText>
-}
+    <View style={[styles.container, style]}>
+      {hideLabel ? null : <UIText style={styles.label}>{label}</UIText>}
       <Pressable
         style={styles.picker({ hideLabel })}
         onPress={() => setIsVisiblePicker((prev) => !prev)}
@@ -35,7 +34,7 @@ export const UIPicker = ({
         <Ionicons
           name={`chevron-${isVisiblePicker ? "up" : "down"}`}
           color={theme.colors.primary}
-          size={theme.scale(24)}
+          size={theme.s(24)}
         />
       </Pressable>
       {isVisiblePicker ? (
@@ -65,7 +64,7 @@ export const UIPicker = ({
 const styles = StyleSheet.create((theme) => ({
   container: {
     marginBottom: theme.spacing.md,
-    flex: 1
+    flex: 1,
   },
   label: {
     ...theme.typography.body,
@@ -73,18 +72,18 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.xs,
     fontWeight: "600",
   },
-  picker: ({ hideLabel }: { hideLabel?: boolean}) => ({
+  picker: ({ hideLabel }: { hideLabel?: boolean }) => ({
     ...theme.typography.body,
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
-    padding: hideLabel ? theme.spacing.sm: theme.spacing.md,
+    padding: hideLabel ? theme.spacing.sm : theme.spacing.md,
     color: theme.colors.text,
-    borderWidth: theme.scale(1),
+    borderWidth: theme.s(1),
     flexDirection: "row",
     justifyContent: "space-between",
   }),
-  pickerItem: ({ isSelected }: { isSelected?: boolean}) => ({
+  pickerItem: ({ isSelected }: { isSelected?: boolean }) => ({
     ...theme.typography.body,
     backgroundColor: isSelected ? theme.colors.primary : theme.colors.surface,
     padding: theme.spacing.sm,
@@ -93,15 +92,15 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     alignItems: "flex-start",
   }),
-  itemsContainer: ({ hideLabel }: { hideLabel?: boolean}) => ({
+  itemsContainer: ({ hideLabel }: { hideLabel?: boolean }) => ({
     position: "absolute",
     zIndex: 10,
-    top: hideLabel ? theme.scale(46) : theme.scale(30),
-    width: '100%',
+    top: hideLabel ? theme.s(46) : theme.s(30),
+    width: "100%",
     shadowColor: theme.colors.white,
     backgroundColor: theme.colors.surface,
     padding: theme.spacing.xs,
-    borderWidth: theme.scale(1),
+    borderWidth: theme.s(1),
     borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
   }),

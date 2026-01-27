@@ -114,7 +114,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.xs,
     paddingTop: theme.spacing.xs,
     paddingBottom: theme.spacing.xs,
-    minHeight: theme.verticalScale(49),
+    minHeight: theme.vs(49),
   },
   tabItem: {
     flex: 1,
@@ -126,13 +126,13 @@ const styles = StyleSheet.create((theme) => ({
   tabItemContent: {
     alignItems: "center",
     justifyContent: "center",
-    gap: theme.scale(4),
+    gap: theme.s(4),
   },
   iconWrapper: {
     alignItems: "center",
     justifyContent: "center",
-    width: theme.scale(28),
-    height: theme.scale(28),
+    width: theme.s(28),
+    height: theme.s(28),
     position: "relative",
   },
   icon: {
@@ -144,16 +144,16 @@ const styles = StyleSheet.create((theme) => ({
   }),
   badge: {
     position: "absolute",
-    top: theme.scale(-6),
-    right: theme.scale(-10),
+    top: theme.s(-6),
+    right: theme.s(-10),
     backgroundColor: theme.colors.error,
     borderRadius: theme.borderRadius.full,
-    minWidth: theme.scale(18),
-    height: theme.scale(18),
-    paddingHorizontal: theme.scale(5),
+    minWidth: theme.s(18),
+    height: theme.s(18),
+    paddingHorizontal: theme.s(5),
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: theme.scale(2),
+    borderWidth: theme.s(2),
     borderColor: theme.colors.tabBar,
   },
 }));

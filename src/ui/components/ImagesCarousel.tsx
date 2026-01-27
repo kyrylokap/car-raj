@@ -74,8 +74,6 @@ export const ImagesCarousel = ({
     });
   };
 
- 
-
   return (
     <UICard style={styles.imageCard}>
       {pathName.includes("sell-vehicle") ? (
@@ -178,8 +176,8 @@ export const ImagesCarousel = ({
 
 const styles = StyleSheet.create((theme) => ({
   imageUploadButton: {
-    padding: theme.scale(10),
-    borderWidth: theme.scale(2),
+    padding: theme.s(10),
+    borderWidth: theme.s(2),
     borderColor: theme.colors.border,
     borderStyle: "dashed",
     borderRadius: theme.borderRadius.md,
@@ -196,22 +194,22 @@ const styles = StyleSheet.create((theme) => ({
   imageCard: {
     marginBottom: theme.spacing.md,
     padding: theme.spacing.md,
-    gap: theme.scale(10),
+    gap: theme.s(10),
   },
   trashContainer: {
     backgroundColor: "rgba(0,0,0,0.5)",
-    width: theme.scale(34),
-    height: theme.scale(34),
+    width: theme.s(34),
+    height: theme.s(34),
     justifyContent: "center",
     alignItems: "center",
     borderRadius: theme.spacing.sm,
     position: "absolute",
-    top: theme.scale(8),
-    right: theme.scale(12),
+    top: theme.s(8),
+    right: theme.s(12),
   },
   imageContainer: {
     width: "100%",
-    height: theme.verticalScale(240),
+    height: theme.vs(240),
     backgroundColor: theme.colors.surface,
     justifyContent: "center",
   },
@@ -223,13 +221,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   currentImageText: {
     position: "absolute",
-    bottom: theme.scale(8),
-    right: theme.scale(12),
+    bottom: theme.s(8),
+    right: theme.s(12),
     backgroundColor: "rgba(0,0,0,0.5)",
     color: "#fff",
-    paddingHorizontal: theme.scale(8),
-    paddingVertical: theme.scale(4),
-    borderRadius: theme.scale(12),
-    fontSize: theme.scale(14),
+    paddingHorizontal: theme.s(8),
+    paddingVertical: theme.vs(4),
+    borderRadius: theme.s(12),
+    fontSize: theme.s(14),
   },
 }));

@@ -75,7 +75,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   carImageContainer: {
     width: "100%",
-    height: theme.verticalScale(200),
+    height: theme.vs(200),
     marginBottom: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
   },

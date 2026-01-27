@@ -59,7 +59,7 @@ const styles = StyleSheet.create((theme) => ({
         },
         outline: {
           backgroundColor: "transparent",
-          borderWidth: theme.scale(1),
+          borderWidth: theme.s(1),
           borderColor: theme.colors.border,
         },
         ghost: {
@@ -70,17 +70,17 @@ const styles = StyleSheet.create((theme) => ({
         small: {
           paddingVertical: theme.spacing.sm,
           paddingHorizontal: theme.spacing.md,
-          minHeight: theme.verticalScale(36),
+          minHeight: theme.vs(36),
         },
         medium: {
           paddingVertical: theme.spacing.md,
           paddingHorizontal: theme.spacing.lg,
-          minHeight: theme.verticalScale(48),
+          minHeight: theme.vs(48),
         },
         large: {
           paddingVertical: theme.spacing.lg,
           paddingHorizontal: theme.spacing.xl,
-          minHeight: theme.verticalScale(56),
+          minHeight: theme.vs(56),
         },
       },
     },

@@ -207,10 +207,10 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.sm,
   },
   filterButton: {
-    width: theme.scale(48),
-    height: theme.scale(48),
+    width: theme.s(48),
+    height: theme.s(48),
     borderRadius: theme.borderRadius.md,
-    borderWidth: theme.scale(1),
+    borderWidth: theme.s(1),
     borderColor: theme.colors.primary,
     backgroundColor: "transparent",
     alignItems: "center",

@@ -226,7 +226,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   headerRight: {
-    width: theme.scale(40),
+    width: theme.s(40),
   },
   scrollContent: {
     flexGrow: 1,
@@ -234,14 +234,14 @@ const styles = StyleSheet.create((theme) => ({
   imageCard: {
     marginBottom: theme.spacing.md,
     padding: theme.spacing.md,
-    gap: theme.scale(10),
+    gap: theme.s(10),
   },
   sectionTitle: {
     marginBottom: theme.spacing.md,
   },
   imageUploadButton: {
-    padding: theme.scale(10),
-    borderWidth: theme.scale(2),
+    padding: theme.s(10),
+    borderWidth: theme.s(2),
     borderColor: theme.colors.border,
     borderStyle: "dashed",
     borderRadius: theme.borderRadius.md,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.primary,
   },
   descriptionInput: {
-    minHeight: theme.verticalScale(120),
+    minHeight: theme.vs(120),
     textAlignVertical: "top",
   },
   actionButtons: {

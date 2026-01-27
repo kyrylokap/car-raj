@@ -1,11 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import {
+  StyleSheet,
+  UnistylesRuntime,
+  useUnistyles,
+} from "react-native-unistyles";
 import { handleSignOut } from "../api/auth";
-import { useThemeContext } from "../contexts/ThemeContext";
 import { UICard, UIContainer, UIText } from "../ui";
 import { PhoneNumberModal } from "../ui/components/PhoneNumberModal";
 
@@ -22,7 +26,6 @@ type SettingItem = {
 export default function SettingsScreen() {
   const { theme, rt } = useUnistyles();
   const router = useRouter();
-  const { isDarkMode, toggleTheme } = useThemeContext();
   const [phoneModalVisible, setPhoneModalVisible] = useState<boolean>(false);
   const accountSettings: SettingItem[] = [
     {
@@ -143,10 +146,18 @@ export default function SettingsScreen() {
         </View>
         {item.type === "toggle" && (
           <Switch
-            value={item.label === "Dark Mode" ? isDarkMode : false}
-            onValueChange={(value) => {
+            value={
+              item.label === "Dark Mode"
+                ? UnistylesRuntime.themeName === "dark"
+                : false
+            }
+            onValueChange={async (value) => {
               if (item.label === "Dark Mode") {
-                toggleTheme();
+                UnistylesRuntime.setTheme(value ? "dark" : "light");
+                await AsyncStorage.setItem(
+                  "@auto_raj_theme_mode",
+                  value ? "dark" : "light",
+                );
               }
             }}
             trackColor={{
@@ -155,7 +166,7 @@ export default function SettingsScreen() {
             }}
             thumbColor={
               item.label === "Dark Mode"
-                ? isDarkMode
+                ? UnistylesRuntime.themeName === "dark"
                   ? theme.colors.primary
                   : theme.colors.textSecondary
                 : theme.colors.textSecondary

@@ -1,4 +1,4 @@
-import "@/unistyles";
+import "@/src/theme/unistyles";
 import {
   DarkTheme,
   DefaultTheme,
@@ -8,12 +8,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
-import { ThemeProvider as ThemeContextProvider } from "../contexts/ThemeContext";
 
+import { UnistylesRuntime } from "react-native-unistyles";
 import { useUser } from "../api/auth";
 import { useNotifications } from "../api/useNotifications";
 import { OnlineUsersProvider } from "../contexts/OnlineUsersContext";
-import { useThemeContext } from "../contexts/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -21,16 +20,13 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView>
       <QueryClientProvider client={queryClient}>
-        <ThemeContextProvider>
-          <RootLayoutNav />
-        </ThemeContextProvider>
+        <RootLayoutNav />
       </QueryClientProvider>
     </GestureHandlerRootView>
   );
 }
 
 function RootLayoutNav() {
-  const { isDarkMode } = useThemeContext();
   const user = useUser();
 
   useNotifications();
@@ -39,7 +35,9 @@ function RootLayoutNav() {
     return null;
   }
   return (
-    <ThemeProvider value={isDarkMode ? DarkTheme : DefaultTheme}>
+    <ThemeProvider
+      value={UnistylesRuntime.themeName === "dark" ? DarkTheme : DefaultTheme}
+    >
       <OnlineUsersProvider>
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Protected guard={!!user}>
@@ -65,7 +63,10 @@ function RootLayoutNav() {
             />
 
             <Stack.Screen name="settings" options={{ presentation: "modal" }} />
-            <Stack.Screen name="favorites" options={{ presentation: "modal" }} />
+            <Stack.Screen
+              name="favorites"
+              options={{ presentation: "modal" }}
+            />
           </Stack.Protected>
           <Stack.Screen name="auth" options={{ presentation: "modal" }} />
         </Stack>

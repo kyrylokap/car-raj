@@ -20,7 +20,7 @@ export default function AuthScreen() {
             <View style={styles.logoCircle}>
               <Ionicons
                 name="car-sport"
-                size={theme.scale(28)}
+                size={theme.s(28)}
                 color={theme.colors.white}
               />
             </View>
@@ -52,7 +52,7 @@ export default function AuthScreen() {
               </View>
               <Ionicons
                 name="heart-outline"
-                size={theme.scale(18)}
+                size={theme.s(18)}
                 color={theme.colors.textSecondary}
               />
             </View>
@@ -61,7 +61,7 @@ export default function AuthScreen() {
               <View style={styles.previewPill}>
                 <Ionicons
                   name="chatbubble-ellipses-outline"
-                  size={theme.scale(14)}
+                  size={theme.s(14)}
                   color={theme.colors.textSecondary}
                 />
                 <UIText size="xs" style={styles.previewPillText}>
@@ -142,8 +142,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   logoCircle: {
-    width: theme.scale(36),
-    height: theme.scale(36),
+    width: theme.s(36),
+    height: theme.s(36),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
@@ -153,7 +153,7 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing.sm,
   },
   subtitle: {
-    maxWidth: theme.scale(340),
+    maxWidth: theme.s(340),
   },
   previewGrid: {
     gap: theme.spacing.md,
@@ -167,8 +167,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   previewImage: {
-    width: theme.scale(56),
-    height: theme.scale(44),
+    width: theme.s(56),
+    height: theme.s(44),
     borderRadius: theme.borderRadius.md,
     backgroundColor: theme.colors.surface,
   },
@@ -196,7 +196,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface,
   },
   previewPillText: {
-    lineHeight: theme.verticalScale(16),
+    lineHeight: theme.vs(16),
   },
   previewHeaderRow: {
     flexDirection: "row",
@@ -204,8 +204,8 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "space-between",
   },
   unreadDot: {
-    width: theme.scale(8),
-    height: theme.scale(8),
+    width: theme.s(8),
+    height: theme.s(8),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
   },
@@ -215,8 +215,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   avatar: {
-    width: theme.scale(36),
-    height: theme.scale(36),
+    width: theme.s(36),
+    height: theme.s(36),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.surface,
   },
@@ -239,6 +239,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   disclaimer: {
     marginTop: theme.spacing.xs,
-    lineHeight: theme.verticalScale(16),
+    lineHeight: theme.vs(16),
   },
 }));

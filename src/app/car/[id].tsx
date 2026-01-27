@@ -270,7 +270,7 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.md,
   },
   description: {
-    lineHeight: theme.verticalScale(22),
+    lineHeight: theme.vs(22),
   },
   specsCard: {
     marginBottom: theme.spacing.md,

@@ -158,7 +158,7 @@ export default function ChatScreen() {
             <View
               style={[
                 styles.inputWrapper,
-                { maxHeight: theme.verticalScale(120), overflow: "hidden" },
+                { maxHeight: theme.vs(120), overflow: "hidden" },
               ]}
             >
               <UIInput
@@ -182,7 +182,7 @@ export default function ChatScreen() {
             >
               <Ionicons
                 name="send"
-                size={theme.scale(20)}
+                size={theme.s(20)}
                 color={
                   inputText.trim()
                     ? theme.colors.white
@@ -253,7 +253,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.lg,
-    minHeight: theme.verticalScale(70),
+    minHeight: theme.vs(70),
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
     backgroundColor: theme.colors.background,
@@ -268,8 +268,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.sm,
   },
   headerAvatar: {
-    width: theme.scale(40),
-    height: theme.scale(40),
+    width: theme.s(40),
+    height: theme.s(40),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
@@ -288,8 +288,8 @@ const styles = StyleSheet.create((theme) => ({
     minWidth: 0,
   },
   statusDot: {
-    width: theme.scale(8),
-    height: theme.scale(8),
+    width: theme.s(8),
+    height: theme.s(8),
     borderRadius: theme.borderRadius.full,
   },
   statusDotOnline: {
@@ -348,7 +348,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   messageTimestamp: {
     color: theme.colors.textSecondary,
-    fontSize: theme.scale(10),
+    fontSize: theme.s(10),
     alignSelf: "flex-end",
   },
   messageTimestampOwn: {
@@ -374,13 +374,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   input: {
     borderRadius: theme.borderRadius.full,
-    height: theme.verticalScale(56),
+    height: theme.vs(56),
     textAlignVertical: "top",
     includeFontPadding: false,
   },
   sendButton: {
-    width: theme.scale(40),
-    height: theme.scale(40),
+    width: theme.s(40),
+    height: theme.s(40),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.surface,
     alignItems: "center",

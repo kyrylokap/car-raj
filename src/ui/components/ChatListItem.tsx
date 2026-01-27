@@ -99,7 +99,7 @@ const styles = StyleSheet.create((theme) => ({
   buttonsContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.scale(24),
+    gap: theme.s(24),
   },
 
   header: {
@@ -117,8 +117,8 @@ const styles = StyleSheet.create((theme) => ({
   },
 
   avatarPlaceholder: {
-    width: theme.scale(56),
-    height: theme.scale(56),
+    width: theme.s(56),
+    height: theme.s(56),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
@@ -129,13 +129,13 @@ const styles = StyleSheet.create((theme) => ({
   },
   onlineDot: {
     position: "absolute",
-    right: theme.scale(0),
-    bottom: theme.scale(0),
-    width: theme.scale(12),
-    height: theme.scale(12),
+    right: theme.s(0),
+    bottom: theme.s(0),
+    width: theme.s(12),
+    height: theme.s(12),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.success,
-    borderWidth: theme.scale(2),
+    borderWidth: theme.s(2),
     borderColor: theme.colors.card,
   },
   lastMessageContainer: {
