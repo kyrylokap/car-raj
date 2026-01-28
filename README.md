@@ -4,7 +4,9 @@ Diagram przedstawia głównych aktorów i przypadki użycia aplikacji mobilnej d
 
 ## Przypadki uzycia
 
-![Use Case Diagram Auto Raj](docs/usecases.svg)
+<!-- ![Use Cases Diagram Auto Raj](docs/usecases.svg) -->
+
+![Use Cases Diagram Auto Raj](docs/usecases_short.svg)
 
 ## Aktorzy
 
@@ -12,6 +14,8 @@ Diagram przedstawia głównych aktorów i przypadki użycia aplikacji mobilnej d
 - **Użytkownik uwierzytelniony** – zalogowany
 - **Kupujący / Sprzedawca** – role kontekstowe użytkownika
 - **Administrator** – zarezerwowany (brak przypisanych przypadków użycia)
+
+![Actors Diagram Auto Raj](docs/roles.svg)
 
 ## Kluczowe funkcje
 
@@ -21,3 +25,5 @@ Diagram przedstawia głównych aktorów i przypadki użycia aplikacji mobilnej d
 - **Czat:** start czatu, wysyłanie / odbieranie wiadomości, status online, powiadomienia
 - **Sprzedaż samochodu:** wystawianie ogłoszeń, zarządzanie swoimi pojazdami
 - **Profil / Ustawienia:** podgląd profilu, numer telefonu, tryb ciemny
+
+![System functions Auto Raj](docs/system_functions.svg)
