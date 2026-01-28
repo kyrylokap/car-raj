@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { Modal, Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUpdatePhoneNumber } from "../../api/userProfile";
 import { UIButton } from "../UIButton";
 import { UIInput } from "../UIInput";
 import { UIText } from "../UIText";
 
-interface PhoneNumberModalProps {
+type PhoneNumberModalProps = {
   visible?: boolean;
   close: () => void;
-}
+};
 
 export const PhoneNumberModal = ({
   visible = false,
   close,
 }: PhoneNumberModalProps) => {
   const [phone, setPhone] = useState<string>("");
+  const { theme } = useUnistyles();
   const { mutateAsync } = useUpdatePhoneNumber();
   const onPress = async () => {
     await mutateAsync({ phone_number: phone });
@@ -23,8 +24,16 @@ export const PhoneNumberModal = ({
   };
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <Pressable style={styles.overlay} onPress={close}>
-        <View style={styles.modalContent}>
+      <Pressable
+        style={[styles.overlay, { backgroundColor: theme.colors.shadow }]}
+        onPress={close}
+      >
+        <View
+          style={[
+            styles.modalContent,
+            { backgroundColor: theme.colors.background },
+          ]}
+        >
           <UIInput
             value={phone}
             onChangeText={setPhone}

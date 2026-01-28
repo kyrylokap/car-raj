@@ -1,7 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUserFavorites } from "../api/favorites";
@@ -11,7 +16,13 @@ import { CarItem } from "../ui/components/CarItem";
 export default function FavoritesScreen() {
   const { theme, rt } = useUnistyles();
   const router = useRouter();
-  const { data: cars } = useUserFavorites();
+  const {
+    data: cars,
+    refetch,
+    isRefetching,
+    isLoading,
+    isFetching,
+  } = useUserFavorites();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -32,6 +43,8 @@ export default function FavoritesScreen() {
 
       <FlatList
         data={cars}
+        onRefresh={refetch}
+        refreshing={isRefetching}
         renderItem={({ item }) => {
           return <CarItem item={item} />;
         }}
@@ -62,6 +75,16 @@ export default function FavoritesScreen() {
           </View>
         }
       />
+      {(isLoading || isFetching || isRefetching) && (
+        <View style={styles.loadingOverlay} pointerEvents="none">
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <UIText style={{ marginTop: theme.spacing.sm }}>
+              Loading favorites...
+            </UIText>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -152,5 +175,21 @@ const styles = StyleSheet.create((theme) => ({
   },
   emptySubtext: {
     marginTop: theme.spacing.xs,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingCard: {
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
   },
 }));

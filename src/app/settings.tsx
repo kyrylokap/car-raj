@@ -36,20 +36,6 @@ export default function SettingsScreen() {
       color: theme.colors.primary,
       onPress: () => setPhoneModalVisible(true),
     },
-    {
-      icon: "lock-closed-outline",
-      label: "Privacy & Security",
-      subtitle: "Password, privacy settings",
-      type: "navigation",
-      color: theme.colors.primary,
-    },
-    {
-      icon: "card-outline",
-      label: "Payment Methods",
-      subtitle: "Manage payment options",
-      type: "navigation",
-      color: theme.colors.primary,
-    },
   ];
 
   const appSettings: SettingItem[] = [
@@ -78,18 +64,7 @@ export default function SettingsScreen() {
       type: "navigation",
       color: theme.colors.textSecondary,
     },
-    {
-      icon: "document-text-outline",
-      label: "Terms of Service",
-      type: "navigation",
-      color: theme.colors.textSecondary,
-    },
-    {
-      icon: "shield-checkmark-outline",
-      label: "Privacy Policy",
-      type: "navigation",
-      color: theme.colors.textSecondary,
-    },
+
     {
       icon: "information-circle-outline",
       label: "About",

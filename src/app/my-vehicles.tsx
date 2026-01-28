@@ -1,7 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../api/auth";
@@ -13,7 +18,13 @@ export default function MyListingsScreen() {
   const { theme, rt } = useUnistyles();
   const router = useRouter();
   const user = useUser();
-  const { data: cars } = useUserCars(user?.id!);
+  const {
+    data: cars,
+    refetch,
+    isRefetching,
+    isLoading,
+    isFetching,
+  } = useUserCars(user?.id!);
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
@@ -47,6 +58,8 @@ export default function MyListingsScreen() {
       </View>
 
       <FlatList
+        onRefresh={refetch}
+        refreshing={isRefetching}
         data={cars}
         renderItem={({ item }) => {
           return <CarItem item={item} />;
@@ -78,11 +91,37 @@ export default function MyListingsScreen() {
           </View>
         }
       />
+      {(isLoading || isFetching || isRefetching) && (
+        <View style={styles.loadingOverlay} pointerEvents="none">
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <UIText style={{ marginTop: theme.spacing.sm }}>
+              Loading vehicles...
+            </UIText>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingCard: {
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

@@ -43,7 +43,7 @@ const styles = StyleSheet.create((theme) => ({
     fontWeight: "600",
   },
   input: {
-    ...theme.typography.body,
+    textAlignVertical: "center",
     backgroundColor: theme.colors.surface,
     borderWidth: theme.s(1),
     borderColor: theme.colors.border,

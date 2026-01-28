@@ -2,7 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import { FlatList, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUserCars } from "../../../api/car";
@@ -15,7 +20,13 @@ export default function UserProfileWithCarsScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { data: userDetails } = useUserDetailsById(params.userId as string);
-  const { data: userCars } = useUserCars(params.userId as string);
+  const {
+    data: userCars,
+    refetch,
+    isRefetching,
+    isLoading,
+    isFetching,
+  } = useUserCars(params.userId as string);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={[]}>
@@ -54,6 +65,8 @@ export default function UserProfileWithCarsScreen() {
       </View>
 
       <FlatList
+        onRefresh={refetch}
+        refreshing={isRefetching}
         data={userCars}
         renderItem={({ item }) => {
           return <CarItem item={item} />;
@@ -79,6 +92,16 @@ export default function UserProfileWithCarsScreen() {
           </View>
         }
       />
+      {(isLoading || isFetching || isRefetching) && (
+        <View style={styles.loadingOverlay} pointerEvents="none">
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <UIText style={{ marginTop: theme.spacing.sm }}>
+              Loading cars...
+            </UIText>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -159,5 +182,21 @@ const styles = StyleSheet.create((theme) => ({
   },
   emptyText: {
     marginTop: theme.spacing.md,
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.2)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loadingCard: {
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.md,
+    alignItems: "center",
   },
 }));

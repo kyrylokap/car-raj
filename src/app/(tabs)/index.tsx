@@ -37,11 +37,13 @@ export default function SearchScreen() {
 
   const {
     data: infiniteData,
+    refetch: refetchInfiniteData,
     isLoading,
     isFetching,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isRefetching,
   } = useInfiniteSearchCars(appliedFilters, 5);
   const cars = infiniteData?.pages.flat() ?? [];
 
@@ -96,6 +98,10 @@ export default function SearchScreen() {
         />
 
         <FlatList
+          onRefresh={() => {
+            refetchInfiniteData();
+          }}
+          refreshing={isRefetching}
           data={cars}
           renderItem={({ item }) => {
             return <CarItem item={item} />;
