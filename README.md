@@ -2,9 +2,9 @@
 
 Diagram przedstawia głównych aktorów i przypadki użycia aplikacji mobilnej do kupna i sprzedaży samochodów.
 
-##Przypadki uzycia
+## Przypadki uzycia
 
-![Use Case Diagram Auto Raj](docs/usecase.svg)
+![Use Case Diagram Auto Raj](docs/usecases.svg)
 
 ## Aktorzy
 
