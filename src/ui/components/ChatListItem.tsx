@@ -179,8 +179,6 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: 4,
     minWidth: 0,
   },
-
-  /* Car Thumbnail */
   carThumbnailWrap: {
     marginLeft: theme.spacing.xs,
   },

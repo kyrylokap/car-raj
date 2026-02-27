@@ -55,14 +55,12 @@ export default function ProfileScreen() {
         ]}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header Title */}
         <View style={styles.headerTop}>
           <UIText size="xxl" weight="bold">
             Profile
           </UIText>
         </View>
 
-        {/* Profile Card */}
         <View style={styles.profileSection}>
           <View style={styles.avatarWrap}>
             {user?.user_metadata?.avatar_url ? (
@@ -98,9 +96,7 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        {/* Action Row: Stats & Primary CTA */}
         <View style={styles.actionRow}>
-          {/* Stat Card */}
           <TouchableOpacity
             style={styles.statCard}
             activeOpacity={0.7}
@@ -123,7 +119,6 @@ export default function ProfileScreen() {
             </View>
           </TouchableOpacity>
 
-          {/* Sell Button */}
           <TouchableOpacity
             style={styles.sellBtn}
             activeOpacity={0.8}
@@ -141,7 +136,6 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Menu List */}
         <View style={styles.menuSection}>
           <UIText size="md" weight="semibold" style={styles.menuHeader}>
             ACCOUNT
@@ -208,14 +202,12 @@ const styles = StyleSheet.create((theme) => ({
     flexGrow: 1,
   },
 
-  /* Header */
   headerTop: {
     paddingHorizontal: theme.spacing.xl,
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.xl,
   },
 
-  /* Profile Card */
   profileSection: {
     alignItems: "center",
     marginBottom: theme.spacing.xl,
@@ -260,7 +252,6 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: 2,
   },
 
-  /* Action Row */
   actionRow: {
     flexDirection: "row",
     paddingHorizontal: theme.spacing.xl,
@@ -295,7 +286,6 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     backgroundColor: theme.colors.primary,
     borderRadius: theme.borderRadius.xl,
-    alignItems: "center",
     justifyContent: "center",
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 6 },
@@ -304,7 +294,6 @@ const styles = StyleSheet.create((theme) => ({
     elevation: 4,
   },
 
-  /* Menu Section */
   menuSection: {
     paddingHorizontal: theme.spacing.xl,
   },

@@ -25,7 +25,6 @@ export default function MessengerScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      {/* Header */}
       <View style={styles.header}>
         <View>
           <UIText size="xxl" weight="bold">

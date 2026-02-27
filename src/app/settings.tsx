@@ -201,7 +201,6 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <UIContainer>
-          {/* Account Settings */}
           <UICard variant="outlined" style={styles.settingsCard}>
             <UIText
               size="sm"
@@ -215,9 +214,6 @@ export default function SettingsScreen() {
             )}
           </UICard>
 
-          {/* Notifications removed */}
-
-          {/* App Settings */}
           <UICard variant="outlined" style={styles.settingsCard}>
             <UIText
               size="sm"
@@ -231,7 +227,6 @@ export default function SettingsScreen() {
             )}
           </UICard>
 
-          {/* Support & Legal */}
           <UICard variant="outlined" style={styles.settingsCard}>
             <UIText
               size="sm"
@@ -245,7 +240,6 @@ export default function SettingsScreen() {
             )}
           </UICard>
 
-          {/* Logout */}
           <TouchableOpacity
             onPress={handleSignOut}
             style={styles.logoutButton}

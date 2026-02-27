@@ -324,7 +324,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   heroCurrentImageText: {
     position: "absolute",
-    bottom: theme.s(38), // clears the sheet's -24 overlap + breathing room
+    bottom: theme.s(38),
     right: theme.s(12),
     backgroundColor: "rgba(0,0,0,0.55)",
     color: "#fff",

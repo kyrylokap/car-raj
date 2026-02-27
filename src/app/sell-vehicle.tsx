@@ -62,7 +62,6 @@ export default function SellCarScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Images Section */}
           <View style={styles.imagesContainer}>
             <ImagesCarousel
               images={images}
@@ -74,7 +73,6 @@ export default function SellCarScreen() {
           </View>
 
           <View style={styles.formContainer}>
-            {/* Make & Model Section */}
             <View style={styles.section}>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Basic Information
@@ -103,7 +101,6 @@ export default function SellCarScreen() {
 
             <View style={styles.divider} />
 
-            {/* Specs Section */}
             <View style={styles.section}>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Specs & Details
@@ -157,7 +154,6 @@ export default function SellCarScreen() {
 
             <View style={styles.divider} />
 
-            {/* Pricing Section */}
             <View style={styles.section}>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Pricing & Location
@@ -180,7 +176,6 @@ export default function SellCarScreen() {
 
             <View style={styles.divider} />
 
-            {/* Description Section */}
             <View style={styles.section}>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Description
@@ -193,7 +188,6 @@ export default function SellCarScreen() {
                 style={styles.descriptionInput}
               />
 
-              {/* Errors Block */}
               {Object.entries(errors).some(([_, msg]) => msg !== "") && (
                 <View style={styles.errorsContainer}>
                   {Object.entries(errors)
@@ -214,7 +208,6 @@ export default function SellCarScreen() {
           </View>
         </ScrollView>
 
-        {/* Fixed Footer */}
         <View
           style={[
             styles.footer,
@@ -252,7 +245,6 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.background,
   },
 
-  /* Header */
   header: {
     paddingVertical: theme.spacing.md,
     flexDirection: "row",
@@ -275,7 +267,6 @@ const styles = StyleSheet.create((theme) => ({
     width: 32,
   },
 
-  /* Scroll Content */
   scrollContent: {
     flexGrow: 1,
     paddingTop: theme.spacing.md,
@@ -287,7 +278,6 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.xl,
   },
 
-  /* Sections */
   section: {
     marginBottom: theme.spacing.md,
   },
@@ -304,7 +294,6 @@ const styles = StyleSheet.create((theme) => ({
     marginVertical: theme.spacing.xl,
   },
 
-  /* Form Elements */
   inputSpacing: {
     marginBottom: theme.spacing.md,
   },
@@ -322,7 +311,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingTop: theme.spacing.md,
   },
 
-  /* Errors */
   errorsContainer: {
     marginTop: theme.spacing.lg,
     padding: theme.spacing.md,
@@ -336,7 +324,6 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: 4,
   },
 
-  /* Fixed Footer */
   footer: {
     paddingHorizontal: theme.spacing.lg,
     paddingTop: theme.spacing.md,

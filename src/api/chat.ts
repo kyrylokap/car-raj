@@ -25,7 +25,7 @@ export type ChatWithDetails = Chat & {
 };
 
 export async function getChatsForUser(
-  userId: string
+  userId: string,
 ): Promise<ChatWithDetails[]> {
   const { data, error } = await supabase
     .from("chat")
@@ -39,7 +39,7 @@ export async function getChatsForUser(
         created_at,
         sender_id
       )
-    `
+    `,
     )
     .order("created_at", { foreignTable: "message", ascending: false })
     .limit(1, { foreignTable: "message" })
@@ -74,9 +74,9 @@ export async function getChatsForUser(
       last_message: embeddedLastMessage,
       other_details: ((): UserDetailsRow | null => {
         if (chat.customer_id === userId) {
-          return chat.owner_id ? detailsMap[chat.owner_id] ?? null : null;
+          return chat.owner_id ? (detailsMap[chat.owner_id] ?? null) : null;
         }
-        return chat.customer_id ? detailsMap[chat.customer_id] ?? null : null;
+        return chat.customer_id ? (detailsMap[chat.customer_id] ?? null) : null;
       })(),
       last_message_time: embeddedLastMessage?.created_at ?? null,
       last_message_text: embeddedLastMessage?.text ?? null,
@@ -146,7 +146,6 @@ export function useUserChats(userId?: string) {
     const chatIds = (chats ?? []).map((c) => c.id);
     if (chatIds.length === 0) return;
 
-    // Cleanup any previous subscriptions first.
     channelRefs.current.forEach((ch) => supabase.removeChannel(ch));
     channelRefs.current = [];
 
@@ -202,9 +201,9 @@ export function useUserChats(userId?: string) {
               });
 
               return updated;
-            }
+            },
           );
-        }
+        },
       );
 
       channel.subscribe();
@@ -247,7 +246,7 @@ export async function createChat(chat: ChatInsert): Promise<Chat> {
 export async function findChatBetweenUsersForCar(
   carId: string,
   userA: string,
-  userB: string
+  userB: string,
 ): Promise<Chat | null> {
   const { data, error } = await supabase
     .from("chat")
@@ -267,7 +266,7 @@ export async function findChatBetweenUsersForCar(
 export async function getOrCreateChatForCar(
   carId: string,
   sellerId: string,
-  buyerId: string
+  buyerId: string,
 ): Promise<Chat> {
   const existing = await findChatBetweenUsersForCar(carId, sellerId, buyerId);
   if (existing) return existing;

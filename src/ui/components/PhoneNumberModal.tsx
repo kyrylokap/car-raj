@@ -58,7 +58,6 @@ export const PhoneNumberModal = ({
           >
             <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
               <View style={styles.modalContent}>
-                {/* Header */}
                 <View style={styles.header}>
                   <View style={styles.iconContainer}>
                     <Ionicons
@@ -80,7 +79,6 @@ export const PhoneNumberModal = ({
                   </TouchableOpacity>
                 </View>
 
-                {/* Body */}
                 <View style={styles.body}>
                   <UIText weight="bold" size="lg" style={styles.title}>
                     Phone Number
@@ -103,7 +101,6 @@ export const PhoneNumberModal = ({
                   />
                 </View>
 
-                {/* Footer */}
                 <View style={styles.footer}>
                   <UIButton
                     variant="primary"
