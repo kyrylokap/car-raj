@@ -1,14 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useSellVehicleForm } from "../hooks/useSellVehicleForm";
-import { UIButton, UICard, UIContainer, UIInput, UIText } from "../ui";
+import { UIButton, UIInput, UIText } from "../ui";
 import { ImagesCarousel } from "../ui/components/ImagesCarousel";
 import { UIPicker } from "../ui/UIPicker";
 
@@ -16,7 +22,7 @@ const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
 
 export default function SellCarScreen() {
-  const { theme } = useUnistyles();
+  const { theme, rt } = useUnistyles();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const {
@@ -29,160 +35,199 @@ export default function SellCarScreen() {
   } = useSellVehicleForm();
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={[]}>
-      <View style={[styles.header]}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={styles.backButton}
-          hitSlop={14}
-        >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
-        </TouchableOpacity>
-
-        <UIText size="xl" weight="bold" style={styles.headerTitle}>
-          Sell vehicle
-        </UIText>
-        <View style={styles.headerRight} />
-      </View>
-
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: insets.bottom + 100 },
-        ]}
-        showsVerticalScrollIndicator={false}
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <UIContainer>
-          <ImagesCarousel
-            images={images}
-            setImages={setImages}
-            handleChangeImagesCount={(newImagesCount) =>
-              handleInputChange("images", newImagesCount.toString())
-            }
-          />
-          <UICard style={styles.formCard}>
-            <UIText size="lg" style={styles.sectionTitle}>
-              Basic Information
-            </UIText>
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            style={styles.backButton}
+            hitSlop={14}
+          >
+            <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          </TouchableOpacity>
+          <UIText size="xl" weight="bold" style={styles.headerTitle}>
+            Sell vehicle
+          </UIText>
+          <View style={styles.headerRight} />
+        </View>
 
-            <UIInput
-              label="Brand"
-              placeholder="e.g., BMW"
-              value={formData.brand}
-              onChangeText={(text) => handleInputChange("brand", text)}
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: Math.max(insets.bottom, 16) + 100 },
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Images Section */}
+          <View style={styles.imagesContainer}>
+            <ImagesCarousel
+              images={images}
+              setImages={setImages}
+              handleChangeImagesCount={(newImagesCount) =>
+                handleInputChange("images", newImagesCount.toString())
+              }
             />
+          </View>
 
-            <UIInput
-              label="Model"
-              placeholder="e.g., C-Class"
-              value={formData.model}
-              onChangeText={(text) => handleInputChange("model", text)}
-            />
-
-            <View style={styles.row}>
+          <View style={styles.formContainer}>
+            {/* Make & Model Section */}
+            <View style={styles.section}>
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                Basic Information
+              </UIText>
               <UIInput
-                label="Year"
-                placeholder="2020"
-                value={String(formData.year)}
-                onChangeText={(text) => handleInputChange("year", text)}
-                keyboardType="numeric"
-                containerStyle={styles.halfInput}
+                label="Brand"
+                placeholder="e.g., BMW, Mercedes"
+                value={formData.brand}
+                onChangeText={(text) => handleInputChange("brand", text)}
+                containerStyle={styles.inputSpacing}
               />
               <UIInput
-                label="Mileage"
-                placeholder="45000"
-                value={String(formData.mileage)}
-                onChangeText={(text) => handleInputChange("mileage", text)}
-                keyboardType="numeric"
-                containerStyle={styles.halfInput}
+                label="Model"
+                placeholder="e.g., C-Class"
+                value={formData.model}
+                onChangeText={(text) => handleInputChange("model", text)}
+                containerStyle={styles.inputSpacing}
+              />
+              <UIInput
+                label="Color"
+                placeholder="Black"
+                value={formData.color}
+                onChangeText={(text) => handleInputChange("color", text)}
               />
             </View>
 
-            <UIInput
-              label="Color"
-              placeholder="Black"
-              value={formData.color}
-              onChangeText={(text) => handleInputChange("color", text)}
-            />
-            <View style={styles.row}>
-              <UIPicker
-                label="Fuel Type"
-                values={fuelTypes}
-                pick={(value) => {
-                  handleInputChange("fuel", value);
-                }}
-                currentPickerValue={formData.fuel}
-              />
+            <View style={styles.divider} />
 
-              <UIPicker
-                label="Transmission"
-                values={transmissions}
-                pick={(value) => {
-                  handleInputChange("transmission", value);
-                }}
-                currentPickerValue={formData.transmission}
+            {/* Specs Section */}
+            <View style={styles.section}>
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                Specs & Details
+              </UIText>
+              <View style={styles.row}>
+                <UIInput
+                  label="Year"
+                  placeholder="2020"
+                  value={String(formData.year || "")}
+                  onChangeText={(text) => handleInputChange("year", text)}
+                  keyboardType="numeric"
+                  containerStyle={styles.halfInput}
+                />
+                <UIInput
+                  label="Mileage"
+                  placeholder="45000"
+                  value={String(formData.mileage || "")}
+                  onChangeText={(text) => handleInputChange("mileage", text)}
+                  keyboardType="numeric"
+                  containerStyle={styles.halfInput}
+                />
+              </View>
+
+              <View style={[styles.row, { marginBottom: 12 }]}>
+                <View style={styles.halfInput}>
+                  <UIPicker
+                    label="Fuel Type"
+                    values={fuelTypes}
+                    pick={(value) => handleInputChange("fuel", value)}
+                    currentPickerValue={formData.fuel}
+                  />
+                </View>
+
+                <View style={styles.halfInput}>
+                  <UIPicker
+                    label="Transmission"
+                    values={transmissions}
+                    pick={(value) => handleInputChange("transmission", value)}
+                    currentPickerValue={formData.transmission}
+                  />
+                </View>
+              </View>
+
+              <UIInput
+                label="VIN (Optional)"
+                placeholder="Vehicle Identification Number"
+                value={formData.vin}
+                onChangeText={(text) => handleInputChange("vin", text)}
               />
             </View>
 
-            <UIInput
-              label="VIN"
-              placeholder="Vehicle Identification Number"
-              value={formData.vin}
-              onChangeText={(text) => handleInputChange("vin", text)}
-            />
-          </UICard>
+            <View style={styles.divider} />
 
-          <UICard style={styles.formCard}>
-            <UIText size="lg" style={styles.sectionTitle}>
-              Pricing & Location
-            </UIText>
+            {/* Pricing Section */}
+            <View style={styles.section}>
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                Pricing & Location
+              </UIText>
+              <UIInput
+                label="Price (PLN)"
+                placeholder="125000"
+                value={String(formData.price || "")}
+                onChangeText={(text) => handleInputChange("price", text)}
+                keyboardType="numeric"
+                containerStyle={styles.inputSpacing}
+              />
+              <UIInput
+                label="Location"
+                placeholder="e.g., Warsaw"
+                value={formData.location}
+                onChangeText={(text) => handleInputChange("location", text)}
+              />
+            </View>
 
-            <UIInput
-              label="Price (PLN)"
-              placeholder="125000"
-              value={String(formData.price)}
-              onChangeText={(text) => handleInputChange("price", text)}
-              keyboardType="numeric"
-            />
+            <View style={styles.divider} />
 
-            <UIInput
-              label="Location"
-              placeholder="e.g., Warsaw"
-              value={formData.location}
-              onChangeText={(text) => handleInputChange("location", text)}
-            />
-          </UICard>
+            {/* Description Section */}
+            <View style={styles.section}>
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                Description
+              </UIText>
+              <UIInput
+                placeholder="Describe your vehicle's condition, features, history, etc."
+                value={formData.description}
+                onChangeText={(text) => handleInputChange("description", text)}
+                multiline
+                style={styles.descriptionInput}
+              />
 
-          <UICard style={styles.formCard}>
-            <UIText size="lg" style={styles.sectionTitle}>
-              Description
-            </UIText>
-            <UIInput
-              placeholder="Describe your vehicle..."
-              value={formData.description}
-              onChangeText={(text) => handleInputChange("description", text)}
-              multiline
-              numberOfLines={6}
-              style={styles.descriptionInput}
-            />
-            <UICard style={styles.formCard}>
-              {Object.entries(errors)
-                .filter(([_, message]) => message != "")
-                .map(([field, message]) => (
-                  <UIText key={field} style={styles.errorText}>
-                    {message}
-                  </UIText>
-                ))}
-            </UICard>
-          </UICard>
+              {/* Errors Block */}
+              {Object.entries(errors).some(([_, msg]) => msg !== "") && (
+                <View style={styles.errorsContainer}>
+                  {Object.entries(errors)
+                    .filter(([_, message]) => message !== "")
+                    .map(([field, message]) => (
+                      <UIText
+                        key={field}
+                        size="sm"
+                        weight="medium"
+                        style={styles.errorText}
+                      >
+                        • {message}
+                      </UIText>
+                    ))}
+                </View>
+              )}
+            </View>
+          </View>
+        </ScrollView>
 
-          <View style={styles.actionButtons}>
+        {/* Fixed Footer */}
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: Math.max(rt.insets.bottom, 16) },
+          ]}
+        >
+          <View style={styles.actionRow}>
             <UIButton
               variant="outline"
               style={styles.cancelButton}
               onPress={() => router.back()}
             >
-              <UIText weight="semibold">Cancel</UIText>
+              <UIText weight="bold">Cancel</UIText>
             </UIButton>
 
             <UIButton
@@ -190,115 +235,135 @@ export default function SellCarScreen() {
               style={styles.submitButton}
               onPress={handleSubmit}
             >
-              <UIText color="white" weight="semibold">
-                Sell vehicle
+              <UIText color="white" weight="bold">
+                List vehicle
               </UIText>
             </UIButton>
           </View>
-        </UIContainer>
-      </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  errorText: {
-    color: "#eb4f4fff",
-  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
+
+  /* Header */
   header: {
-    paddingTop: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: theme.spacing.md,
-    paddingBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
     backgroundColor: theme.colors.background,
+    zIndex: 10,
   },
   backButton: {
     marginRight: theme.spacing.md,
+    width: 32,
   },
   headerTitle: {
     flex: 1,
+    letterSpacing: -0.5,
   },
   headerRight: {
-    width: theme.s(40),
+    width: 32,
   },
+
+  /* Scroll Content */
   scrollContent: {
     flexGrow: 1,
+    paddingTop: theme.spacing.md,
   },
-  imageCard: {
+  formContainer: {
+    paddingHorizontal: theme.spacing.lg,
+  },
+  imagesContainer: {
+    marginBottom: theme.spacing.xl,
+  },
+
+  /* Sections */
+  section: {
     marginBottom: theme.spacing.md,
-    padding: theme.spacing.md,
-    gap: theme.s(10),
   },
   sectionTitle: {
     marginBottom: theme.spacing.md,
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    fontSize: 13,
   },
-  imageUploadButton: {
-    padding: theme.s(10),
-    borderWidth: theme.s(2),
-    borderColor: theme.colors.border,
-    borderStyle: "dashed",
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.borderLight,
+    marginVertical: theme.spacing.xl,
   },
-  hintText: {
-    marginTop: theme.spacing.xs,
-  },
-  formCard: {
+
+  /* Form Elements */
+  inputSpacing: {
     marginBottom: theme.spacing.md,
-    padding: theme.spacing.md,
   },
   row: {
     flexDirection: "row",
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   halfInput: {
     flex: 1,
-    marginBottom: theme.spacing.md,
-  },
-  pickerContainer: {
-    marginTop: theme.spacing.xs,
-    marginBottom: theme.spacing.md,
-    borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    overflow: "hidden",
-  },
-  pickerOption: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderLight,
-  },
-  pickerOptionActive: {
-    backgroundColor: theme.colors.primary,
   },
   descriptionInput: {
     minHeight: theme.vs(120),
     textAlignVertical: "top",
+    paddingTop: theme.spacing.md,
   },
-  actionButtons: {
+
+  /* Errors */
+  errorsContainer: {
+    marginTop: theme.spacing.lg,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.error + "15",
+    borderRadius: theme.borderRadius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.error + "40",
+  },
+  errorText: {
+    color: theme.colors.error,
+    marginBottom: 4,
+  },
+
+  /* Fixed Footer */
+  footer: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderLight,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionRow: {
     flexDirection: "row",
     gap: theme.spacing.md,
-    marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
   },
   cancelButton: {
     flex: 1,
+    paddingVertical: 14,
   },
   submitButton: {
-    flex: 1,
+    flex: 2,
+    paddingVertical: 14,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
 }));

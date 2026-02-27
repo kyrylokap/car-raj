@@ -3,13 +3,13 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   TouchableOpacity,
   View,
 } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { UIButton } from "../UIButton";
-import { UICard } from "../UICard";
 import { UIInput } from "../UIInput";
 import { UIPicker } from "../UIPicker";
 import { UIText } from "../UIText";
@@ -34,41 +34,49 @@ export const FiltersModal = ({
   handleResetFilters,
   handleChangeFilters,
 }: FiltersModalProps) => {
-  const { theme } = useUnistyles();
+  const { theme, rt } = useUnistyles();
+
   return (
     <Modal
-      style={{ flex: 1 }}
       transparent={true}
       animationType="slide"
       visible={visible}
+      onRequestClose={close}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <View
-            style={[
-              styles.modalHeader,
-              //   { paddingTop: rt.insets.top + theme.spacing.sm },
-            ]}
-          >
-            <UIText size="lg" style={styles.filtersTitle}>
-              Filters
-            </UIText>
-            <TouchableOpacity
-              onPress={close}
-              style={styles.modalClose}
-              hitSlop={14}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { paddingTop: rt.insets.top }]}>
+            <View style={styles.header}>
+              <UIText size="xl" weight="bold" style={styles.headerTitle}>
+                Filters
+              </UIText>
+              <TouchableOpacity
+                onPress={close}
+                style={styles.closeBtn}
+                hitSlop={10}
+              >
+                <Ionicons name="close" size={24} color={theme.colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
             >
-              <Ionicons name="close" size={22} color={theme.colors.text} />
-            </TouchableOpacity>
-          </View>
-          <ScrollView contentContainerStyle={styles.modalContent}>
-            <KeyboardAvoidingView>
-              <UICard variant="elevated" style={styles.filtersCard}>
+              <View style={styles.section}>
+                <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                  Make & Model
+                </UIText>
                 <UIInput
                   label="Brand"
                   placeholder="e.g., BMW, Mercedes"
                   value={draftFilters.brand}
                   onChangeText={(text) => updateDraftFilter("brand", text)}
+                  containerStyle={styles.inputSpacing}
                 />
                 <UIInput
                   label="Model"
@@ -76,10 +84,18 @@ export const FiltersModal = ({
                   value={draftFilters.model}
                   onChangeText={(text) => updateDraftFilter("model", text)}
                 />
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.section}>
+                <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                  Price & Year
+                </UIText>
                 <View style={styles.row}>
                   <UIInput
                     label="Min Price"
-                    placeholder="eg. 0"
+                    placeholder="0"
                     value={draftFilters.minPrice}
                     onChangeText={(text) => updateDraftFilter("minPrice", text)}
                     containerStyle={styles.halfInput}
@@ -87,7 +103,7 @@ export const FiltersModal = ({
                   />
                   <UIInput
                     label="Max Price"
-                    placeholder="eg. 500000"
+                    placeholder="50,000+"
                     value={draftFilters.maxPrice}
                     onChangeText={(text) => updateDraftFilter("maxPrice", text)}
                     containerStyle={styles.halfInput}
@@ -97,7 +113,7 @@ export const FiltersModal = ({
                 <View style={styles.row}>
                   <UIInput
                     label="Min Year"
-                    placeholder="eg. 1990"
+                    placeholder="1990"
                     value={draftFilters.minYear}
                     onChangeText={(text) => updateDraftFilter("minYear", text)}
                     containerStyle={styles.halfInput}
@@ -105,17 +121,25 @@ export const FiltersModal = ({
                   />
                   <UIInput
                     label="Max Year"
-                    placeholder={`eg. ${new Date().getFullYear()}`}
+                    placeholder={`${new Date().getFullYear()}`}
                     value={draftFilters.maxYear}
                     onChangeText={(text) => updateDraftFilter("maxYear", text)}
                     containerStyle={styles.halfInput}
                     keyboardType="numeric"
                   />
                 </View>
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.section}>
+                <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+                  Details & Location
+                </UIText>
                 <View style={styles.row}>
                   <UIInput
                     label="Min Mileage"
-                    placeholder="eg. 0"
+                    placeholder="0"
                     value={draftFilters.minMileage}
                     onChangeText={(text) =>
                       updateDraftFilter("minMileage", text)
@@ -124,8 +148,8 @@ export const FiltersModal = ({
                     keyboardType="numeric"
                   />
                   <UIInput
-                    label="Max mileage"
-                    placeholder="eg. 340000"
+                    label="Max Mileage"
+                    placeholder="200,000+"
                     value={draftFilters.maxMileage}
                     onChangeText={(text) =>
                       updateDraftFilter("maxMileage", text)
@@ -135,138 +159,167 @@ export const FiltersModal = ({
                   />
                 </View>
 
-                <View style={styles.row}>
-                  <UIPicker
-                    label="Fuel Type"
-                    values={fuelTypes}
-                    currentPickerValue={draftFilters.fuelType}
-                    pick={(value) => {
-                      updateDraftFilter("fuelType", value as any);
-                    }}
-                  />
-                  <UIPicker
-                    label="Transmission"
-                    values={transmissions}
-                    currentPickerValue={draftFilters.transmission}
-                    pick={(value) => {
-                      updateDraftFilter("transmission", value as any);
-                    }}
-                  />
+                <View style={[styles.row, { marginBottom: 12 }]}>
+                  <View style={styles.halfInput}>
+                    <UIPicker
+                      label="Fuel Type"
+                      values={["Any", ...fuelTypes]}
+                      currentPickerValue={draftFilters.fuelType || "Any"}
+                      pick={(value) =>
+                        updateDraftFilter(
+                          "fuelType",
+                          value === "Any" ? "" : (value as any),
+                        )
+                      }
+                    />
+                  </View>
+                  <View style={styles.halfInput}>
+                    <UIPicker
+                      label="Transmission"
+                      values={["Any", ...transmissions]}
+                      currentPickerValue={draftFilters.transmission || "Any"}
+                      pick={(value) =>
+                        updateDraftFilter(
+                          "transmission",
+                          value === "Any" ? "" : (value as any),
+                        )
+                      }
+                    />
+                  </View>
                 </View>
+
                 <UIInput
                   label="Location"
-                  placeholder="City"
+                  placeholder="City or Region"
                   value={draftFilters.location}
                   onChangeText={(text) => updateDraftFilter("location", text)}
                 />
-                <View style={styles.filterActions}>
-                  <UIButton
-                    variant="outline"
-                    onPress={handleResetFilters}
-                    style={styles.resetButton}
-                  >
-                    <UIText weight="semibold">Reset</UIText>
-                  </UIButton>
-                  <UIButton
-                    variant="primary"
-                    onPress={handleChangeFilters}
-                    style={styles.applyButton}
-                  >
-                    <UIText color="white" weight="semibold">
-                      Apply Filters
-                    </UIText>
-                  </UIButton>
-                </View>
-              </UICard>
-            </KeyboardAvoidingView>
-          </ScrollView>
+              </View>
+            </ScrollView>
+
+            <View
+              style={[
+                styles.footer,
+                { paddingBottom: Math.max(rt.insets.bottom, 16) },
+              ]}
+            >
+              <View style={styles.actionRow}>
+                <UIButton
+                  variant="outline"
+                  onPress={handleResetFilters}
+                  style={styles.resetButton}
+                >
+                  <UIText weight="bold">Clear All</UIText>
+                </UIButton>
+                <UIButton
+                  variant="primary"
+                  onPress={handleChangeFilters}
+                  style={styles.applyButton}
+                >
+                  <UIText color="white" weight="bold">
+                    Show Results
+                  </UIText>
+                </UIButton>
+              </View>
+            </View>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
 
-const styles = StyleSheet.create((theme, rt) => ({
+const styles = StyleSheet.create((theme) => ({
   modalOverlay: {
-    paddingTop: rt.insets.top,
     flex: 1,
     backgroundColor: theme.colors.background,
   },
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    borderRadius: 0,
-    margin: 0,
-    overflow: "hidden",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-  },
-  modalClose: {
-    padding: theme.spacing.xs,
-  },
-  modalContent: {
-    padding: theme.spacing.md,
-    paddingBottom: theme.spacing.lg,
   },
 
   header: {
     flexDirection: "row",
-    paddingHorizontal: theme.spacing.md,
-    paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.background,
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderLight,
   },
-
-  searchInput: {
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    paddingVertical: theme.spacing.sm,
+  headerTitle: {
+    letterSpacing: -0.5,
   },
-  filterButton: {
-    width: theme.s(48),
-    height: theme.s(48),
-    borderRadius: theme.borderRadius.md,
-    borderWidth: theme.s(1),
-    borderColor: theme.colors.primary,
-    backgroundColor: "transparent",
+  closeBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
 
-  filtersCard: {
-    marginHorizontal: theme.spacing.md,
+  scrollContent: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.xxl,
+  },
+  section: {
     marginBottom: theme.spacing.md,
   },
-  filtersTitle: {
+  sectionTitle: {
+    marginBottom: theme.spacing.md,
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    fontSize: 13,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.borderLight,
+    marginVertical: theme.spacing.lg,
+  },
+
+  inputSpacing: {
     marginBottom: theme.spacing.md,
   },
   row: {
     flexDirection: "row",
-    gap: theme.spacing.sm,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.md,
   },
   halfInput: {
     flex: 1,
-    marginBottom: theme.spacing.md,
   },
-  filterActions: {
+
+  footer: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    backgroundColor: theme.colors.background,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderLight,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionRow: {
     flexDirection: "row",
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.sm,
+    gap: theme.spacing.md,
   },
   resetButton: {
     flex: 1,
+    paddingVertical: 14,
   },
   applyButton: {
-    flex: 1,
+    flex: 2,
+    paddingVertical: 14,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
 }));

@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { UICard } from "../UICard";
 import { UIText } from "../UIText";
 
 const pickImages = async () => {
@@ -33,10 +32,12 @@ export const ImagesCarousel = ({
   images,
   setImages,
   handleChangeImagesCount,
+  hero = false,
 }: {
   images: string[];
   setImages?: React.Dispatch<React.SetStateAction<string[]>>;
   handleChangeImagesCount?: React.Dispatch<React.SetStateAction<number>>;
+  hero?: boolean;
 }) => {
   const { theme } = useUnistyles();
   const { width } = useWindowDimensions();
@@ -74,16 +75,98 @@ export const ImagesCarousel = ({
     });
   };
 
+  const carouselContent =
+    images.length !== 0 ? (
+      <View>
+        <Carousel
+          ref={carouselRef}
+          loop={false}
+          width={width}
+          style={hero ? styles.heroImageContainer : styles.imageContainer}
+          data={images}
+          onProgressChange={(_, absoluteProgress) => {
+            const currentItemIndex = Math.round(absoluteProgress);
+            setCurrentIndex(currentItemIndex);
+          }}
+          renderItem={({ item: imageUrl }) => (
+            <Pressable
+              style={{ flex: 1 }}
+              onLongPress={() => {
+                setSelectedImage(imageUrl);
+                setModalVisible(true);
+              }}
+            >
+              <Image
+                style={styles.imagePlaceholder}
+                source={{ uri: imageUrl }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                transition={100}
+                placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
+                priority="high"
+                recyclingKey={imageUrl}
+                allowDownscaling={true}
+              />
+            </Pressable>
+          )}
+        />
+        <UIText
+          style={hero ? styles.heroCurrentImageText : styles.currentImageText}
+        >
+          {currentIndex + 1} / {images?.length}
+        </UIText>
+        {setImages ? (
+          <TouchableOpacity style={styles.trashContainer} onPress={deleteImage}>
+            <Ionicons name="trash" color="red" size={24} />
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    ) : null;
+
+  if (hero) {
+    return (
+      <>
+        {carouselContent}
+        <Modal visible={modalVisible} transparent={true}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0,0,0,0.9)",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <TouchableOpacity
+              style={{ flex: 1, width: "100%" }}
+              onPress={() => setModalVisible(false)}
+            >
+              {selectedImage && (
+                <Image
+                  contentFit="contain"
+                  source={{ uri: selectedImage }}
+                  style={{ width: "100%", height: "100%" }}
+                  cachePolicy="memory-disk"
+                  transition={200}
+                  priority="high"
+                />
+              )}
+            </TouchableOpacity>
+          </View>
+        </Modal>
+      </>
+    );
+  }
+
   return (
-    <UICard style={styles.imageCard}>
+    <View style={styles.imageSection}>
       {pathName.includes("sell-vehicle") ? (
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <View style={styles.sectionHeader}>
           <View>
-            <UIText size="lg" style={styles.sectionTitle}>
-              Images
+            <UIText size="md" weight="semibold" style={styles.sectionTitle}>
+              Vehicle Photos
             </UIText>
             <UIText size="xs" color="textSecondary" style={styles.hintText}>
-              Add at least 4 images of your vehicle
+              Add at least 4 photos
             </UIText>
           </View>
 
@@ -91,77 +174,58 @@ export const ImagesCarousel = ({
             style={styles.imageUploadButton}
             onPress={handlePickImages}
           >
-            <Ionicons name="camera" size={32} color={theme.colors.primary} />
+            <Ionicons name="camera" size={24} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
       ) : null}
 
-      {images.length !== 0 ? (
-        <View>
-          <Carousel
-            ref={carouselRef}
-            loop={false}
-            width={width}
-            style={styles.imageContainer}
-            data={images}
-            onProgressChange={(_, absoluteProgress) => {
-              const currentItemIndex = Math.round(absoluteProgress);
-              setCurrentIndex(currentItemIndex);
-            }}
-            renderItem={({ item: imageUrl }) => (
-              <Pressable
-                style={{ flex: 1 }}
-                onLongPress={() => {
-                  setSelectedImage(imageUrl);
-
-                  setModalVisible(true);
-                }}
-              >
-                <Image
-                  style={styles.imagePlaceholder}
-                  source={{ uri: imageUrl }}
-                  contentFit="cover"
-                  cachePolicy="memory-disk"
-                  transition={100}
-                  placeholder={{ blurhash: "L6PZfSi_.AyE_3t7t7R**0o#DgR4" }}
-                  priority="high"
-                  recyclingKey={imageUrl}
-                  allowDownscaling={true}
-                />
-              </Pressable>
-            )}
+      {images.length === 0 && pathName.includes("sell-vehicle") ? (
+        <TouchableOpacity
+          style={styles.emptyStateContainer}
+          onPress={handlePickImages}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name="images-outline"
+            size={48}
+            color={theme.colors.textSecondary}
+            style={{ opacity: 0.5 }}
           />
-          <UIText style={styles.currentImageText}>
-            {currentIndex + 1} / {images?.length}
+          <UIText
+            weight="medium"
+            color="textSecondary"
+            style={{ marginTop: 12 }}
+          >
+            Tap to select photos
           </UIText>
-          {setImages ? (
-            <TouchableOpacity
-              style={styles.trashContainer}
-              onPress={deleteImage}
-            >
-              <Ionicons name="trash" color="red" size={24} />
-            </TouchableOpacity>
-          ) : null}
-        </View>
+        </TouchableOpacity>
+      ) : images.length > 0 ? (
+        <View style={styles.carouselWrapper}>{carouselContent}</View>
       ) : null}
-      <Modal visible={modalVisible} transparent={true}>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0,0,0,0.9)",
+            backgroundColor: "rgba(0,0,0,0.95)",
             justifyContent: "center",
             alignItems: "center",
           }}
         >
           <TouchableOpacity
-            style={{ flex: 1, width: "100%" }}
+            style={{ flex: 1, width: "100%", justifyContent: "center" }}
             onPress={() => setModalVisible(false)}
+            activeOpacity={1}
           >
             {selectedImage && (
               <Image
                 contentFit="contain"
                 source={{ uri: selectedImage }}
-                style={{ width: "100%", height: "100%" }}
+                style={{ width: "100%", height: "80%" }}
                 cachePolicy="memory-disk"
                 transition={200}
                 priority="high"
@@ -170,47 +234,75 @@ export const ImagesCarousel = ({
           </TouchableOpacity>
         </View>
       </Modal>
-    </UICard>
+    </View>
   );
 };
 
 const styles = StyleSheet.create((theme) => ({
+  imageSection: {
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: theme.spacing.md,
+  },
+  sectionTitle: {
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    fontSize: 13,
+  },
+  hintText: {
+    marginTop: 2,
+    opacity: 0.8,
+  },
   imageUploadButton: {
-    padding: theme.s(10),
-    borderWidth: theme.s(2),
-    borderColor: theme.colors.border,
-    borderStyle: "dashed",
+    width: 44,
+    height: 44,
     borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.primary + "15",
     alignItems: "center",
     justifyContent: "center",
   },
-  hintText: {
-    marginTop: theme.spacing.xs,
+  emptyStateContainer: {
+    height: theme.vs(180),
+    borderRadius: theme.borderRadius.xl,
+    borderWidth: 2,
+    borderColor: theme.colors.borderLight,
+    borderStyle: "dashed",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.surface,
   },
-  sectionTitle: {
-    marginBottom: theme.spacing.md,
-  },
-  imageCard: {
-    marginBottom: theme.spacing.md,
-    padding: theme.spacing.md,
-    gap: theme.s(10),
+  carouselWrapper: {
+    borderRadius: theme.borderRadius.xl,
+    overflow: "hidden",
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
   },
   trashContainer: {
     backgroundColor: "rgba(0,0,0,0.5)",
-    width: theme.s(34),
-    height: theme.s(34),
+    width: theme.s(36),
+    height: theme.s(36),
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: theme.spacing.sm,
+    borderRadius: theme.borderRadius.full,
     position: "absolute",
-    top: theme.s(8),
+    top: theme.s(12),
     right: theme.s(12),
   },
   imageContainer: {
     width: "100%",
     height: theme.vs(240),
-    backgroundColor: theme.colors.surface,
+    justifyContent: "center",
+  },
+  heroImageContainer: {
+    width: "100%",
+    height: theme.vs(320),
     justifyContent: "center",
   },
   imagePlaceholder: {
@@ -229,5 +321,17 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.vs(4),
     borderRadius: theme.s(12),
     fontSize: theme.s(14),
+  },
+  heroCurrentImageText: {
+    position: "absolute",
+    bottom: theme.s(38), // clears the sheet's -24 overlap + breathing room
+    right: theme.s(12),
+    backgroundColor: "rgba(0,0,0,0.55)",
+    color: "#fff",
+    paddingHorizontal: theme.s(10),
+    paddingVertical: theme.vs(5),
+    borderRadius: theme.s(14),
+    fontSize: theme.s(13),
+    fontWeight: "600",
   },
 }));

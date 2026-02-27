@@ -7,7 +7,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserChats } from "../../api/chat";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
-import { UIContainer, UIText } from "../../ui";
+import { UIText } from "../../ui";
 
 export default function MessengerScreen() {
   const { theme, rt } = useUnistyles();
@@ -25,54 +25,71 @@ export default function MessengerScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <UIContainer>
-        <View style={styles.header}>
-          <UIText size="xxl" style={styles.headerTitle}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View>
+          <UIText size="xxl" weight="bold">
             Chats
           </UIText>
-        </View>
-        <FlatList
-          onRefresh={refetch}
-          refreshing={isRefetching}
-          data={chats}
-          renderItem={({ item }) => (
-            <ChatListItem item={item} onlineUserIdSet={onlineUserIdSet} />
+          {onlineUserIdSet && onlineUserIdSet.size > 0 && (
+            <View style={styles.onlineBadgeRow}>
+              <View style={styles.onlinePulse} />
+              <UIText size="xs" color="primary">
+                {onlineUserIdSet.size} online
+              </UIText>
+            </View>
           )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingBottom: rt.insets.bottom + 100 },
-          ]}
-          showsVerticalScrollIndicator={false}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          windowSize={10}
-          initialNumToRender={10}
-          updateCellsBatchingPeriod={50}
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Ionicons
-                name="chatbubbles-outline"
-                size={64}
-                color={theme.colors.textSecondary}
-              />
-              <UIText size="lg" color="textSecondary" style={styles.emptyText}>
-                No messages yet
-              </UIText>
-            </View>
-          }
-        />
-        {(isLoading || isFetching) && (
-          <View style={styles.loadingOverlay} pointerEvents="none">
-            <View style={styles.loadingCard}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-              <UIText style={{ marginTop: theme.spacing.sm }}>
-                Loading chats...
-              </UIText>
-            </View>
-          </View>
+        </View>
+      </View>
+
+      <FlatList
+        onRefresh={refetch}
+        refreshing={isRefetching}
+        data={chats}
+        renderItem={({ item }) => (
+          <ChatListItem item={item} onlineUserIdSet={onlineUserIdSet} />
         )}
-      </UIContainer>
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={[
+          styles.listContent,
+          { paddingBottom: rt.insets.bottom + 100 },
+        ]}
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        initialNumToRender={10}
+        updateCellsBatchingPeriod={50}
+        ListEmptyComponent={
+          !isLoading ? (
+            <View style={styles.emptyState}>
+              <View style={styles.emptyIconWrap}>
+                <Ionicons
+                  name="chatbubble-ellipses-outline"
+                  size={40}
+                  color={theme.colors.primary}
+                />
+              </View>
+              <UIText size="lg" weight="semibold" style={styles.emptyTitle}>
+                No conversations yet
+              </UIText>
+              <UIText size="sm" color="textSecondary" style={styles.emptyText}>
+                Start by browsing a car listing and contacting the seller.
+              </UIText>
+            </View>
+          ) : null
+        }
+      />
+      {(isLoading || isFetching) && (
+        <View style={styles.loadingOverlay} pointerEvents="none">
+          <View style={styles.loadingCard}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <UIText style={{ marginTop: theme.spacing.sm }}>
+              Loading chats...
+            </UIText>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -101,24 +118,46 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
-    backgroundColor: theme.colors.background,
+    paddingBottom: theme.spacing.md,
+    borderBottomWidth: 0.5,
+    borderBottomColor: theme.colors.borderLight,
   },
-  headerTitle: {
-    marginBottom: theme.spacing.sm,
+  onlineBadgeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    marginTop: 2,
+  },
+  onlinePulse: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: theme.colors.success,
   },
   listContent: {
-    padding: theme.spacing.md,
-    gap: theme.spacing.md,
+    flexGrow: 1,
   },
-
   emptyState: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: theme.spacing.xxl,
+    paddingVertical: theme.spacing.xxl * 2,
+    paddingHorizontal: theme.spacing.xl,
+  },
+  emptyIconWrap: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: theme.colors.primary + "18",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: theme.spacing.md,
+  },
+  emptyTitle: {
+    marginBottom: theme.spacing.xs,
   },
   emptyText: {
-    marginTop: theme.spacing.md,
+    textAlign: "center",
+    lineHeight: 20,
   },
 }));

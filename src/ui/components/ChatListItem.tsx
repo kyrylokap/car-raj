@@ -1,12 +1,12 @@
+import { useCarFirstImage } from "@/src/api/car";
 import { ChatWithDetails, useCarTitle } from "@/src/api/chat";
 import { formatChatTime } from "@/src/utils/chat";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { Pressable, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { UICard } from "../UICard";
 import { UIText } from "../UIText";
 
 export const ChatListItem = ({
@@ -17,6 +17,10 @@ export const ChatListItem = ({
   onlineUserIdSet?: Set<string>;
 }) => {
   const { data: carTitle } = useCarTitle(chat.car_id);
+  const { data: carImage, isLoading: isCarImageLoading } = useCarFirstImage({
+    userId: chat.owner_id ?? "",
+    carId: chat.car_id ?? "",
+  });
   const router = useRouter();
   const { theme } = useUnistyles();
   const handleNavigateToCar = useCallback(() => {
@@ -27,144 +31,167 @@ export const ChatListItem = ({
   const lastMessageTime = formatChatTime(chat.last_message_time);
   const otherUserId = chat.other_details?.id ?? null;
   const isOnline = otherUserId ? onlineUserIdSet?.has(otherUserId) : false;
+  const name = chat.other_details?.fullname ?? "Unknown";
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
 
   return (
     <TouchableOpacity
-      onPress={() => {
-        router.push(`/chat/${chat.id}`);
-      }}
-      activeOpacity={0.7}
+      onPress={() => router.push(`/chat/${chat.id}`)}
+      activeOpacity={0.75}
+      style={styles.row}
     >
-      <UICard variant="outlined" style={styles.chatCard}>
-        <View style={styles.avatarContainer}>
+      <View style={styles.avatarWrap}>
+        {chat.other_details?.image_url ? (
           <Image
-            style={styles.avatarPlaceholder}
-            source={{ uri: chat.other_details?.image_url! }}
+            style={styles.avatar}
+            source={{ uri: chat.other_details.image_url }}
             cachePolicy="memory-disk"
-            transition={100}
+            transition={150}
             contentFit="cover"
             priority="normal"
-            recyclingKey={chat.other_details?.id}
-            allowDownscaling={true}
+            recyclingKey={chat.other_details.id}
+            allowDownscaling
           />
-          {isOnline ? <View style={styles.onlineDot} /> : null}
-        </View>
+        ) : (
+          <View style={[styles.avatar, styles.avatarFallback]}>
+            <UIText style={styles.initials}>{initials}</UIText>
+          </View>
+        )}
+        {isOnline && <View style={styles.onlineDot} />}
+      </View>
 
-        <View style={styles.chatContent}>
-          <UIText size="sm" color="primary" style={styles.carTitle}>
-            {carTitle}
+      <View style={styles.content}>
+        <View style={styles.topRow}>
+          <UIText
+            size="lg"
+            weight="semibold"
+            numberOfLines={1}
+            style={styles.name}
+          >
+            {name}
           </UIText>
-          <View style={styles.nameRow}>
-            <UIText size="lg" style={styles.chatUserName} numberOfLines={1}>
-              {chat.other_details?.fullname}
-            </UIText>
-          </View>
-          <View style={styles.lastMessageContainer}>
-            <UIText size="xs" color="textSecondary" style={styles.timeText}>
-              {lastMessageTime ?? ""}
-            </UIText>
+        </View>
 
-            <UIText
-              size="sm"
-              color="textSecondary"
-              style={styles.lastMessageText}
-              numberOfLines={1}
-            >
-              {lastMessageText || "No messages yet"}
-            </UIText>
+        <UIText size="xs" color="textSecondary" style={styles.timeTitleRow}>
+          {carTitle ?? "Loading car..."} · {lastMessageTime}
+        </UIText>
+
+        <UIText
+          size="sm"
+          color="textSecondary"
+          numberOfLines={1}
+          style={styles.preview}
+        >
+          {lastMessageText || "No messages yet"}
+        </UIText>
+      </View>
+
+      <TouchableOpacity
+        style={styles.carThumbnailWrap}
+        activeOpacity={0.7}
+        onPress={handleNavigateToCar}
+        hitSlop={8}
+      >
+        {carImage ? (
+          <Image
+            style={styles.carThumbnail}
+            source={{ uri: carImage }}
+            cachePolicy="memory-disk"
+            transition={200}
+            contentFit="cover"
+          />
+        ) : (
+          <View style={[styles.carThumbnail, styles.carThumbnailFallback]}>
+            <Ionicons name="car-sport" size={20} color={theme.colors.primary} />
           </View>
-        </View>
-        <View style={styles.buttonsContainer}>
-          <Pressable hitSlop={14} onPress={handleNavigateToCar}>
-            <Ionicons
-              name="car-outline"
-              size={24}
-              color={theme.colors.primary}
-            />
-          </Pressable>
-          <Pressable hitSlop={14}>
-            <Ionicons
-              name="chevron-forward"
-              size={24}
-              color={theme.colors.textSecondary}
-            />
-          </Pressable>
-        </View>
-      </UICard>
+        )}
+      </TouchableOpacity>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create((theme) => ({
-  buttonsContainer: {
+  row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.s(24),
-  },
-
-  header: {
-    paddingHorizontal: theme.spacing.md,
-    paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
-    backgroundColor: theme.colors.background,
-  },
-
-  chatCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: theme.spacing.md,
     gap: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.lg,
+    borderBottomWidth: 0.5,
+    borderBottomColor: theme.colors.borderLight,
   },
 
-  avatarPlaceholder: {
-    width: theme.s(56),
-    height: theme.s(56),
+  avatarWrap: {
+    position: "relative",
+  },
+  avatar: {
+    width: theme.s(62),
+    height: theme.s(62),
     borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.primary,
+  },
+  avatarFallback: {
+    backgroundColor: theme.colors.primary + "22",
+    borderWidth: 1.5,
+    borderColor: theme.colors.primary + "44",
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarContainer: {
-    position: "relative",
+  initials: {
+    color: theme.colors.primary,
+    fontWeight: "700",
+    fontSize: theme.s(22),
   },
   onlineDot: {
     position: "absolute",
-    right: theme.s(0),
-    bottom: theme.s(0),
-    width: theme.s(12),
-    height: theme.s(12),
+    right: 1,
+    bottom: 1,
+    width: theme.s(14),
+    height: theme.s(14),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.success,
-    borderWidth: theme.s(2),
-    borderColor: theme.colors.card,
-  },
-  lastMessageContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
+    borderWidth: 2.5,
+    borderColor: theme.colors.background,
   },
 
-  chatContent: {
+  content: {
     flex: 1,
-    gap: theme.spacing.xs,
+    minWidth: 0,
+    justifyContent: "center",
   },
-  nameRow: {
+  topRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing.sm,
   },
-  timeText: {
-    flexShrink: 0,
-  },
-
-  chatUserName: {
+  name: {
     flex: 1,
     minWidth: 0,
+    letterSpacing: -0.3,
   },
-  lastMessageText: {
+  timeTitleRow: {
+    marginTop: 2,
+    opacity: 0.8,
+  },
+  preview: {
+    marginTop: 4,
     minWidth: 0,
   },
-  carTitle: {
-    marginTop: theme.spacing.xs,
+
+  /* Car Thumbnail */
+  carThumbnailWrap: {
+    marginLeft: theme.spacing.xs,
+  },
+  carThumbnail: {
+    width: theme.s(52),
+    height: theme.s(52),
+    borderRadius: theme.borderRadius.md,
+  },
+  carThumbnailFallback: {
+    backgroundColor: theme.colors.primary + "18",
+    alignItems: "center",
+    justifyContent: "center",
   },
 }));

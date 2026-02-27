@@ -7,206 +7,194 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCarsCount } from "../../api/car";
-import { UICard, UIContainer, UIText } from "../../ui";
+import { UIText } from "../../ui";
 
 export default function ProfileScreen() {
   const { theme, rt } = useUnistyles();
   const user = useUser();
   const router = useRouter();
   const { data: userCarsCount } = useUserCarsCount();
-  const stats = [
-    {
-      label: "Vehicles",
-      value: userCarsCount,
-      icon: "car-outline",
-      color: theme.colors.primary,
-    },
-  ];
+
+  const name = user?.user_metadata?.full_name ?? "User";
+  const initials = name
+    .split(" ")
+    .slice(0, 2)
+    .map((w: string) => w[0]?.toUpperCase() ?? "")
+    .join("");
 
   const menuItems = [
     {
       icon: "car-outline",
       label: "My vehicles",
-      subtitle: "Manage your vehicles",
+      subtitle: "Manage your active listings",
       color: theme.colors.primary,
+      route: "/my-vehicles",
     },
     {
       icon: "heart-outline",
       label: "Favorites",
-      subtitle: "Favorite vehicles",
+      subtitle: "Cars you've saved",
       color: theme.colors.error,
+      route: "/favorites",
     },
     {
       icon: "settings-outline",
       label: "Settings",
       subtitle: "Preferences & privacy",
       color: theme.colors.textSecondary,
+      route: "/settings",
     },
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <UIContainer>
-        <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: rt.insets.bottom + 100 },
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.header}>
-            <View style={styles.avatarSection}>
-              <View style={styles.avatarContainer}>
-                <Image
-                  style={styles.avatar}
-                  source={{ uri: user?.user_metadata?.avatar_url }}
-                  cachePolicy="memory-disk"
-                  transition={200}
-                  contentFit="cover"
-                  priority="high"
-                />
-              </View>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: rt.insets.bottom + 100 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header Title */}
+        <View style={styles.headerTop}>
+          <UIText size="xxl" weight="bold">
+            Profile
+          </UIText>
+        </View>
 
-              <View style={styles.profileInfo}>
-                <View style={styles.nameRow}>
-                  <UIText size="xl" weight="bold" style={styles.name}>
-                    {user?.user_metadata?.full_name}
-                  </UIText>
-                  <View style={styles.verifiedBadge}>
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={18}
-                      color={theme.colors.primary}
-                    />
-                  </View>
-                </View>
-                <UIText size="sm" color="textSecondary" style={styles.email}>
-                  {user?.email}
-                </UIText>
+        {/* Profile Card */}
+        <View style={styles.profileSection}>
+          <View style={styles.avatarWrap}>
+            {user?.user_metadata?.avatar_url ? (
+              <Image
+                style={styles.avatar}
+                source={{ uri: user.user_metadata.avatar_url }}
+                cachePolicy="memory-disk"
+                transition={200}
+                contentFit="cover"
+              />
+            ) : (
+              <View style={[styles.avatar, styles.avatarFallback]}>
+                <UIText style={styles.initials}>{initials}</UIText>
               </View>
-            </View>
+            )}
           </View>
 
-          <View style={styles.statsSection}>
-            <View style={styles.statsContainer}>
-              {stats.map((stat, index) => (
-                <TouchableOpacity
-                  key={index}
-                  activeOpacity={0.7}
-                  style={styles.statCardWrapper}
-                  onPress={() => {
-                    if (stat.label === "Vehicles") {
-                      router.push("/my-vehicles");
-                    }
-                  }}
-                >
-                  <UICard variant="elevated" style={styles.statCard}>
-                    <View
-                      style={[
-                        styles.statIconContainer,
-                        { backgroundColor: `${stat.color}15` },
-                      ]}
-                    >
-                      <Ionicons
-                        name={stat.icon as any}
-                        size={20}
-                        color={stat.color}
-                      />
-                    </View>
-                    <UIText
-                      size="xxl"
-                      color="primary"
-                      weight="bold"
-                      style={styles.statValue}
-                    >
-                      {stat.value}
-                    </UIText>
-                    <UIText size="xs" color="textSecondary" weight="medium">
-                      {stat.label}
-                    </UIText>
-                  </UICard>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-
-          <View style={styles.quickActionsSection}>
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={[styles.quickActionButton, styles.quickActionPrimary]}
-              onPress={() => {
-                router.push("/sell-vehicle");
-              }}
-            >
-              <Ionicons name="add-circle" size={22} color={theme.colors.text} />
-              <UIText
-                size="sm"
-                color={"white"}
-                weight="semibold"
-                style={styles.quickActionLabel}
-              >
-                Sell vehicle
+          <View style={styles.infoWrap}>
+            <View style={styles.nameRow}>
+              <UIText size="xl" weight="bold" style={styles.nameText}>
+                {name}
               </UIText>
-            </TouchableOpacity>
+              <Ionicons
+                name="checkmark-circle"
+                size={22}
+                color={theme.colors.primary}
+                style={styles.verifiedIcon}
+              />
+            </View>
+            <UIText size="sm" color="textSecondary">
+              {user?.email}
+            </UIText>
           </View>
+        </View>
 
-          <View style={styles.menuSection}>
-            <UICard variant="outlined" style={styles.menuCard}>
-              {menuItems.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
+        {/* Action Row: Stats & Primary CTA */}
+        <View style={styles.actionRow}>
+          {/* Stat Card */}
+          <TouchableOpacity
+            style={styles.statCard}
+            activeOpacity={0.7}
+            onPress={() => router.push("/my-vehicles")}
+          >
+            <View style={styles.statIconWrap}>
+              <Ionicons
+                name="car-sport"
+                size={24}
+                color={theme.colors.primary}
+              />
+            </View>
+            <View style={styles.statTextWrap}>
+              <UIText size="xl" weight="bold" color="primary">
+                {userCarsCount ?? 0}
+              </UIText>
+              <UIText size="xs" color="textSecondary" weight="medium">
+                Listings
+              </UIText>
+            </View>
+          </TouchableOpacity>
+
+          {/* Sell Button */}
+          <TouchableOpacity
+            style={styles.sellBtn}
+            activeOpacity={0.8}
+            onPress={() => router.push("/sell-vehicle")}
+          >
+            <Ionicons name="add" size={26} color="#FFF" />
+            <UIText
+              size="md"
+              weight="bold"
+              color="white"
+              style={{ marginLeft: 4 }}
+            >
+              Sell vehicle
+            </UIText>
+          </TouchableOpacity>
+        </View>
+
+        {/* Menu List */}
+        <View style={styles.menuSection}>
+          <UIText size="md" weight="semibold" style={styles.menuHeader}>
+            ACCOUNT
+          </UIText>
+
+          <View style={styles.menuList}>
+            {menuItems.map((item, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.menuItem,
+                  index === menuItems.length - 1 && styles.menuItemLast,
+                ]}
+                activeOpacity={0.7}
+                onPress={() => router.push(item.route as any)}
+              >
+                <View
                   style={[
-                    styles.menuItem,
-                    index === menuItems.length - 1 && styles.menuItemLast,
+                    styles.menuIconBox,
+                    { backgroundColor: `${item.color}15` },
                   ]}
-                  activeOpacity={0.7}
-                  onPress={() => {
-                    if (item.label === "My vehicles") {
-                      router.push("/my-vehicles");
-                    } else if (item.label === "Settings") {
-                      router.push("/settings");
-                    } else if (item.label === "Favorites") {
-                      router.push("/favorites");
-                    }
-                  }}
                 >
-                  <View
-                    style={[
-                      styles.menuIconContainer,
-                      { backgroundColor: `${item.color}15` },
-                    ]}
-                  >
-                    <Ionicons
-                      name={item.icon as any}
-                      size={22}
-                      color={item.color}
-                    />
-                  </View>
-                  <View style={styles.menuTextContainer}>
-                    <UIText weight="medium" style={styles.menuLabel}>
-                      {item.label}
-                    </UIText>
-                    <UIText
-                      size="xs"
-                      color="textSecondary"
-                      style={styles.menuSubtitle}
-                    >
-                      {item.subtitle}
-                    </UIText>
-                  </View>
                   <Ionicons
-                    name="chevron-forward"
-                    hitSlop={14}
-                    size={18}
-                    color={theme.colors.textSecondary}
-                    style={styles.menuChevron}
+                    name={item.icon as any}
+                    size={22}
+                    color={item.color}
                   />
-                </TouchableOpacity>
-              ))}
-            </UICard>
+                </View>
+
+                <View style={styles.menuTextContent}>
+                  <UIText size="md" weight="medium">
+                    {item.label}
+                  </UIText>
+                  <UIText
+                    size="xs"
+                    color="textSecondary"
+                    style={styles.menuSubtitle}
+                  >
+                    {item.subtitle}
+                  </UIText>
+                </View>
+
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={theme.colors.textSecondary}
+                  style={{ opacity: 0.5 }}
+                />
+              </TouchableOpacity>
+            ))}
           </View>
-        </ScrollView>
-      </UIContainer>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -217,167 +205,145 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.background,
   },
   scrollContent: {
+    flexGrow: 1,
+  },
+
+  /* Header */
+  headerTop: {
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.xl,
   },
-  header: {
-    paddingTop: theme.spacing.lg,
-    paddingBottom: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.md,
-  },
-  avatarSection: {
+
+  /* Profile Card */
+  profileSection: {
     alignItems: "center",
+    marginBottom: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.xl,
   },
-  avatarContainer: {
-    position: "relative",
-    marginBottom: theme.spacing.md,
+  avatarWrap: {
+    marginBottom: theme.spacing.lg,
+    alignItems: "center",
+    justifyContent: "center",
   },
   avatar: {
-    width: theme.s(110),
-    height: theme.s(110),
+    width: theme.s(100),
+    height: theme.s(100),
     borderRadius: theme.borderRadius.full,
+  },
+  avatarFallback: {
+    backgroundColor: theme.colors.primary + "18",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: theme.s(4),
-    borderColor: `${theme.colors.primary}20`,
+    borderWidth: 2,
+    borderColor: theme.colors.primary + "33",
   },
-  editAvatarButton: {
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    width: theme.s(36),
-    height: theme.s(36),
-    borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: theme.s(3),
-    borderColor: theme.colors.background,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: theme.s(2) },
-    shadowOpacity: 0.2,
-    shadowRadius: theme.s(4),
-    elevation: theme.s(4),
+  initials: {
+    color: theme.colors.primary,
+    fontSize: theme.s(36),
+    fontWeight: "700",
   },
-  profileInfo: {
+  infoWrap: {
     alignItems: "center",
-    width: "100%",
   },
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: theme.spacing.xs,
-    marginBottom: theme.spacing.xs,
+    justifyContent: "center",
+    marginBottom: 4,
   },
-  name: {
-    textAlign: "center",
+  nameText: {
+    letterSpacing: -0.5,
   },
-  verifiedBadge: {
-    marginTop: theme.s(2),
+  verifiedIcon: {
+    marginLeft: 6,
+    marginTop: 2,
   },
-  email: {
-    marginBottom: theme.spacing.xs,
-  },
-  locationRow: {
+
+  /* Action Row */
+  actionRow: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
-    marginTop: theme.spacing.xs,
-  },
-  location: {
-    marginTop: theme.s(1),
-  },
-  statsSection: {
-    marginBottom: theme.spacing.lg,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.lg,
-  },
-  statCardWrapper: {
-    flex: 1,
+    paddingHorizontal: theme.spacing.xl,
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.xxl,
   },
   statCard: {
-    alignItems: "center",
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.xs,
-    minHeight: theme.s(110),
-  },
-  statIconContainer: {
-    width: theme.s(36),
-    height: theme.s(36),
-    borderRadius: theme.borderRadius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: theme.spacing.sm,
-  },
-  statValue: {
-    marginBottom: theme.spacing.xs,
-  },
-  quickActionsSection: {
-    marginBottom: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.md,
-  },
-  quickActionsContainer: {
-    flexDirection: "row",
-    gap: theme.spacing.sm,
-  },
-  quickActionButton: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    borderRadius: theme.borderRadius.lg,
     backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.md,
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
-    gap: theme.spacing.xs,
   },
-  quickActionPrimary: {
+  statIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.colors.primary + "15",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  statTextWrap: {
+    flexDirection: "column",
+  },
+  sellBtn: {
+    flex: 1.5,
+    flexDirection: "row",
     backgroundColor: theme.colors.primary,
-    borderColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.xl,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 4,
   },
-  quickActionLabel: {
-    marginTop: theme.s(1),
-  },
+
+  /* Menu Section */
   menuSection: {
-    marginBottom: theme.spacing.lg,
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: theme.spacing.xl,
   },
-  menuCard: {
+  menuHeader: {
+    color: theme.colors.textSecondary,
+    letterSpacing: 1,
+    marginBottom: theme.spacing.md,
+    marginLeft: theme.spacing.xs,
+  },
+  menuList: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    gap: theme.spacing.md,
-    borderBottomWidth: theme.s(1),
+    padding: theme.spacing.md,
+    borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
   },
   menuItemLast: {
     borderBottomWidth: 0,
   },
-  menuIconContainer: {
-    width: theme.s(40),
-    height: theme.s(40),
-    borderRadius: theme.borderRadius.md,
+  menuIconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: "center",
     justifyContent: "center",
+    marginRight: theme.spacing.md,
   },
-  menuTextContainer: {
+  menuTextContent: {
     flex: 1,
-  },
-  menuLabel: {
-    marginBottom: theme.s(2),
+    gap: 2,
   },
   menuSubtitle: {
-    marginTop: theme.s(2),
-  },
-  menuChevron: {
-    marginLeft: theme.spacing.xs,
+    opacity: 0.8,
   },
 }));
