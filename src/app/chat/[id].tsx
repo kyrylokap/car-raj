@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
   Pressable,
   TouchableOpacity,
   View,
@@ -70,7 +71,6 @@ export default function ChatScreen() {
     [messages],
   );
 
-  // GiftedChat requires onSend to be synchronous (returns void)
   const onSend = useCallback(
     (newMessages: IMessage[]) => {
       onSendAsync(newMessages);
@@ -78,9 +78,23 @@ export default function ChatScreen() {
     [onSendAsync],
   );
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const show = Keyboard.addListener("keyboardWillShow", (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const hide = Keyboard.addListener("keyboardWillHide", () => {
+      setKeyboardHeight(0);
+    });
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* ───── Header ───── */}
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={handleLeaveChat}
@@ -143,85 +157,102 @@ export default function ChatScreen() {
         </Pressable>
       </View>
 
-      {/* ───── GiftedChat ───── */}
-      <GiftedChat
-        messages={giftedMessages}
-        onSend={onSend}
-        user={{ _id: userId ?? "" }}
-        isTyping={userTyping}
-        loadEarlierMessagesProps={{
-          isAvailable: hasNextPage ?? false,
-          isLoading: isLoadingMessages,
-          onPress: () => {
-            fetchNextPage();
-          },
-          isInfiniteScrollEnabled: true,
-        }}
-        isAvatarOnTop
-        isAvatarVisibleForEveryMessage={false}
-        renderAvatar={null}
-        maxComposerHeight={120}
-        timeTextStyle={{
-          right: { color: theme.colors.white, opacity: 0.7 },
-          left: { color: theme.colors.textSecondary },
-        }}
-        textInputProps={{
-          placeholder: "Type a message...",
-          onChangeText: onInputTextChanged,
-        }}
-        renderBubble={(props) => (
-          <Bubble
-            {...props}
-            wrapperStyle={{
-              right: {
-                backgroundColor: theme.colors.primary,
-                borderBottomRightRadius: 4,
-              },
-              left: {
-                backgroundColor: theme.colors.surface,
-                borderBottomLeftRadius: 4,
-              },
-            }}
-            textStyle={{
-              right: { color: theme.colors.white },
-              left: { color: theme.colors.text },
-            }}
-          />
-        )}
-        renderInputToolbar={(props) => (
-          <InputToolbar
-            {...props}
-            containerStyle={styles.inputToolbar}
-            primaryStyle={styles.inputPrimary}
-          />
-        )}
-        renderSend={(props) => (
-          <Send {...props} containerStyle={styles.sendContainer}>
-            <View style={styles.sendButton}>
-              <Ionicons
-                name="send"
-                size={theme.s(18)}
-                color={theme.colors.white}
-              />
-            </View>
-          </Send>
-        )}
-        renderLoading={() => (
-          <ActivityIndicator
-            size="large"
-            color={theme.colors.primary}
-            style={{ flex: 1 }}
-          />
-        )}
-      />
+      <View style={[styles.chatContainer, { marginBottom: keyboardHeight }]}>
+        <GiftedChat
+          messages={giftedMessages}
+          onSend={onSend}
+          user={{ _id: userId ?? "" }}
+          isTyping={userTyping}
+          keyboardAvoidingViewProps={{ enabled: false }}
+          loadEarlierMessagesProps={{
+            isAvailable: hasNextPage ?? false,
+            isLoading: isLoadingMessages,
+            onPress: () => {
+              fetchNextPage();
+            },
+            isInfiniteScrollEnabled: true,
+          }}
+          isAvatarOnTop
+          isAvatarVisibleForEveryMessage={false}
+          renderAvatar={null}
+          maxComposerHeight={120}
+          timeTextStyle={{
+            right: { color: theme.colors.white, opacity: 0.7 },
+            left: { color: theme.colors.textSecondary },
+          }}
+          textInputProps={{
+            placeholder: "Type a message...",
+            placeholderTextColor: theme.colors.textSecondary,
+            onChangeText: onInputTextChanged,
+            style: {
+              color: theme.colors.text,
+              backgroundColor: theme.colors.surface,
+              borderRadius: 22,
+              borderWidth: 1,
+              borderColor: theme.colors.borderLight,
+              paddingHorizontal: theme.spacing.md,
+              paddingVertical: theme.spacing.sm,
+              fontSize: theme.s(15),
+              minHeight: theme.vs(44),
+            },
+          }}
+          renderBubble={(props) => (
+            <Bubble
+              {...props}
+              wrapperStyle={{
+                right: {
+                  backgroundColor: theme.colors.primary,
+                  borderBottomRightRadius: 4,
+                },
+                left: {
+                  backgroundColor: theme.colors.surface,
+                  borderBottomLeftRadius: 4,
+                },
+              }}
+              textStyle={{
+                right: { color: theme.colors.white },
+                left: { color: theme.colors.text },
+              }}
+            />
+          )}
+          renderInputToolbar={(props) => (
+            <InputToolbar
+              {...props}
+              containerStyle={styles.inputToolbar}
+              primaryStyle={styles.inputPrimary}
+            />
+          )}
+          renderSend={(props) => (
+            <Send {...props} containerStyle={styles.sendContainer}>
+              <View style={styles.sendButton}>
+                <Ionicons
+                  name="send"
+                  size={theme.s(18)}
+                  color={theme.colors.white}
+                />
+              </View>
+            </Send>
+          )}
+          renderLoading={() => (
+            <ActivityIndicator
+              size="large"
+              color={theme.colors.primary}
+              style={{ flex: 1 }}
+            />
+          )}
+        />
+      </View>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  chatContainer: {
+    flex: 1,
   },
   header: {
     flexDirection: "row",
@@ -280,26 +311,33 @@ const styles = StyleSheet.create((theme) => ({
   },
   inputToolbar: {
     backgroundColor: theme.colors.background,
-    borderTopWidth: 1,
+    borderTopWidth: 0.5,
     borderTopColor: theme.colors.borderLight,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm + rt.insets.bottom,
   },
   inputPrimary: {
+    flexDirection: "row",
     alignItems: "center",
+    gap: theme.spacing.sm,
   },
   sendContainer: {
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: theme.spacing.xs,
-    paddingBottom: 4,
+    paddingBottom: 2,
   },
   sendButton: {
-    width: theme.s(38),
-    height: theme.s(38),
+    width: theme.s(44),
+    height: theme.s(44),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+    elevation: 6,
   },
 }));
