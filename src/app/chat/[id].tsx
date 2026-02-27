@@ -2,23 +2,36 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   ActivityIndicator,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   TouchableOpacity,
   View,
 } from "react-native";
+import {
+  Bubble,
+  GiftedChat,
+  IMessage,
+  InputToolbar,
+  Send,
+} from "react-native-gifted-chat";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
 import { Message } from "../../api/message";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
 import { useChatScreen } from "../../hooks/useChatScreen";
-import { UIInput, UIText } from "../../ui";
+import { UIText } from "../../ui";
+
+function toGiftedMessage(msg: Message): IMessage {
+  return {
+    _id: msg.id,
+    text: msg.text ?? "",
+    createdAt: msg.created_at ? new Date(msg.created_at) : new Date(),
+    user: { _id: msg.sender_id ?? "" },
+  };
+}
 
 export default function ChatScreen() {
   const { theme } = useUnistyles();
@@ -29,16 +42,14 @@ export default function ChatScreen() {
   const chatId = id as string;
 
   const {
-    inputText,
-    flatListRef,
     userId,
     messages,
     hasNextPage,
     fetchNextPage,
     isLoadingMessages,
     userTyping,
-    handleSendMessage,
-    handleChangeInput,
+    onSend: onSendAsync,
+    onInputTextChanged,
     handleLeaveChat,
   } = useChatScreen(chatId);
 
@@ -53,8 +64,23 @@ export default function ChatScreen() {
   const { data: owner } = useUserProfile(chattingUserId!);
   const { data: carTitle } = useCarTitle(chat?.car_id ?? null);
   const isOnline = chattingUserId ? isOnlineByUserId(chattingUserId) : false;
+
+  const giftedMessages = useMemo(
+    () => messages.map(toGiftedMessage),
+    [messages],
+  );
+
+  // GiftedChat requires onSend to be synchronous (returns void)
+  const onSend = useCallback(
+    (newMessages: IMessage[]) => {
+      onSendAsync(newMessages);
+    },
+    [onSendAsync],
+  );
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* ───── Header ───── */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={handleLeaveChat}
@@ -117,133 +143,82 @@ export default function ChatScreen() {
         </Pressable>
       </View>
 
-      <KeyboardAvoidingView
-        style={styles.content}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-      >
-        <FlatList
-          ref={flatListRef}
-          keyboardShouldPersistTaps="handled"
-          data={messages}
-          renderItem={({ item }) => (
-            <MessageItem item={item} userId={userId!} />
-          )}
-          inverted
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.messagesList}
-          showsVerticalScrollIndicator={false}
-          onEndReached={() => {
-            if (hasNextPage) fetchNextPage();
-          }}
-          onEndReachedThreshold={0.8}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={15}
-          windowSize={10}
-          initialNumToRender={15}
-          updateCellsBatchingPeriod={50}
-        />
-        <ActivityIndicator
-          animating={isLoadingMessages}
-          size={26}
-          color={theme.colors.primary}
-          style={styles.activityIndicator}
-        />
-        <View>
-          <UIText size="sm" color="primary" style={styles.typingText}>
-            {userTyping ? "Typing..." : ""}
-          </UIText>
-
-          <View style={styles.inputContainer}>
-            <View
-              style={[
-                styles.inputWrapper,
-                { maxHeight: theme.vs(120), overflow: "hidden" },
-              ]}
-            >
-              <UIInput
-                placeholder="Type a message..."
-                value={inputText}
-                onChangeText={handleChangeInput}
-                multiline
-                maxLength={500}
-                scrollEnabled={true}
-                containerStyle={{ marginBottom: 0 }}
-                style={[styles.input]}
-              />
-            </View>
-            <Pressable
-              style={[
-                styles.sendButton,
-                inputText.trim() && styles.sendButtonActive,
-              ]}
-              onPress={handleSendMessage}
-              disabled={!inputText.trim()}
-            >
+      {/* ───── GiftedChat ───── */}
+      <GiftedChat
+        messages={giftedMessages}
+        onSend={onSend}
+        user={{ _id: userId ?? "" }}
+        isTyping={userTyping}
+        loadEarlierMessagesProps={{
+          isAvailable: hasNextPage ?? false,
+          isLoading: isLoadingMessages,
+          onPress: () => {
+            fetchNextPage();
+          },
+          isInfiniteScrollEnabled: true,
+        }}
+        isAvatarOnTop
+        isAvatarVisibleForEveryMessage={false}
+        renderAvatar={null}
+        maxComposerHeight={120}
+        timeTextStyle={{
+          right: { color: theme.colors.white, opacity: 0.7 },
+          left: { color: theme.colors.textSecondary },
+        }}
+        textInputProps={{
+          placeholder: "Type a message...",
+          onChangeText: onInputTextChanged,
+        }}
+        renderBubble={(props) => (
+          <Bubble
+            {...props}
+            wrapperStyle={{
+              right: {
+                backgroundColor: theme.colors.primary,
+                borderBottomRightRadius: 4,
+              },
+              left: {
+                backgroundColor: theme.colors.surface,
+                borderBottomLeftRadius: 4,
+              },
+            }}
+            textStyle={{
+              right: { color: theme.colors.white },
+              left: { color: theme.colors.text },
+            }}
+          />
+        )}
+        renderInputToolbar={(props) => (
+          <InputToolbar
+            {...props}
+            containerStyle={styles.inputToolbar}
+            primaryStyle={styles.inputPrimary}
+          />
+        )}
+        renderSend={(props) => (
+          <Send {...props} containerStyle={styles.sendContainer}>
+            <View style={styles.sendButton}>
               <Ionicons
                 name="send"
-                size={theme.s(20)}
-                color={
-                  inputText.trim()
-                    ? theme.colors.white
-                    : theme.colors.textSecondary
-                }
+                size={theme.s(18)}
+                color={theme.colors.white}
               />
-            </Pressable>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
+            </View>
+          </Send>
+        )}
+        renderLoading={() => (
+          <ActivityIndicator
+            size="large"
+            color={theme.colors.primary}
+            style={{ flex: 1 }}
+          />
+        )}
+      />
     </SafeAreaView>
   );
 }
 
-const MessageItem = ({ item, userId }: { item: Message; userId: string }) => {
-  const isOwn = item.sender_id === userId;
-  const time = item.created_at
-    ? new Date(item.created_at).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "";
-  return (
-    <View
-      style={[
-        styles.messageContainer,
-        isOwn ? styles.messageOwn : styles.messageOther,
-      ]}
-    >
-      <View
-        style={[
-          styles.messageBubble,
-          isOwn ? styles.messageBubbleOwn : styles.messageBubbleOther,
-        ]}
-      >
-        <UIText style={[styles.messageText, isOwn && styles.messageTextOwn]}>
-          {item.text}
-        </UIText>
-        <UIText
-          size="xxs"
-          style={[styles.messageTimestamp, isOwn && styles.messageTimestampOwn]}
-        >
-          {time}
-        </UIText>
-      </View>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create((theme) => ({
-  activityIndicator: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    right: 10,
-  },
-  typingText: {
-    marginLeft: 16,
-    height: 20,
-    marginBottom: 2,
-  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -272,8 +247,6 @@ const styles = StyleSheet.create((theme) => ({
     height: theme.s(40),
     borderRadius: theme.borderRadius.full,
     backgroundColor: theme.colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
   },
   headerText: {
     flex: 1,
@@ -305,88 +278,28 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     minWidth: 0,
   },
-  moreButton: {
-    padding: theme.spacing.xs,
-  },
-  content: {
-    flex: 1,
-  },
-  messagesList: {
-    padding: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
-  },
-  messageContainer: {
-    marginBottom: theme.spacing.sm,
-    flexDirection: "row",
-  },
-  messageOwn: {
-    justifyContent: "flex-end",
-  },
-  messageOther: {
-    justifyContent: "flex-start",
-  },
-  messageBubble: {
-    maxWidth: "75%",
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.lg,
-  },
-  messageBubbleOwn: {
-    backgroundColor: theme.colors.primary,
-    borderBottomRightRadius: theme.borderRadius.sm,
-  },
-  messageBubbleOther: {
-    backgroundColor: theme.colors.surface,
-    borderBottomLeftRadius: theme.borderRadius.sm,
-  },
-  messageText: {
-    color: theme.colors.text,
-    marginBottom: theme.spacing.xs,
-  },
-  messageTextOwn: {
-    color: theme.colors.white,
-  },
-  messageTimestamp: {
-    color: theme.colors.textSecondary,
-    fontSize: theme.s(10),
-    alignSelf: "flex-end",
-  },
-  messageTimestampOwn: {
-    color: theme.colors.white,
-    opacity: 0.8,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+  inputToolbar: {
+    backgroundColor: theme.colors.background,
     borderTopWidth: 1,
     borderTopColor: theme.colors.borderLight,
-    backgroundColor: theme.colors.background,
-    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
   },
-  attachButton: {
-    padding: theme.spacing.sm,
+  inputPrimary: {
+    alignItems: "center",
   },
-  inputWrapper: {
-    flex: 1,
-    marginBottom: 0,
-  },
-  input: {
-    borderRadius: theme.borderRadius.full,
-    height: theme.vs(56),
-    textAlignVertical: "top",
-    includeFontPadding: false,
+  sendContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: theme.spacing.xs,
+    paddingBottom: 4,
   },
   sendButton: {
-    width: theme.s(40),
-    height: theme.s(40),
+    width: theme.s(38),
+    height: theme.s(38),
     borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
-  },
-  sendButtonActive: {
-    backgroundColor: theme.colors.primary,
   },
 }));

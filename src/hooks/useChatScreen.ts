@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from "react";
-import { FlatList } from "react-native";
 import { useRouter } from "expo-router";
+import { useCallback } from "react";
+import { IMessage } from "react-native-gifted-chat";
 import { useUser } from "../api/auth";
 import { useDeleteChat } from "../api/chat";
 import useChatMessages from "../api/message";
@@ -9,8 +9,6 @@ export function useChatScreen(chatId: string) {
   const router = useRouter();
   const user = useUser();
   const userId = user?.id;
-  const [inputText, setInputText] = useState("");
-  const flatListRef = useRef<FlatList>(null);
   const { mutate: deleteChat } = useDeleteChat({ chatId });
 
   const {
@@ -23,21 +21,22 @@ export function useChatScreen(chatId: string) {
     userTyping,
   } = useChatMessages({ chatId });
 
-  const handleSendMessage = async () => {
-    if (!inputText.trim() || !userId) return;
-    try {
-      await sendMessage({ text: inputText });
-      setInputText("");
-      setTimeout(() => {
-        flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-      }, 100);
-    } catch (err) {
-      console.error("Send failed", err);
-    }
-  };
+  const onSend = useCallback(
+    async (newMessages: IMessage[] = []) => {
+      if (!userId) return;
+      const text = newMessages[0]?.text;
+      if (!text || !text.trim()) return;
 
-  const handleChangeInput = (text: string) => {
-    setInputText(text);
+      try {
+        await sendMessage({ text });
+      } catch (err) {
+        console.error("Send failed", err);
+      }
+    },
+    [sendMessage, userId],
+  );
+
+  const onInputTextChanged = (text: string) => {
     sendTyping();
   };
 
@@ -45,21 +44,18 @@ export function useChatScreen(chatId: string) {
     router.back();
     if (messages.length === 0) {
       deleteChat();
-      return;
     }
   }, [chatId, messages.length, router, deleteChat]);
 
   return {
-    inputText,
-    flatListRef,
     userId,
     messages,
     hasNextPage,
     fetchNextPage,
     isLoadingMessages,
     userTyping,
-    handleSendMessage,
-    handleChangeInput,
+    onSend,
+    onInputTextChanged,
     handleLeaveChat,
   };
 }
