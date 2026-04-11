@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { useCarSuggestionsFormatted } from "../api/car";
 import { UIText } from "./UIText";
 
@@ -29,7 +29,6 @@ export const UIAutocompleteInput = ({
   containerStyle,
   initialOptions,
 }: UIAutocompleteInputProps) => {
-  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
   const [isFocus, setIsFocus] = useState(false);
   const hasError = !!errorMessage;
@@ -47,7 +46,7 @@ export const UIAutocompleteInput = ({
   const suggestions = React.useMemo(() => {
     const list = remoteData || [];
     if (value && !list.find((item: any) => item.id === value)) {
-      return [{ id: value, title: value }, ...list];
+      list.unshift({ id: value, title: value });
     }
     return list;
   }, [remoteData, value]);
@@ -59,7 +58,11 @@ export const UIAutocompleteInput = ({
           {item.title}
         </UIText>
         {item.id === value && (
-          <Ionicons color={theme.colors.primary} name="checkmark" size={20} />
+          <Ionicons
+            color={styles.primaryColor.color}
+            name="checkmark"
+            size={20}
+          />
         )}
       </View>
     );
@@ -76,7 +79,7 @@ export const UIAutocompleteInput = ({
         style={
           [
             styles.dropdown,
-            isFocus && { borderColor: theme.colors.primary },
+            isFocus && { borderColor: styles.primaryColor.color },
             hasError && styles.dropdownError,
           ] as StyleProp<ViewStyle>
         }
@@ -84,7 +87,7 @@ export const UIAutocompleteInput = ({
         selectedTextStyle={
           [
             styles.selectedTextStyle,
-            isFocus && { color: theme.colors.textSecondary, opacity: 0.3 },
+            isFocus && { color: styles.textSecondaryColor.color, opacity: 0.3 },
           ] as StyleProp<TextStyle>
         }
         inputSearchStyle={styles.inputSearchStyle as StyleProp<TextStyle>}
@@ -108,7 +111,7 @@ export const UIAutocompleteInput = ({
         renderItem={renderItem}
         containerStyle={styles.dropdownContainer as StyleProp<ViewStyle>}
         dropdownPosition="bottom"
-        activeColor={theme.colors.surface}
+        activeColor={styles.surfaceColor.backgroundColor}
         flatListProps={{
           keyboardShouldPersistTaps: "handled",
           nestedScrollEnabled: true,
@@ -117,7 +120,11 @@ export const UIAutocompleteInput = ({
           <Ionicons
             name="chevron-down"
             size={20}
-            color={hasError ? theme.colors.error : theme.colors.textSecondary}
+            color={
+              hasError
+                ? styles.errorColor.color
+                : styles.textSecondaryColor.color
+            }
           />
         )}
       />
@@ -136,6 +143,12 @@ export const UIAutocompleteInput = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
+  surfaceColor: {
+    backgroundColor: theme.colors.surface,
+  },
+  errorColor: {
+    color: theme.colors.error,
+  },
   container: {
     marginBottom: theme.spacing.lg,
   },
@@ -145,6 +158,12 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.sm,
     fontWeight: "600",
     letterSpacing: 0.2,
+  },
+  textSecondaryColor: {
+    color: theme.colors.textSecondary,
+  },
+  primaryColor: {
+    color: theme.colors.primary,
   },
   dropdown: {
     height: theme.s(52),
