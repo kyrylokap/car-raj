@@ -125,12 +125,7 @@ export default function ProfileScreen() {
             onPress={() => router.push("/sell-vehicle")}
           >
             <Ionicons name="add" size={26} color="#FFF" />
-            <UIText
-              size="md"
-              weight="bold"
-              color="white"
-              style={{ marginLeft: 4 }}
-            >
+            <UIText size="md" weight="bold" color="white">
               Sell vehicle
             </UIText>
           </TouchableOpacity>
@@ -282,11 +277,13 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "column",
   },
   sellBtn: {
+    gap: theme.s(4),
     flex: 1.5,
     flexDirection: "row",
     backgroundColor: theme.colors.primary,
     borderRadius: theme.borderRadius.xl,
     justifyContent: "center",
+    alignItems: "center",
     shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,

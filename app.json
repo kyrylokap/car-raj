@@ -24,7 +24,8 @@
             ]
           }
         ]
-      }
+      },
+      "appleTeamId": "XK5WKNF6H3"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +34,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.kyrylokap.autoraj"
+      "package": "com.kyrylokap.autoraj",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
