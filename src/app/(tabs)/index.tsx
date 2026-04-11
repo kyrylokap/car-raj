@@ -1,6 +1,10 @@
-import { FiltersModal, FiltersModalRef } from "@/src/ui/components/FiltersModal";
+import { CarItem } from "@/src/ui/components/CarItem";
+import {
+  FiltersModal,
+  FiltersModalRef,
+} from "@/src/ui/components/FiltersModal";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,9 +15,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useInfiniteSearchCars } from "../../api/car";
 import { useSearchFilters } from "../../hooks/useSearchFilters";
-import { UIAutocompleteInput } from "../../ui/UIAutocompleteInput";
 import { UIContainer, UIText } from "../../ui";
-import { CarItem } from "@/src/ui/components/CarItem";
+import { UIAutocompleteInput } from "../../ui/UIAutocompleteInput";
 
 const sortingTypes = [
   { id: "price_asc", label: "From lowest price" },
@@ -78,11 +81,7 @@ export default function SearchScreen() {
             style={styles.filterButton}
             onPress={() => filtersModalRef.current?.present()}
           >
-            <Ionicons
-              name="filter"
-              size={20}
-              color={theme.colors.primary}
-            />
+            <Ionicons name="filter" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
         <FiltersModal
@@ -91,7 +90,6 @@ export default function SearchScreen() {
           updateDraftFilter={updateDraftFilter}
           handleResetFilters={handleResetFilters}
           handleChangeFilters={handleChangeFilters}
-          onClose={() => {}}
         />
 
         <FlatList
@@ -145,7 +143,7 @@ export default function SearchScreen() {
           }}
         />
 
-        {(isLoading || isFetching) && (
+        {isLoading && (
           <View style={styles.loadingOverlay} pointerEvents="none">
             <View style={styles.loadingCard}>
               <ActivityIndicator size="large" color={theme.colors.primary} />

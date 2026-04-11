@@ -193,7 +193,12 @@ export default function ProfileScreen() {
         </View>
       </ScrollView>
 
-      <MyVehiclesSheet ref={myVehiclesSheetRef} />
+      <MyVehiclesSheet
+        ref={myVehiclesSheetRef}
+        onSellPress={() => {
+          sellVehicleSheetRef.current?.present();
+        }}
+      />
       <FavoritesSheet ref={favoritesSheetRef} />
       <SellVehicleSheet ref={sellVehicleSheetRef} />
     </SafeAreaView>

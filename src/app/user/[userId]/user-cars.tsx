@@ -92,7 +92,7 @@ export default function UserProfileWithCarsScreen() {
           </View>
         }
       />
-      {(isLoading || isFetching || isRefetching) && (
+      {isLoading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color={theme.colors.primary} />

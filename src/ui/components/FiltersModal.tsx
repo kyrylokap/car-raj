@@ -16,7 +16,6 @@ interface FiltersModalProps {
   updateDraftFilter: <K extends keyof Filter>(key: K, value: Filter[K]) => void;
   handleResetFilters: () => void;
   handleChangeFilters: () => void;
-  onClose: () => void;
 }
 
 export type { UIBottomSheetRef as FiltersModalRef } from "../UIBottomSheet";
@@ -28,7 +27,6 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
       updateDraftFilter,
       handleResetFilters,
       handleChangeFilters,
-      onClose,
     },
     ref,
   ) => {
@@ -36,7 +34,6 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
       <UIBottomSheet
         ref={ref}
         title="Filters"
-        onDismiss={onClose}
         enableDynamicSizing={false}
         snapPoints={["50%", "90%"]}
         footer={
@@ -161,7 +158,9 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
               />
             </View>
 
-            <View style={[styles.row, { marginBottom: 12 }] as StyleProp<ViewStyle>}>
+            <View
+              style={[styles.row, { marginBottom: 12 }] as StyleProp<ViewStyle>}
+            >
               <View style={styles.halfInput as StyleProp<ViewStyle>}>
                 <UIAutocompleteInput
                   label="Fuel Type"
@@ -248,4 +247,3 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.lg,
   },
 }));
-

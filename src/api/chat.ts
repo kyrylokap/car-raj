@@ -119,7 +119,6 @@ export function useChatsCount() {
 
 export function useUserChats(userId?: string) {
   const queryClient = useQueryClient();
-  const channelRefs = useRef<RealtimeChannel[]>([]);
 
   const query = useQuery<ChatWithDetails[], Error>({
     queryKey: ["userChats", userId],
@@ -139,15 +138,37 @@ export function useUserChats(userId?: string) {
   useEffect(() => {
     if (!userId) return;
 
+    // 1. Listen for new chats or chat deletions
+    const globalChatChannel = supabase
+      .channel(`user:${userId}:chats-sync`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chat",
+          filter: `owner_id=eq.${userId}`,
+        },
+        () => query.refetch(),
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "chat",
+          filter: `customer_id=eq.${userId}`,
+        },
+        () => query.refetch(),
+      )
+      .subscribe();
+
+    // 2. Setup listeners for messages in existing chats to update "last message"
     const chats = queryClient.getQueryData<ChatWithDetails[]>([
       "userChats",
       userId,
     ]);
     const chatIds = (chats ?? []).map((c) => c.id);
-    if (chatIds.length === 0) return;
-
-    channelRefs.current.forEach((ch) => supabase.removeChannel(ch));
-    channelRefs.current = [];
 
     const channels = chatIds.map((chatId) => {
       const channel = supabase.channel(`chat:${chatId}:last_message`);
@@ -187,7 +208,7 @@ export function useUserChats(userId?: string) {
                 last_message_time: newMsg.created_at ?? old.last_message_time,
                 last_message_text: newMsg.text ?? old.last_message_text,
                 last_message_sender_id:
-                  newMsg.sender_id ?? old.last_message_sender_id,
+                   newMsg.sender_id ?? old.last_message_sender_id,
               };
 
               updated.sort((a, b) => {
@@ -210,11 +231,9 @@ export function useUserChats(userId?: string) {
       return channel;
     });
 
-    channelRefs.current = channels;
-
     return () => {
-      channelRefs.current.forEach((ch) => supabase.removeChannel(ch));
-      channelRefs.current = [];
+      supabase.removeChannel(globalChatChannel);
+      channels.forEach((ch) => supabase.removeChannel(ch));
     };
   }, [userId, chatIdsKey, queryClient]);
 

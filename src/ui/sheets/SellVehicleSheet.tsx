@@ -1,12 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { ScrollView, StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useSellVehicleForm } from "../../hooks/useSellVehicleForm";
 import { UIButton, UIInput, UIText } from "../../ui";
 import { UIAutocompleteInput } from "../UIAutocompleteInput";
 import { UIBottomSheet, UIBottomSheetRef } from "../UIBottomSheet";
 import { ImagesCarousel } from "../components/ImagesCarousel";
-import { Ionicons } from "@expo/vector-icons";
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
@@ -16,10 +16,10 @@ interface SellVehicleSheetProps {
   onDismiss?: () => void;
 }
 
-export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetProps>(({
-  onSuccess,
-  onDismiss,
-}, ref) => {
+export const SellVehicleSheet = forwardRef<
+  UIBottomSheetRef,
+  SellVehicleSheetProps
+>(({ onSuccess, onDismiss }, ref) => {
   const bottomSheetRef = useRef<UIBottomSheetRef>(null);
   const { theme } = useUnistyles();
 
@@ -53,7 +53,9 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
         onPress={() => bottomSheetRef.current?.dismiss()}
         disabled={isPending}
       >
-        <UIText color="textSecondary" weight="semibold">Cancel</UIText>
+        <UIText color="textSecondary" weight="semibold">
+          Cancel
+        </UIText>
       </UIButton>
 
       <UIButton
@@ -77,7 +79,11 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
         <View style={styles.titleContainer as StyleProp<ViewStyle>}>
           <View style={styles.titleRow as StyleProp<ViewStyle>}>
             <View style={styles.iconContainer as StyleProp<ViewStyle>}>
-              <Ionicons name="car-sport" size={22} color={theme.colors.primary} />
+              <Ionicons
+                name="car-sport"
+                size={22}
+                color={theme.colors.primary}
+              />
             </View>
             <UIText size="xl" weight="bold">
               Sell vehicle
@@ -113,13 +119,21 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
           <View style={styles.section as StyleProp<ViewStyle>}>
             <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
               <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
-                <Ionicons name="information-circle" size={18} color={theme.colors.primary} />
+                <Ionicons
+                  name="information-circle"
+                  size={18}
+                  color={theme.colors.primary}
+                />
               </View>
-              <UIText size="md" weight="semibold" style={styles.sectionTitle as StyleProp<TextStyle>}>
+              <UIText
+                size="md"
+                weight="semibold"
+                style={styles.sectionTitle as StyleProp<TextStyle>}
+              >
                 Basic Information
               </UIText>
             </View>
-            
+
             <UIAutocompleteInput
               label="Brand"
               placeholder="e.g., BMW"
@@ -139,11 +153,12 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
               containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
               errorMessage={errors.model}
             />
-            <UIInput
+            <UIAutocompleteInput
               label="Color"
-              placeholder="Black"
+              placeholder="e.g., Black"
               value={formData.color}
               onChangeText={(text) => handleInputChange("color", text)}
+              containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
               errorMessage={errors.color}
             />
           </View>
@@ -153,13 +168,21 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
           <View style={styles.section as StyleProp<ViewStyle>}>
             <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
               <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
-                <Ionicons name="options" size={18} color={theme.colors.primary} />
+                <Ionicons
+                  name="options"
+                  size={18}
+                  color={theme.colors.primary}
+                />
               </View>
-              <UIText size="md" weight="semibold" style={styles.sectionTitle as StyleProp<TextStyle>}>
+              <UIText
+                size="md"
+                weight="semibold"
+                style={styles.sectionTitle as StyleProp<TextStyle>}
+              >
                 Specs & Details
               </UIText>
             </View>
-            
+
             <View style={styles.row as StyleProp<ViewStyle>}>
               <UIInput
                 label="Year"
@@ -181,7 +204,9 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
               />
             </View>
 
-            <View style={[styles.row, { marginBottom: 12 }] as StyleProp<ViewStyle>}>
+            <View
+              style={[styles.row, { marginBottom: 12 }] as StyleProp<ViewStyle>}
+            >
               <View style={styles.halfInput as StyleProp<ViewStyle>}>
                 <UIAutocompleteInput
                   label="Fuel Type"
@@ -223,11 +248,15 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
               <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
                 <Ionicons name="cash" size={18} color={theme.colors.primary} />
               </View>
-              <UIText size="md" weight="semibold" style={styles.sectionTitle as StyleProp<TextStyle>}>
+              <UIText
+                size="md"
+                weight="semibold"
+                style={styles.sectionTitle as StyleProp<TextStyle>}
+              >
                 Pricing & Location
               </UIText>
             </View>
-            
+
             <UIInput
               label="Price (PLN)"
               placeholder="125000"
@@ -252,13 +281,21 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
           <View style={styles.section as StyleProp<ViewStyle>}>
             <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
               <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
-                <Ionicons name="create" size={18} color={theme.colors.primary} />
+                <Ionicons
+                  name="create"
+                  size={18}
+                  color={theme.colors.primary}
+                />
               </View>
-              <UIText size="md" weight="semibold" style={styles.sectionTitle as StyleProp<TextStyle>}>
+              <UIText
+                size="md"
+                weight="semibold"
+                style={styles.sectionTitle as StyleProp<TextStyle>}
+              >
                 Description
               </UIText>
             </View>
-            
+
             <UIInput
               placeholder="Describe your vehicle's condition, features, history, etc."
               value={formData.description}
@@ -268,21 +305,27 @@ export const SellVehicleSheet = forwardRef<UIBottomSheetRef, SellVehicleSheetPro
               errorMessage={errors.description}
             />
 
-            {Object.entries(errors).length > 0 && Object.entries(errors).some(([k, v]) => v !== "" && k !== "images") && (
-              <View style={styles.errorsContainer as StyleProp<ViewStyle>}>
-                <View style={styles.errorHeader as StyleProp<ViewStyle>}>
-                  <Ionicons name="alert-circle" size={18} color={theme.colors.error} />
-                  <UIText size="sm" weight="semibold" color="error">
-                    Some fields need attention
-                  </UIText>
+            {Object.entries(errors).length > 0 &&
+              Object.entries(errors).some(
+                ([k, v]) => v !== "" && k !== "images",
+              ) && (
+                <View style={styles.errorsContainer as StyleProp<ViewStyle>}>
+                  <View style={styles.errorHeader as StyleProp<ViewStyle>}>
+                    <Ionicons
+                      name="alert-circle"
+                      size={18}
+                      color={theme.colors.error}
+                    />
+                    <UIText size="sm" weight="semibold" color="error">
+                      Some fields need attention
+                    </UIText>
+                  </View>
                 </View>
-              </View>
-            )}
+              )}
           </View>
         </View>
       </View>
     </UIBottomSheet>
-
   );
 });
 

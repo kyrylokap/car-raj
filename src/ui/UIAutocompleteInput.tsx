@@ -81,7 +81,12 @@ export const UIAutocompleteInput = ({
           ] as StyleProp<ViewStyle>
         }
         placeholderStyle={styles.placeholderStyle as StyleProp<TextStyle>}
-        selectedTextStyle={styles.selectedTextStyle as StyleProp<TextStyle>}
+        selectedTextStyle={
+          [
+            styles.selectedTextStyle,
+            isFocus && { color: theme.colors.textSecondary, opacity: 0.3 },
+          ] as StyleProp<TextStyle>
+        }
         inputSearchStyle={styles.inputSearchStyle as StyleProp<TextStyle>}
         iconStyle={styles.iconStyle}
         data={suggestions}
@@ -89,8 +94,8 @@ export const UIAutocompleteInput = ({
         maxHeight={250}
         labelField="title"
         valueField="id"
-        placeholder={!isFocus ? placeholder || "Select item" : "..."}
-        searchPlaceholder="Search..."
+        placeholder={!isFocus ? placeholder || "Select item" : ""}
+        searchPlaceholder="Type to search..."
         value={value}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
@@ -189,7 +194,6 @@ const styles = StyleSheet.create((theme) => ({
     height: theme.s(20),
   },
   inputSearchStyle: {
-    height: theme.s(44),
     ...theme.typography.body,
     color: theme.colors.text,
     borderRadius: theme.borderRadius.sm,

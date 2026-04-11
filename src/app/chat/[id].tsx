@@ -60,11 +60,20 @@ export default function ChatScreen() {
     enabled: !!chatId,
   });
 
-  const chattingUserId =
-    chat?.owner_id === userId ? chat?.customer_id : chat?.owner_id;
+  const chattingUserId = useMemo(() => {
+    if (!chat) return null;
+    return chat.owner_id === userId ? chat.customer_id : chat.owner_id;
+  }, [chat, userId]);
+
+  const isOnline = useMemo(() => {
+    if (!chattingUserId) return false;
+    return isOnlineByUserId(chattingUserId);
+  }, [chattingUserId, isOnlineByUserId]);
+
+  const showStatus = !!chat;
+
   const { data: owner } = useUserProfile(chattingUserId!);
   const { data: carTitle } = useCarTitle(chat?.car_id ?? null);
-  const isOnline = chattingUserId ? isOnlineByUserId(chattingUserId) : false;
 
   const giftedMessages = useMemo(
     () => messages.map(toGiftedMessage),
@@ -125,34 +134,36 @@ export default function ChatScreen() {
             <UIText size="lg" numberOfLines={1} ellipsizeMode="tail">
               {owner?.fullname || "Owner"}
             </UIText>
-            <View style={styles.subRow}>
-              <View
-                style={[
-                  styles.statusDot,
-                  isOnline ? styles.statusDotOnline : styles.statusDotOffline,
-                ]}
-              />
-              <UIText
-                size="xs"
-                color={isOnline ? "success" : "textSecondary"}
-                style={styles.statusText}
-                numberOfLines={1}
-              >
-                {isOnline ? "Online" : "Offline"}
-              </UIText>
-              <UIText size="xs" color="textSecondary">
-                •
-              </UIText>
-              <UIText
-                size="xs"
-                color="textSecondary"
-                style={styles.carTitleText}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {carTitle ?? "—"}
-              </UIText>
-            </View>
+            {showStatus && (
+              <View style={styles.subRow}>
+                <View
+                  style={[
+                    styles.statusDot,
+                    isOnline ? styles.statusDotOnline : styles.statusDotOffline,
+                  ]}
+                />
+                <UIText
+                  size="xs"
+                  color={isOnline ? "success" : "textSecondary"}
+                  style={styles.statusText}
+                  numberOfLines={1}
+                >
+                  {isOnline ? "Online" : "Offline"}
+                </UIText>
+                <UIText size="xs" color="textSecondary">
+                  •
+                </UIText>
+                <UIText
+                  size="xs"
+                  color="textSecondary"
+                  style={styles.carTitleText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {carTitle ?? "—"}
+                </UIText>
+              </View>
+            )}
           </View>
         </Pressable>
       </View>

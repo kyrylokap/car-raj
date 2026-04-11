@@ -30,48 +30,93 @@ export type Filter = {
   sortBy: "price_asc" | "price_desc" | "newest" | "oldest" | "";
 };
 
+export const CAR_COLORS = [
+  "White",
+  "Black",
+  "Silver",
+  "Grey",
+  "Blue",
+  "Red",
+  "Brown",
+  "Green",
+  "Yellow",
+  "Beige",
+  "Orange",
+  "Gold",
+  "Purple",
+  "Other",
+];
+
 export function useCarSuggestions(
-  type: "brand" | "model" | "location",
+  type: "brand" | "model" | "location" | "color",
   query: string,
-  brandFilter?: string
+  brandFilter?: string,
 ) {
   return useQuery({
     queryKey: ["suggestions", type, query, brandFilter],
     queryFn: async () => {
-      console.log("Fetching suggestions:", { type, query, brandFilter });
-      if (!query || query.length < 1) return [];
+      if (!query && type !== "color") return [];
 
+      if (type === "brand") {
+        const response = await fetch(
+          `https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForVehicleType/car?format=json`,
+        );
+        const json = await response.json();
+        const results = (json.Results || [])
+          .map((item: any) => item.MakeName)
+          .filter((name: string) =>
+            name.toLowerCase().includes(query.toLowerCase()),
+          );
+        return Array.from(new Set(results))
+          .sort()
+          .slice(0, 15);
+      }
+
+      if (type === "model" && brandFilter) {
+        const response = await fetch(
+          `https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/${brandFilter}?format=json`,
+        );
+        const json = await response.json();
+        const results = (json.Results || [])
+          .map((item: any) => item.Model_Name)
+          .filter((name: string) =>
+            name.toLowerCase().includes(query.toLowerCase()),
+          );
+        return Array.from(new Set(results))
+          .sort()
+          .slice(0, 15);
+      }
+
+      if (type === "color") {
+        return CAR_COLORS.filter((c) =>
+          c.toLowerCase().includes(query.toLowerCase()),
+        );
+      }
+
+      // Fallback to supabase for location or other types
       let supabaseQuery = supabase
         .from("car")
         .select(type)
-        .ilike(type, `%${query}%`)
+        .ilike(type as any, `%${query}%`)
         .limit(20);
 
-      if (type === "model" && brandFilter) {
-        supabaseQuery = supabaseQuery.ilike("brand", brandFilter);
-      }
-
       const { data, error } = await supabaseQuery;
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
-      // Extract unique values
       const values = data
         .map((item: any) => item[type])
         .filter((v): v is string => !!v);
-      const uniqueValues = Array.from(new Set(values)).sort();
-      return uniqueValues;
+      return Array.from(new Set(values)).sort();
     },
-    enabled: query.length > 0,
-    staleTime: 1000 * 60 * 5,
+    enabled: type === "color" || query.length > 0,
+    staleTime: 1000 * 60 * 60, // Cache for 1 hour as brands don't change often
   });
 }
 
 export function useCarSuggestionsFormatted(
-  type: "brand" | "model" | "location",
+  type: "brand" | "model" | "location" | "color",
   query: string,
-  brandFilter?: string
+  brandFilter?: string,
 ) {
   const { data = [], isLoading } = useCarSuggestions(type, query, brandFilter);
   return React.useMemo(

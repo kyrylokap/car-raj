@@ -146,10 +146,6 @@ export default function useChatMessages({ chatId }: { chatId: string }) {
 
     await sendMessageFirebase({ text, message_id: data?.id! });
 
-    if (userId) {
-      queryClient.invalidateQueries({ queryKey: ["userChats", userId] });
-    }
-
     return data;
   };
 

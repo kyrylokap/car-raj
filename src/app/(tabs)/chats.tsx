@@ -17,11 +17,14 @@ export default function MessengerScreen() {
   const {
     data: chats,
     refetch,
-    isRefetching,
     isLoading,
     isFetching,
   } = useUserChats(userId);
+
   const { onlineUserIdSet } = useOnlineUsersContext();
+  const otherOnlineCount = onlineUserIdSet.has(userId || "")
+    ? onlineUserIdSet.size - 1
+    : onlineUserIdSet.size;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -30,11 +33,12 @@ export default function MessengerScreen() {
           <UIText size="xxl" weight="bold">
             Chats
           </UIText>
-          {onlineUserIdSet && onlineUserIdSet.size > 0 && (
+          {otherOnlineCount > 0 && (
             <View style={styles.onlineBadgeRow}>
               <View style={styles.onlinePulse} />
               <UIText size="xs" color="primary">
-                {onlineUserIdSet.size} online
+                {otherOnlineCount} {otherOnlineCount === 1 ? "user" : "users"}{" "}
+                online
               </UIText>
             </View>
           )}
@@ -43,7 +47,7 @@ export default function MessengerScreen() {
 
       <FlatList
         onRefresh={refetch}
-        refreshing={isRefetching}
+        refreshing={isFetching}
         data={chats}
         renderItem={({ item }) => (
           <ChatListItem item={item} onlineUserIdSet={onlineUserIdSet} />
@@ -79,7 +83,7 @@ export default function MessengerScreen() {
           ) : null
         }
       />
-      {(isLoading || isFetching) && (
+      {isLoading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color={theme.colors.primary} />

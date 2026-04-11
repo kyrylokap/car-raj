@@ -61,7 +61,12 @@ export const ChatListItem = ({
             <UIText style={styles.initials}>{initials}</UIText>
           </View>
         )}
-        {isOnline && <View style={styles.onlineDot} />}
+        <View
+          style={[
+            styles.onlineDot,
+            isOnline ? styles.onlineDotActive : styles.onlineDotInactive,
+          ]}
+        />
       </View>
 
       <View style={styles.content}>
@@ -153,12 +158,17 @@ const styles = StyleSheet.create((theme) => ({
     position: "absolute",
     right: 0,
     bottom: 0,
-    width: theme.s(16),
-    height: theme.s(16),
+    width: theme.s(14),
+    height: theme.s(14),
     borderRadius: theme.borderRadius.full,
-    backgroundColor: theme.colors.success,
     borderWidth: 2,
     borderColor: theme.colors.surface,
+  },
+  onlineDotActive: {
+    backgroundColor: theme.colors.success,
+  },
+  onlineDotInactive: {
+    backgroundColor: theme.colors.borderLight,
   },
 
   content: {
