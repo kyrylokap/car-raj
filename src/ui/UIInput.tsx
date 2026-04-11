@@ -24,7 +24,15 @@ export const UIInput: React.FC<InputProps> = ({
     <View style={[styles.container, containerStyle]}>
       {label && <UIText style={styles.label}>{label}</UIText>}
       <TextInput
-        style={[styles.input, style]}
+        style={[
+          styles.input,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: props.hasError ? theme.colors.error : theme.colors.border,
+            color: theme.colors.text,
+          },
+          style,
+        ]}
         placeholderTextColor={theme.colors.textSecondary}
         {...props}
       />

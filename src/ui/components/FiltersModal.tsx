@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { UIButton } from "../UIButton";
 import { UIInput } from "../UIInput";
 import { UIPicker } from "../UIPicker";
@@ -34,8 +34,6 @@ export const FiltersModal = ({
   handleResetFilters,
   handleChangeFilters,
 }: FiltersModalProps) => {
-  const { theme, rt } = useUnistyles();
-
   return (
     <Modal
       transparent={true}
@@ -48,7 +46,7 @@ export const FiltersModal = ({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContainer, { paddingTop: rt.insets.top }]}>
+          <View style={styles.modalContainer}>
             <View style={styles.header}>
               <UIText size="xl" weight="bold" style={styles.headerTitle}>
                 Filters
@@ -58,7 +56,7 @@ export const FiltersModal = ({
                 style={styles.closeBtn}
                 hitSlop={10}
               >
-                <Ionicons name="close" size={24} color={theme.colors.text} />
+                <Ionicons name="close" size={24} style={styles.closeIcon} />
               </TouchableOpacity>
             </View>
 
@@ -197,12 +195,7 @@ export const FiltersModal = ({
               </View>
             </ScrollView>
 
-            <View
-              style={[
-                styles.footer,
-                { paddingBottom: Math.max(rt.insets.bottom, 16) },
-              ]}
-            >
+            <View style={styles.footer}>
               <View style={styles.actionRow}>
                 <UIButton
                   variant="outline"
@@ -229,7 +222,7 @@ export const FiltersModal = ({
   );
 };
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
   modalOverlay: {
     flex: 1,
     backgroundColor: theme.colors.background,
@@ -237,6 +230,7 @@ const styles = StyleSheet.create((theme) => ({
   modalContainer: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
   },
 
   header: {
@@ -258,6 +252,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
+  },
+  closeIcon: {
+    color: theme.colors.text,
   },
 
   scrollContent: {
@@ -296,6 +293,7 @@ const styles = StyleSheet.create((theme) => ({
   footer: {
     paddingHorizontal: theme.spacing.lg,
     paddingTop: theme.spacing.md,
+    paddingBottom: Math.max(rt.insets.bottom, 16),
     backgroundColor: theme.colors.background,
     borderTopWidth: 1,
     borderTopColor: theme.colors.borderLight,
@@ -323,3 +321,4 @@ const styles = StyleSheet.create((theme) => ({
     elevation: 3,
   },
 }));
+
