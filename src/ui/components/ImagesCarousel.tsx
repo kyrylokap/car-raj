@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { usePathname } from "expo-router";
 import { useRef, useState } from "react";
 import {
   Modal,
@@ -31,12 +30,12 @@ const pickImages = async () => {
 export const ImagesCarousel = ({
   images,
   setImages,
-  handleChangeImagesCount,
+  onImagesChange,
   hero = false,
 }: {
   images: string[];
   setImages?: React.Dispatch<React.SetStateAction<string[]>>;
-  handleChangeImagesCount?: React.Dispatch<React.SetStateAction<number>>;
+  onImagesChange?: (count: number) => void;
   hero?: boolean;
 }) => {
   const { theme } = useUnistyles();
@@ -45,7 +44,6 @@ export const ImagesCarousel = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const pathName = usePathname();
   const deleteImage = () => {
     if (!setImages) return;
     setImages((prev) => {
@@ -58,13 +56,13 @@ export const ImagesCarousel = ({
       });
       return updated;
     });
-    handleChangeImagesCount?.((prev) => prev - 1);
+    onImagesChange?.(images.length - 1);
   };
   const handlePickImages = async () => {
     const newImages = await pickImages();
     setImages!((prev) => {
-      handleChangeImagesCount!(images.length + newImages.length);
       const resultImages = [...prev, ...newImages];
+      onImagesChange?.(resultImages.length);
       const firstPickedImage = prev.length;
       setCurrentIndex(firstPickedImage);
       carouselRef?.current?.scrollTo({
@@ -159,7 +157,7 @@ export const ImagesCarousel = ({
 
   return (
     <View style={styles.imageSection}>
-      {pathName.includes("sell-vehicle") ? (
+      {setImages ? (
         <View style={styles.sectionHeader}>
           <View>
             <UIText size="md" weight="semibold" style={styles.sectionTitle}>
@@ -179,7 +177,7 @@ export const ImagesCarousel = ({
         </View>
       ) : null}
 
-      {images.length === 0 && pathName.includes("sell-vehicle") ? (
+      {images.length === 0 && setImages ? (
         <TouchableOpacity
           style={styles.emptyStateContainer}
           onPress={handlePickImages}

@@ -229,7 +229,32 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_cars: {
+        Args: { p_filters: Json; p_limit?: number; p_offset?: number }
+        Returns: {
+          brand: string
+          color: string | null
+          created_at: string
+          description: string | null
+          fuel: Database["public"]["Enums"]["car_fuel_type"] | null
+          id: string
+          location: string | null
+          mileage: number | null
+          model: string
+          price: number | null
+          status: Database["public"]["Enums"]["car_status"] | null
+          transmission: Database["public"]["Enums"]["car_transmission"] | null
+          user_id: string
+          vin: string | null
+          year: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "car"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       car_fuel_type: "Petrol" | "Diesel" | "Electric" | "Hybrid" | "Other"

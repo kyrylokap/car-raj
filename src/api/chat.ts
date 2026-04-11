@@ -98,12 +98,12 @@ export async function getChatsForUser(
 }
 
 export async function getChatsCount(userId: string) {
-  const { data, error } = await supabase
+  const { count, error } = await supabase
     .from("chat")
-    .select("*", { count: "exact" })
-    .eq("customer_id", userId);
+    .select("*", { count: "exact", head: true })
+    .or(`owner_id.eq.${userId},customer_id.eq.${userId}`);
   if (error) throw error;
-  return data?.length || 0;
+  return count || 0;
 }
 export function useChatsCount() {
   const user = useUser();

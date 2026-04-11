@@ -75,15 +75,16 @@ export const CustomTabBar = () => {
               activeOpacity={0.7}
             >
               <View style={styles.tabItemContent}>
-                <View style={styles.iconWrapper}>
+                <View style={[styles.iconWrapper, active && styles.iconWrapperActive]}>
                   <Ionicons
                     name={active ? tab.activeIcon : tab.icon}
-                    size={26}
+                    size={24}
                     color={
                       active ? theme.colors.primary : theme.colors.textSecondary
                     }
                     style={styles.icon}
                   />
+                  {active && <View style={styles.activeIndicator} />}
                 </View>
                 <UIText size="xs" style={styles.label(active)}>
                   {tab.label}
@@ -104,23 +105,28 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     backgroundColor: theme.colors.tabBar,
-    borderTopWidth: 0.5,
-    borderTopColor: theme.colors.border,
+    borderTopWidth: 0,
+    shadowColor: theme.colors.shadow,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   tabBar: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    paddingHorizontal: theme.spacing.xs,
-    paddingTop: theme.spacing.xs,
-    paddingBottom: theme.spacing.xs,
-    minHeight: theme.vs(49),
+    paddingHorizontal: theme.spacing.md,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
+    minHeight: theme.vs(60),
+    backgroundColor: theme.colors.tabBar,
   },
   tabItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: theme.spacing.xs,
+    paddingVertical: theme.spacing.sm,
     position: "relative",
   },
   tabItemContent: {
@@ -131,16 +137,30 @@ const styles = StyleSheet.create((theme) => ({
   iconWrapper: {
     alignItems: "center",
     justifyContent: "center",
-    width: theme.s(28),
-    height: theme.s(28),
+    width: theme.s(32),
+    height: theme.s(32),
     position: "relative",
+    borderRadius: theme.borderRadius.full,
+  },
+  iconWrapperActive: {
+    backgroundColor: `${theme.colors.primary}15`,
   },
   icon: {
     position: "relative",
   },
+  activeIndicator: {
+    position: "absolute",
+    bottom: -2,
+    width: theme.s(4),
+    height: theme.s(4),
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.borderRadius.full,
+  },
   label: (active: boolean) => ({
     marginTop: 0,
-    color: active ? theme.colors.primary : theme.colors.textSecondary,
+    color: active ? theme.colors.text : theme.colors.textSecondary,
+    fontWeight: active ? "600" : "400",
+    fontSize: theme.s(11),
   }),
   badge: {
     position: "absolute",

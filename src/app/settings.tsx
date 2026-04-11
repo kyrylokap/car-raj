@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useRef } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -11,7 +11,7 @@ import {
 } from "react-native-unistyles";
 import { handleSignOut } from "../api/auth";
 import { UICard, UIContainer, UIText } from "../ui";
-import { PhoneNumberModal } from "../ui/components/PhoneNumberModal";
+import { PhoneNumberModal, PhoneNumberModalRef } from "../ui/components/PhoneNumberModal";
 
 type SettingItem = {
   icon: string;
@@ -24,9 +24,10 @@ type SettingItem = {
 };
 
 export default function SettingsScreen() {
-  const { theme, rt } = useUnistyles();
+  const { theme } = useUnistyles();
   const router = useRouter();
-  const [phoneModalVisible, setPhoneModalVisible] = useState<boolean>(false);
+  const phoneNumberModalRef = useRef<PhoneNumberModalRef>(null);
+
   const accountSettings: SettingItem[] = [
     {
       icon: "phone-portrait",
@@ -34,7 +35,7 @@ export default function SettingsScreen() {
       subtitle: "Allow customers call you",
       type: "navigation",
       color: theme.colors.primary,
-      onPress: () => setPhoneModalVisible(true),
+      onPress: () => phoneNumberModalRef.current?.present(),
     },
   ];
 
@@ -174,30 +175,21 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <PhoneNumberModal
-        visible={phoneModalVisible}
-        close={() => setPhoneModalVisible(false)}
-      />
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
-        <TouchableOpacity
+        <TouchableOpacity 
+          style={styles.backButton} 
           onPress={() => router.back()}
-          style={styles.backButton}
-          hitSlop={14}
         >
-          <Ionicons name="arrow-back" size={24} color={theme.colors.text} />
+          <Ionicons name="chevron-back" size={28} color={theme.colors.text} />
         </TouchableOpacity>
-        <UIText size="xl" weight="bold" style={styles.headerTitle}>
-          Settings
-        </UIText>
-        <View style={styles.headerRight} />
+        <UIText size="xl" weight="bold">Settings</UIText>
+        <View style={{ width: 28 }} />
       </View>
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: rt.insets.bottom + 100 },
-        ]}
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
         <UIContainer>
@@ -241,7 +233,10 @@ export default function SettingsScreen() {
           </UICard>
 
           <TouchableOpacity
-            onPress={handleSignOut}
+            onPress={() => {
+              handleSignOut();
+              router.replace("/auth");
+            }}
             style={styles.logoutButton}
             activeOpacity={0.7}
           >
@@ -256,6 +251,11 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </UIContainer>
       </ScrollView>
+
+      <PhoneNumberModal
+        ref={phoneNumberModalRef}
+        onClose={() => {}}
+      />
     </SafeAreaView>
   );
 }
@@ -268,23 +268,22 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
+    height: 56,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.card,
   },
   backButton: {
-    marginRight: theme.spacing.md,
+    padding: 4,
+    marginLeft: -4,
   },
-  headerTitle: {
+  scrollView: {
     flex: 1,
   },
-  headerRight: {
-    width: 40,
-  },
-  scrollContent: {
-    flexGrow: 1,
+  container: {
+    paddingVertical: theme.spacing.lg,
   },
   settingsCard: {
     marginBottom: theme.spacing.md,
@@ -343,6 +342,6 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: `${theme.colors.error}20`,
     marginTop: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.xl,
   },
 }));

@@ -191,9 +191,7 @@ export default function ChatScreen() {
               borderWidth: 1,
               borderColor: theme.colors.borderLight,
               paddingHorizontal: theme.spacing.md,
-              paddingVertical: theme.spacing.sm,
               fontSize: theme.s(15),
-              minHeight: theme.vs(44),
             },
           }}
           renderBubble={(props) => (

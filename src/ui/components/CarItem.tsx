@@ -7,7 +7,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Car, useCarFirstImage } from "../../api/car";
 import { UIText } from "../UIText";
 
-export const CarItem = ({ item }: { item: Car }) => {
+export const CarItem = ({ item, onPress }: { item: Car; onPress?: () => void }) => {
   const { theme } = useUnistyles();
   const {
     data: firstImageUrl,
@@ -20,9 +20,17 @@ export const CarItem = ({ item }: { item: Car }) => {
 
   const isLoading = isFirstImageFetching || isFirstImageLoading;
 
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push(`/car/${item?.id}`);
+    }
+  };
+
   return (
     <TouchableOpacity
-      onPress={() => router.push(`/car/${item?.id}`)}
+      onPress={handlePress}
       activeOpacity={0.88}
       style={styles.wrapper}
     >
@@ -125,20 +133,17 @@ export const CarItem = ({ item }: { item: Car }) => {
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
-    marginBottom: theme.spacing.md,
-    borderRadius: theme.borderRadius.xl,
-    backgroundColor: theme.colors.card,
+    marginBottom: theme.spacing.lg,
+    borderRadius: theme.borderRadius.xxl,
+    backgroundColor: theme.colors.surfaceElevated,
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.2,
-    shadowRadius: 14,
-    elevation: 6,
+    ...theme.shadows.lg,
   },
   imageContainer: {
     width: "100%",
-    height: theme.vs(210),
+    height: theme.vs(220),
     position: "relative",
+    backgroundColor: theme.colors.surfaceVariant,
   },
   image: {
     width: "100%",
@@ -146,7 +151,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   placeholder: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surfaceVariant,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -155,53 +160,65 @@ const styles = StyleSheet.create((theme) => ({
     bottom: 0,
     left: 0,
     right: 0,
-    height: "60%",
+    height: "65%",
   },
   priceBadge: {
     position: "absolute",
-    bottom: theme.spacing.sm,
-    left: theme.spacing.sm,
+    bottom: theme.spacing.md,
+    left: theme.spacing.md,
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.full,
+    borderRadius: theme.borderRadius.lg,
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
+    paddingVertical: theme.spacing.sm,
+    shadowColor: theme.colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 4,
   },
   priceText: {
-    color: "#fff",
+    color: theme.colors.textInverse,
     fontWeight: "700",
+    fontSize: theme.s(15),
   },
   locationChip: {
     position: "absolute",
-    bottom: theme.spacing.sm,
-    right: theme.spacing.sm,
+    bottom: theme.spacing.md,
+    right: theme.spacing.md,
     flexDirection: "row",
     alignItems: "center",
-    gap: 3,
-    backgroundColor: "rgba(0,0,0,0.42)",
+    gap: theme.s(4),
+    backgroundColor: "rgba(0,0,0,0.65)",
+    backdropFilter: "blur(8px)",
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 4,
+    paddingVertical: theme.spacing.xs,
   },
   locationText: {
-    color: "rgba(255,255,255,0.82)",
-    fontSize: 11,
+    color: "rgba(255,255,255,0.9)",
+    fontSize: theme.s(11),
+    fontWeight: "500",
   },
   info: {
     paddingHorizontal: theme.spacing.md,
-    paddingTop: theme.spacing.sm,
+    paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.md,
-    gap: theme.spacing.xs,
+    gap: theme.spacing.sm,
   },
   pills: {
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-    gap: theme.spacing.xs,
+    gap: theme.spacing.sm,
   },
   pill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: theme.s(4),
+    backgroundColor: theme.colors.surfaceVariant,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.md,
   },
   dot: {
     width: 3,

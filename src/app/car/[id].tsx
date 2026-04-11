@@ -277,10 +277,12 @@ const styles = StyleSheet.create((theme, rt) => ({
 
   heroContainer: {
     width: "100%",
+    height: theme.vs(320),
     position: "relative",
   },
   heroPlaceholder: {
-    flex: 1,
+    width: "100%",
+    height: theme.vs(320),
     backgroundColor: theme.colors.surface,
     alignItems: "center",
     justifyContent: "center",
@@ -394,7 +396,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
   floatingHeader: {
     position: "absolute",
-    top: 20,
+    top: rt.insets.top + theme.spacing.sm,
     left: 0,
     right: 0,
     flexDirection: "row",

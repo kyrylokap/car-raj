@@ -13,7 +13,7 @@ export const FormDataSchema = z.object({
       const num = Number(val);
       return !isNaN(num) && num >= 4 && num <= 10;
     },
-    { message: "*Please, choose between 4-10 images" }
+    { message: "*Please, choose between 4-10 images" },
   ),
   brand: z.string().nonempty({ message: "*Please, provide valid brand" }),
   model: z.string().nonempty({ message: "*Please, provide valid model" }),
@@ -25,7 +25,7 @@ export const FormDataSchema = z.object({
         const num = Number(val);
         return !isNaN(num) && num >= 1990 && num <= new Date().getFullYear();
       },
-      { message: "*Year must be a number between 1990 and current year" }
+      { message: "*Year must be a number between 1990 and current year" },
     ),
   price: z
     .string()
@@ -93,7 +93,7 @@ export function useSellVehicleForm() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async (): Promise<boolean> => {
     const result = FormDataSchema.safeParse(formData);
 
     if (!result.success) {
@@ -108,12 +108,12 @@ export function useSellVehicleForm() {
       }
 
       setErrors(fieldErrors);
-      return;
+      return false;
     }
 
     if (images.length < 4) {
       setErrors({ images: "Please add at least 4 images" });
-      return;
+      return false;
     }
 
     setErrors({});
@@ -131,14 +131,20 @@ export function useSellVehicleForm() {
       color: result.data.color,
     };
 
-    sellCar.mutate({ car, images });
-    router.back();
-    Alert.alert("Success", "You added new car to marketplace!", [
-      {
-        text: "Ok",
-        style: "cancel",
-      },
-    ]);
+    try {
+      await sellCar.mutateAsync({ car, images });
+      Alert.alert("Success", "You added new car to marketplace!", [
+        {
+          text: "Ok",
+          style: "cancel",
+        },
+      ]);
+      return true;
+    } catch (error) {
+      console.error("Error adding car:", error);
+      Alert.alert("Error", "Failed to add car. Please try again.");
+      return false;
+    }
   };
 
   return {
@@ -146,6 +152,7 @@ export function useSellVehicleForm() {
     errors,
     images,
     setImages,
+    isPending: sellCar.isPending,
     handleInputChange,
     handleSubmit,
   };

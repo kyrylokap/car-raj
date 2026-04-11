@@ -1,19 +1,27 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useRef } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCarsCount } from "../../api/car";
 import { UIText } from "../../ui";
+import { UIBottomSheetRef } from "../../ui/UIBottomSheet";
+import { FavoritesSheet } from "../../ui/sheets/FavoritesSheet";
+import { MyVehiclesSheet } from "../../ui/sheets/MyVehiclesSheet";
+import { SellVehicleSheet } from "../../ui/sheets/SellVehicleSheet";
 
 export default function ProfileScreen() {
   const { theme, rt } = useUnistyles();
   const user = useUser();
   const router = useRouter();
   const { data: userCarsCount } = useUserCarsCount();
+
+  const myVehiclesSheetRef = useRef<UIBottomSheetRef>(null);
+  const favoritesSheetRef = useRef<UIBottomSheetRef>(null);
+  const sellVehicleSheetRef = useRef<UIBottomSheetRef>(null);
 
   const name = user?.user_metadata?.full_name ?? "User";
   const initials = name
@@ -28,21 +36,21 @@ export default function ProfileScreen() {
       label: "My vehicles",
       subtitle: "Manage your active listings",
       color: theme.colors.primary,
-      route: "/my-vehicles",
+      onPress: () => myVehiclesSheetRef.current?.present(),
     },
     {
       icon: "heart-outline",
       label: "Favorites",
       subtitle: "Cars you've saved",
       color: theme.colors.error,
-      route: "/favorites",
+      onPress: () => favoritesSheetRef.current?.present(),
     },
     {
       icon: "settings-outline",
       label: "Settings",
       subtitle: "Preferences & privacy",
       color: theme.colors.textSecondary,
-      route: "/settings",
+      onPress: () => router.push("/settings"),
     },
   ];
 
@@ -100,7 +108,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.statCard}
             activeOpacity={0.7}
-            onPress={() => router.push("/my-vehicles")}
+            onPress={() => myVehiclesSheetRef.current?.present()}
           >
             <View style={styles.statIconWrap}>
               <Ionicons
@@ -122,7 +130,7 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.sellBtn}
             activeOpacity={0.8}
-            onPress={() => router.push("/sell-vehicle")}
+            onPress={() => sellVehicleSheetRef.current?.present()}
           >
             <Ionicons name="add" size={26} color="#FFF" />
             <UIText size="md" weight="bold" color="white">
@@ -145,7 +153,7 @@ export default function ProfileScreen() {
                   index === menuItems.length - 1 && styles.menuItemLast,
                 ]}
                 activeOpacity={0.7}
-                onPress={() => router.push(item.route as any)}
+                onPress={item.onPress}
               >
                 <View
                   style={[
@@ -184,6 +192,10 @@ export default function ProfileScreen() {
           </View>
         </View>
       </ScrollView>
+
+      <MyVehiclesSheet ref={myVehiclesSheetRef} />
+      <FavoritesSheet ref={favoritesSheetRef} />
+      <SellVehicleSheet ref={sellVehicleSheetRef} />
     </SafeAreaView>
   );
 }
@@ -198,15 +210,15 @@ const styles = StyleSheet.create((theme) => ({
   },
 
   headerTop: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.lg,
+    paddingBottom: theme.spacing.lg,
   },
 
   profileSection: {
     alignItems: "center",
     marginBottom: theme.spacing.xl,
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
   },
   avatarWrap: {
     marginBottom: theme.spacing.lg,
@@ -214,20 +226,23 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
   },
   avatar: {
-    width: theme.s(100),
-    height: theme.s(100),
+    width: theme.s(110),
+    height: theme.s(110),
     borderRadius: theme.borderRadius.full,
+    borderWidth: 3,
+    borderColor: theme.colors.surface,
+    ...theme.shadows.lg,
   },
   avatarFallback: {
-    backgroundColor: theme.colors.primary + "18",
+    backgroundColor: theme.colors.primary + "15",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
-    borderColor: theme.colors.primary + "33",
+    borderWidth: 3,
+    borderColor: theme.colors.primary + "30",
   },
   initials: {
     color: theme.colors.primary,
-    fontSize: theme.s(36),
+    fontSize: theme.s(40),
     fontWeight: "700",
   },
   infoWrap: {
@@ -237,19 +252,19 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 4,
+    marginBottom: theme.spacing.xs,
   },
   nameText: {
     letterSpacing: -0.5,
   },
   verifiedIcon: {
-    marginLeft: 6,
+    marginLeft: theme.spacing.sm,
     marginTop: 2,
   },
 
   actionRow: {
     flexDirection: "row",
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
     gap: theme.spacing.md,
     marginBottom: theme.spacing.xxl,
   },
@@ -257,17 +272,16 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.borderRadius.xxl,
     padding: theme.spacing.md,
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: theme.colors.borderLight,
+    ...theme.shadows.md,
   },
   statIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: theme.colors.primary + "15",
     alignItems: "center",
     justifyContent: "center",
@@ -281,7 +295,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1.5,
     flexDirection: "row",
     backgroundColor: theme.colors.primary,
-    borderRadius: theme.borderRadius.xl,
+    borderRadius: theme.borderRadius.xxl,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: theme.colors.primary,
@@ -292,44 +306,48 @@ const styles = StyleSheet.create((theme) => ({
   },
 
   menuSection: {
-    paddingHorizontal: theme.spacing.xl,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.xxl,
   },
   menuHeader: {
     color: theme.colors.textSecondary,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
     marginBottom: theme.spacing.md,
     marginLeft: theme.spacing.xs,
+    fontSize: theme.s(13),
+    fontWeight: "600",
   },
   menuList: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.xl,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.borderRadius.xxl,
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: theme.colors.borderLight,
+    ...theme.shadows.md,
   },
   menuItem: {
     flexDirection: "row",
     alignItems: "center",
-    padding: theme.spacing.md,
-    borderBottomWidth: 1,
+    padding: theme.spacing.lg,
+    borderBottomWidth: 0.5,
     borderBottomColor: theme.colors.borderLight,
+    backgroundColor: theme.colors.surfaceElevated,
   },
   menuItemLast: {
     borderBottomWidth: 0,
   },
   menuIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 48,
+    height: 48,
+    borderRadius: theme.borderRadius.lg,
     alignItems: "center",
     justifyContent: "center",
     marginRight: theme.spacing.md,
   },
   menuTextContent: {
     flex: 1,
-    gap: 2,
+    gap: theme.s(4),
   },
   menuSubtitle: {
-    opacity: 0.8,
+    opacity: 0.7,
+    fontSize: theme.s(13),
   },
 }));

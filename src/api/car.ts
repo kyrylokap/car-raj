@@ -1,3 +1,4 @@
+import React from "react";
 import { Database } from "@/src/lib/database.types";
 import {
   useInfiniteQuery,
@@ -29,123 +30,89 @@ export type Filter = {
   sortBy: "price_asc" | "price_desc" | "newest" | "oldest" | "";
 };
 
+export function useCarSuggestions(
+  type: "brand" | "model" | "location",
+  query: string,
+  brandFilter?: string
+) {
+  return useQuery({
+    queryKey: ["suggestions", type, query, brandFilter],
+    queryFn: async () => {
+      console.log("Fetching suggestions:", { type, query, brandFilter });
+      if (!query || query.length < 1) return [];
+
+      let supabaseQuery = supabase
+        .from("car")
+        .select(type)
+        .ilike(type, `%${query}%`)
+        .limit(20);
+
+      if (type === "model" && brandFilter) {
+        supabaseQuery = supabaseQuery.ilike("brand", brandFilter);
+      }
+
+      const { data, error } = await supabaseQuery;
+      if (error) {
+        throw error;
+      }
+
+      // Extract unique values
+      const values = data
+        .map((item: any) => item[type])
+        .filter((v): v is string => !!v);
+      const uniqueValues = Array.from(new Set(values)).sort();
+      return uniqueValues;
+    },
+    enabled: query.length > 0,
+    staleTime: 1000 * 60 * 5,
+  });
+}
+
+export function useCarSuggestionsFormatted(
+  type: "brand" | "model" | "location",
+  query: string,
+  brandFilter?: string
+) {
+  const { data = [], isLoading } = useCarSuggestions(type, query, brandFilter);
+  return React.useMemo(
+    () => ({
+      data: data.map((item) => ({ id: item, title: item })),
+      isLoading,
+    }),
+    [data, isLoading]
+  );
+}
+
 export function useSearchCarWithFilters(filters?: Filter) {
   return useQuery({
     queryKey: ["searchCars", filters],
     queryFn: async () => {
-      if (!filters) {
-        const { data, error } = await supabase.from("car").select("*");
-        if (error) throw error;
-        return data;
-      }
-      const {
-        brand,
-        model,
-        minPrice,
-        maxPrice,
-        minYear,
-        maxYear,
-        fuelType,
-        location,
-        transmission,
-      } = filters;
-      let query = supabase.from("car").select("*");
+      const { data, error } = await supabase.rpc("search_cars", {
+        p_filters: filters || {},
+        p_limit: 1000,
+        p_offset: 0,
+      });
 
-      if (brand !== "") {
-        query = query.ilike("brand", `%${brand}%`);
-      }
-      if (model !== "") {
-        query = query.ilike("model", `%${model}%`);
-      }
-      if (minPrice !== "") {
-        query = query.gte("price", Number.parseInt(minPrice, 10));
-      }
-      if (maxPrice !== "") {
-        query = query.lte("price", Number.parseInt(maxPrice, 10));
-      }
-      if (minYear !== "") {
-        query = query.gte("year", Number.parseInt(minYear, 10));
-      }
-      if (maxYear !== "") {
-        query = query.lte("year", Number.parseInt(maxYear, 10));
-      }
-      if (fuelType !== "") {
-        query = query.eq("fuel", fuelType);
-      }
-
-      if (location !== "") {
-        query = query.ilike("location", `%${location}%`);
-      }
-      if (transmission !== "") {
-        query = query.eq("transmission", transmission);
-      }
-
-      if (filters.sortBy === "price_asc") {
-        query = query.order("price", { ascending: true });
-      } else if (filters.sortBy === "price_desc") {
-        query = query.order("price", { ascending: false });
-      } else if (filters.sortBy === "newest") {
-        query = query.order("created_at", { ascending: false });
-      } else if (filters.sortBy === "oldest") {
-        query = query.order("created_at", { ascending: true });
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return (data || []) as Car[];
     },
     staleTime: 1000 * 60 * 5,
   });
 }
 
 export async function fetchCarsPage(filters?: Filter, limit = 5, offset = 0) {
-  const {
-    brand,
-    model,
-    minPrice,
-    maxPrice,
-    minYear,
-    maxYear,
-    fuelType,
-    location,
-    transmission,
-    sortBy,
-    minMileage,
-    maxMileage,
-  } = (filters || {}) as Filter;
+  const { data, error } = await supabase.rpc("search_cars", {
+    p_filters: filters || {},
+    p_limit: limit,
+    p_offset: offset,
+  });
 
-  let query = supabase.from("car").select("*");
-
-  if (filters) {
-    if (brand !== "") query = query.ilike("brand", `%${brand}%`);
-    if (model !== "") query = query.ilike("model", `%${model}%`);
-    if (minPrice !== "")
-      query = query.gte("price", Number.parseInt(minPrice, 10));
-    if (maxPrice !== "")
-      query = query.lte("price", Number.parseInt(maxPrice, 10));
-    if (minYear !== "") query = query.gte("year", Number.parseInt(minYear, 10));
-    if (maxYear !== "") query = query.lte("year", Number.parseInt(maxYear, 10));
-    if (fuelType !== "") query = query.eq("fuel", fuelType);
-    if (location !== "") query = query.ilike("location", `%${location}%`);
-    if (transmission !== "") query = query.eq("transmission", transmission);
-    if (sortBy === "price_asc")
-      query = query.order("price", { ascending: true });
-    else if (sortBy === "price_desc")
-      query = query.order("price", { ascending: false });
-    else if (sortBy === "newest")
-      query = query.order("created_at", { ascending: false });
-    else if (sortBy === "oldest")
-      query = query.order("created_at", { ascending: true });
-    
-    if (minMileage !== "") query = query.gte("mileage", Number.parseInt(minMileage, 10));
-    if (maxMileage !== "") query = query.lte("mileage", Number.parseInt(maxMileage, 10));
+  if (error) {
+    console.error("Error fetching cars via RPC:", error);
+    throw error;
   }
 
-  query = query.range(offset, offset + limit - 1);
-
-  const { data, error } = await query;
-  if (error) throw error;
-  return data || [];
+  return (data || []) as Car[];
 }
 
 export function useInfiniteSearchCars(filters?: Filter, pageSize = 5) {

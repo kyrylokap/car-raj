@@ -28,6 +28,7 @@ export const UIText = ({
 const styles = StyleSheet.create((theme) => ({
   text: {
     includeFontPadding: false,
+    letterSpacing: 0.1,
     variants: {
       size: {
         xxs: {
@@ -70,17 +71,26 @@ const styles = StyleSheet.create((theme) => ({
         secondary: {
           color: theme.colors.secondary,
         },
+        success: {
+          color: theme.colors.success,
+        },
+        warning: {
+          color: theme.colors.warning,
+        },
+        error: {
+          color: theme.colors.error,
+        },
         text: {
           color: theme.colors.text,
         },
         textSecondary: {
           color: theme.colors.textSecondary,
         },
-        error: {
-          color: theme.colors.error,
+        textTertiary: {
+          color: theme.colors.textTertiary,
         },
-        success: {
-          color: theme.colors.success,
+        textInverse: {
+          color: theme.colors.textInverse,
         },
         white: {
           color: theme.colors.white,
@@ -98,6 +108,9 @@ const styles = StyleSheet.create((theme) => ({
         },
         bold: {
           fontWeight: "700",
+        },
+        extrabold: {
+          fontWeight: "800",
         },
       },
     },

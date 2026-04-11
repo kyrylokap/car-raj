@@ -1,6 +1,6 @@
-import { FiltersModal } from "@/src/ui/components/FiltersModal";
+import { FiltersModal, FiltersModalRef } from "@/src/ui/components/FiltersModal";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -11,9 +11,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useInfiniteSearchCars } from "../../api/car";
 import { useSearchFilters } from "../../hooks/useSearchFilters";
+import { UIAutocompleteInput } from "../../ui/UIAutocompleteInput";
 import { UIContainer, UIText } from "../../ui";
-import { CarItem } from "../../ui/components/CarItem";
-import { UIPicker } from "../../ui/UIPicker";
+import { CarItem } from "@/src/ui/components/CarItem";
 
 const sortingTypes = [
   { id: "price_asc", label: "From lowest price" },
@@ -24,8 +24,7 @@ const sortingTypes = [
 
 export default function SearchScreen() {
   const { theme, rt } = useUnistyles();
-
-  const [showFilters, setShowFilters] = useState(false);
+  const filtersModalRef = useRef<FiltersModalRef>(null);
 
   const {
     draftFilters,
@@ -49,7 +48,7 @@ export default function SearchScreen() {
 
   const handleChangeFilters = () => {
     applyFilters();
-    setShowFilters(false);
+    filtersModalRef.current?.dismiss();
   };
 
   return (
@@ -61,40 +60,38 @@ export default function SearchScreen() {
               sortingTypes.find((s) => s.id === draftFilters.sortBy)?.label ||
               "Sort by";
             return (
-              <UIPicker
-                style={styles.sortPicker}
-                label="Sort"
-                hideLabel
-                values={sortingTypes.map((v) => v.label)}
-                currentPickerValue={currentSortLabel}
-                pick={(label) => {
+              <UIAutocompleteInput
+                containerStyle={styles.sortPicker}
+                placeholder="Sort by"
+                initialOptions={sortingTypes.map((v) => v.label)}
+                value={currentSortLabel}
+                onChangeText={(label) => {
                   const found = sortingTypes.find((s) => s.label === label);
-                  updateDraftFilter("sortBy", found ? (found.id as any) : "");
+                  if (found) {
+                    updateDraftFilter("sortBy", found.id as any);
+                  }
                 }}
               />
             );
           })()}
           <TouchableOpacity
-            style={[
-              styles.filterButton,
-              showFilters && styles.filterButtonActive,
-            ]}
-            onPress={() => setShowFilters(!showFilters)}
+            style={styles.filterButton}
+            onPress={() => filtersModalRef.current?.present()}
           >
             <Ionicons
               name="filter"
               size={20}
-              color={showFilters ? theme.colors.white : theme.colors.primary}
+              color={theme.colors.primary}
             />
           </TouchableOpacity>
         </View>
         <FiltersModal
-          visible={showFilters}
-          close={() => setShowFilters(false)}
+          ref={filtersModalRef}
           draftFilters={draftFilters}
           updateDraftFilter={updateDraftFilter}
           handleResetFilters={handleResetFilters}
           handleChangeFilters={handleChangeFilters}
+          onClose={() => {}}
         />
 
         <FlatList
@@ -166,7 +163,8 @@ export default function SearchScreen() {
 const styles = StyleSheet.create((theme) => ({
   emptyListWrapper: {
     alignItems: "center",
-    paddingTop: theme.spacing.lg,
+    paddingTop: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.xl,
   },
   emptyListText: {
     textAlign: "center",
@@ -178,15 +176,18 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.2)",
+    backgroundColor: theme.colors.overlay,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 999,
   },
   loadingCard: {
-    padding: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.xl,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.borderRadius.xxl,
     alignItems: "center",
+    ...theme.shadows.xl,
+    minWidth: "60%",
   },
   safeArea: {
     flex: 1,
@@ -196,11 +197,12 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.sm,
+    paddingBottom: theme.spacing.md,
     gap: theme.spacing.sm,
     backgroundColor: theme.colors.background,
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "space-between",
+    borderBottomWidth: 0,
   },
 
   searchInputContainer: {
@@ -236,7 +238,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingTop: theme.spacing.sm,
   },
   sortPicker: {
-    marginRight: theme.spacing.sm,
-    justifyContent: "center",
+    flex: 1,
+    marginBottom: 0,
   },
 }));

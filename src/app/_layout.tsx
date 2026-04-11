@@ -9,6 +9,7 @@ import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { useUser } from "../api/auth";
 import { useNotifications } from "../api/useNotifications";
@@ -18,7 +19,7 @@ const queryClient = new QueryClient();
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <RootLayoutNav />
       </QueryClientProvider>
@@ -39,37 +40,15 @@ function RootLayoutNav() {
       value={UnistylesRuntime.themeName === "dark" ? DarkTheme : DefaultTheme}
     >
       <OnlineUsersProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Protected guard={!!user}>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-            <Stack.Screen
-              name="chat/[id]"
-              options={{ presentation: "modal" }}
-            />
-
-            <Stack.Screen name="car/[id]" options={{ presentation: "modal" }} />
-            <Stack.Screen
-              name="user/[userId]/user-cars"
-              options={{ presentation: "modal" }}
-            />
-            <Stack.Screen
-              name="my-vehicles"
-              options={{ presentation: "modal" }}
-            />
-            <Stack.Screen
-              name="sell-vehicle"
-              options={{ presentation: "modal" }}
-            />
-
-            <Stack.Screen name="settings" options={{ presentation: "modal" }} />
-            <Stack.Screen
-              name="favorites"
-              options={{ presentation: "modal" }}
-            />
-          </Stack.Protected>
-          <Stack.Screen name="auth" options={{ presentation: "modal" }} />
-        </Stack>
+        <BottomSheetModalProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Protected guard={!!user}>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="settings" />
+            </Stack.Protected>
+            <Stack.Screen name="auth" />
+          </Stack>
+        </BottomSheetModalProvider>
       </OnlineUsersProvider>
     </ThemeProvider>
   );

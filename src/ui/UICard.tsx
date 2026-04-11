@@ -32,26 +32,26 @@ export const UICard: React.FC<CardProps> = ({
 
 const styles = StyleSheet.create((theme) => ({
   card: {
-    backgroundColor: theme.colors.card,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.md,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.lg,
+    overflow: "hidden",
     variants: {
       variant: {
         elevated: {
-          backgroundColor: theme.colors.card,
-          shadowColor: theme.colors.shadow,
-          shadowOffset: {
-            width: 0,
-            height: 2,
-          },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
+          backgroundColor: theme.colors.surfaceElevated,
+          ...theme.shadows.md,
         },
         outlined: {
-          backgroundColor: theme.colors.card,
-          borderWidth: 1,
+          backgroundColor: theme.colors.surface,
+          borderWidth: theme.s(1.5),
           borderColor: theme.colors.border,
+        },
+        filled: {
+          backgroundColor: theme.colors.surfaceVariant,
+        },
+        ghost: {
+          backgroundColor: "transparent",
         },
       },
     },

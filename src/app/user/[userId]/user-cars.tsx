@@ -29,7 +29,7 @@ export default function UserProfileWithCarsScreen() {
   } = useUserCars(params.userId as string);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={[]}>
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => router.back()}

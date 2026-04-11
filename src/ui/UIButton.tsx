@@ -45,24 +45,54 @@ export const UIButton: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create((theme) => ({
   button: {
-    borderRadius: theme.borderRadius.md,
+    borderRadius: theme.borderRadius.lg,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
+    gap: theme.spacing.sm,
     variants: {
       variant: {
         primary: {
           backgroundColor: theme.colors.primary,
+          shadowColor: theme.colors.primary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
         },
         secondary: {
           backgroundColor: theme.colors.secondary,
+          shadowColor: theme.colors.secondary,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
+        },
+        success: {
+          backgroundColor: theme.colors.success,
+          shadowColor: theme.colors.success,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
+        },
+        error: {
+          backgroundColor: theme.colors.error,
+          shadowColor: theme.colors.error,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
         },
         outline: {
           backgroundColor: "transparent",
-          borderWidth: theme.s(1),
-          borderColor: theme.colors.border,
+          borderWidth: theme.s(1.5),
+          borderColor: theme.colors.primary,
         },
         ghost: {
+          backgroundColor: theme.colors.surfaceVariant,
+        },
+        link: {
           backgroundColor: "transparent",
         },
       },
@@ -70,7 +100,8 @@ const styles = StyleSheet.create((theme) => ({
         small: {
           paddingVertical: theme.spacing.sm,
           paddingHorizontal: theme.spacing.md,
-          minHeight: theme.vs(36),
+          minHeight: theme.vs(40),
+          borderRadius: theme.borderRadius.md,
         },
         medium: {
           paddingVertical: theme.spacing.md,
@@ -81,11 +112,14 @@ const styles = StyleSheet.create((theme) => ({
           paddingVertical: theme.spacing.lg,
           paddingHorizontal: theme.spacing.xl,
           minHeight: theme.vs(56),
+          borderRadius: theme.borderRadius.xl,
         },
       },
     },
   },
   disabled: {
     opacity: 0.5,
+    shadowOpacity: 0,
+    elevation: 0,
   },
 }));
