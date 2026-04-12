@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
+import { Presets } from "react-native-pulsar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   StyleSheet,
@@ -27,7 +28,6 @@ type SettingItem = {
 };
 
 export default function SettingsScreen() {
-  const { theme } = useUnistyles();
   const router = useRouter();
   const phoneNumberModalRef = useRef<PhoneNumberModalRef>(null);
 
@@ -37,7 +37,7 @@ export default function SettingsScreen() {
       label: "Phone number",
       subtitle: "Allow customers call you",
       type: "navigation",
-      color: theme.colors.primary,
+      color: "primary",
       onPress: () => phoneNumberModalRef.current?.present(),
     },
   ];
@@ -48,7 +48,7 @@ export default function SettingsScreen() {
       label: "Dark Mode",
       subtitle: "Switch between light and dark theme",
       type: "toggle",
-      color: theme.colors.textSecondary,
+      color: "textSecondary",
     },
     {
       icon: "language-outline",
@@ -56,7 +56,7 @@ export default function SettingsScreen() {
       subtitle: "English",
       value: "English",
       type: "value",
-      color: theme.colors.textSecondary,
+      color: "textSecondary",
     },
   ];
 
@@ -66,7 +66,7 @@ export default function SettingsScreen() {
       label: "Help & Support",
       subtitle: "Get help and contact support",
       type: "navigation",
-      color: theme.colors.textSecondary,
+      color: "textSecondary",
     },
 
     {
@@ -74,7 +74,7 @@ export default function SettingsScreen() {
       label: "About",
       subtitle: "App version 1.0.0",
       type: "navigation",
-      color: theme.colors.textSecondary,
+      color: "textSecondary",
     },
   ];
 
@@ -91,8 +91,11 @@ export default function SettingsScreen() {
         style={[styles.settingItem, isLast && styles.settingItemLast]}
         activeOpacity={item.type === "toggle" ? 1 : 0.7}
         onPress={() => {
-          if (item.type === "navigation" && item.onPress) {
-            item.onPress();
+          if (item.type === "navigation") {
+            Presets.System.selection();
+            if (item.onPress) {
+              item.onPress();
+            }
           }
         }}
         disabled={item.type === "toggle"}
@@ -100,13 +103,17 @@ export default function SettingsScreen() {
         <View
           style={[
             styles.settingIconContainer,
-            { backgroundColor: `${item.color || theme.colors.primary}15` },
+            item.color === "primary" ? styles.bgPrimary : styles.bgSecondary,
           ]}
         >
           <Ionicons
             name={item.icon as any}
             size={20}
-            color={item.color || theme.colors.primary}
+            color={
+              item.color === "primary" 
+                ? styles.primaryIcon.color 
+                : styles.secondaryIcon.color
+            }
           />
         </View>
         <View style={styles.settingContent}>
@@ -132,24 +139,25 @@ export default function SettingsScreen() {
                 : false
             }
             onValueChange={async (value) => {
+              Presets.System.selection();
               if (item.label === "Dark Mode") {
                 UnistylesRuntime.setTheme(value ? "dark" : "light");
                 await AsyncStorage.setItem(
                   "@auto_raj_theme_mode",
-                  value ? "dark" : "light",
+                  value ? "dark" : "light"
                 );
               }
             }}
             trackColor={{
-              false: theme.colors.border,
-              true: theme.colors.primary + "40",
+              false: styles.switchTrack.borderColor,
+              true: styles.switchTrack.color,
             }}
             thumbColor={
               item.label === "Dark Mode"
                 ? UnistylesRuntime.themeName === "dark"
-                  ? theme.colors.primary
-                  : theme.colors.textSecondary
-                : theme.colors.textSecondary
+                  ? styles.primaryIcon.color
+                  : styles.secondaryIcon.color
+                : styles.secondaryIcon.color
             }
           />
         )}
@@ -162,7 +170,7 @@ export default function SettingsScreen() {
               hitSlop={14}
               name="chevron-forward"
               size={18}
-              color={theme.colors.textSecondary}
+              color={styles.secondaryIcon.color}
             />
           </View>
         )}
@@ -171,7 +179,7 @@ export default function SettingsScreen() {
             name="chevron-forward"
             hitSlop={14}
             size={18}
-            color={theme.colors.textSecondary}
+            color={styles.secondaryIcon.color}
           />
         )}
       </TouchableOpacity>
@@ -184,9 +192,12 @@ export default function SettingsScreen() {
         <TouchableOpacity
           testID="settings-back-button"
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => {
+            Presets.System.impactLight();
+            router.back();
+          }}
         >
-          <Ionicons name="chevron-back" size={28} color={theme.colors.text} />
+          <Ionicons name="chevron-back" size={28} color={styles.headerIcon.color} />
         </TouchableOpacity>
         <UIText size="xxl" weight="bold">
           Settings
@@ -240,6 +251,7 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             onPress={() => {
+              Presets.System.impactMedium();
               handleSignOut();
               router.replace("/auth");
             }}
@@ -249,7 +261,7 @@ export default function SettingsScreen() {
             <Ionicons
               name="log-out-outline"
               size={20}
-              color={theme.colors.error}
+              color={styles.logoutIcon.color}
             />
             <UIText color="error" weight="semibold">
               Log Out
@@ -264,6 +276,34 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
+  bgPrimary: {
+    backgroundColor: `${theme.colors.primary}15`,
+  },
+  bgSecondary: {
+    backgroundColor: `${theme.colors.textSecondary}15`,
+  },
+  textSecondary: {
+    color: theme.colors.textSecondary,
+  },
+  primary: {
+    color: theme.colors.primary,
+  },
+  headerIcon: {
+    color: theme.colors.text,
+  },
+  logoutIcon: {
+    color: theme.colors.error,
+  },
+  switchTrack: {
+    color: theme.colors.primary + "40",
+    borderColor: theme.colors.border,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

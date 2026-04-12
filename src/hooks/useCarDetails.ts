@@ -6,8 +6,10 @@ import { useCarById } from "../api/car";
 import { getOrCreateChatForCar } from "../api/chat";
 import { useChangeFavorite, useIsCarFavorite } from "../api/favorites";
 import { useUserPhoneNumber } from "../api/userProfile";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function useCarDetails(carId: string) {
+  const queryClient = useQueryClient();
   const router = useRouter();
   const user = useUser();
   const currentUserId = user?.id;
@@ -38,6 +40,7 @@ export function useCarDetails(carId: string) {
         car.user_id,
         currentUserId
       );
+      queryClient.invalidateQueries({ queryKey: ["userChats", currentUserId] });
       router.push(`/chat/${chat.id}`);
     } catch (err) {
       console.error("Failed to open chat", err);

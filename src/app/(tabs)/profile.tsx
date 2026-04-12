@@ -5,6 +5,7 @@ import React, { useRef } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Presets } from "react-native-pulsar";
 import { useUser } from "../../api/auth";
 import { useUserCarsCount } from "../../api/car";
 import { UIText } from "../../ui";
@@ -14,7 +15,6 @@ import { MyVehiclesSheet } from "../../ui/sheets/MyVehiclesSheet";
 import { SellVehicleSheet } from "../../ui/sheets/SellVehicleSheet";
 
 export default function ProfileScreen() {
-  const { theme, rt } = useUnistyles();
   const user = useUser();
   const router = useRouter();
   const { data: userCarsCount } = useUserCarsCount();
@@ -35,32 +35,38 @@ export default function ProfileScreen() {
       icon: "car-outline",
       label: "My vehicles",
       subtitle: "Manage your active listings",
-      color: theme.colors.primary,
-      onPress: () => myVehiclesSheetRef.current?.present(),
+      color: "primary",
+      onPress: () => {
+        Presets.System.impactLight();
+        myVehiclesSheetRef.current?.present();
+      },
     },
     {
       icon: "heart-outline",
       label: "Favorites",
       subtitle: "Cars you've saved",
-      color: theme.colors.error,
-      onPress: () => favoritesSheetRef.current?.present(),
+      color: "error",
+      onPress: () => {
+        Presets.System.selection();
+        favoritesSheetRef.current?.present();
+      },
     },
     {
       icon: "settings-outline",
       label: "Settings",
       subtitle: "Preferences & privacy",
-      color: theme.colors.textSecondary,
-      onPress: () => router.push("/settings"),
+      color: "textSecondary",
+      onPress: () => {
+        Presets.System.selection();
+        router.push("/settings");
+      },
     },
   ];
 
   return (
     <SafeAreaView testID="profile-screen" style={styles.safeArea} edges={["top"]}>
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: rt.insets.bottom + 100 },
-        ]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerTop}>
@@ -94,7 +100,7 @@ export default function ProfileScreen() {
               <Ionicons
                 name="checkmark-circle"
                 size={22}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
                 style={styles.verifiedIcon}
               />
             </View>
@@ -108,13 +114,16 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.statCard}
             activeOpacity={0.7}
-            onPress={() => myVehiclesSheetRef.current?.present()}
+            onPress={() => {
+              Presets.System.impactLight();
+              myVehiclesSheetRef.current?.present();
+            }}
           >
             <View style={styles.statIconWrap}>
               <Ionicons
                 name="car-sport"
                 size={24}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
             </View>
             <View style={styles.statTextWrap}>
@@ -130,9 +139,12 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.sellBtn}
             activeOpacity={0.8}
-            onPress={() => sellVehicleSheetRef.current?.present()}
+            onPress={() => {
+              Presets.System.impactLight();
+              sellVehicleSheetRef.current?.present();
+            }}
           >
-            <Ionicons name="add" size={26} color="#FFF" />
+            <Ionicons name="add" size={26} color={styles.whiteIcon.color} />
             <UIText size="md" weight="bold" color="white">
               Sell vehicle
             </UIText>
@@ -158,13 +170,21 @@ export default function ProfileScreen() {
                 <View
                   style={[
                     styles.menuIconBox,
-                    { backgroundColor: `${item.color}15` },
+                    item.color === "primary" && styles.bgPrimary,
+                    item.color === "error" && styles.bgError,
+                    item.color === "textSecondary" && styles.bgSecondary,
                   ]}
                 >
                   <Ionicons
                     name={item.icon as any}
                     size={22}
-                    color={item.color}
+                    color={
+                      item.color === "primary" 
+                        ? styles.primaryIcon.color 
+                        : item.color === "error" 
+                          ? styles.errorIcon.color 
+                          : styles.secondaryIcon.color
+                    }
                   />
                 </View>
 
@@ -184,7 +204,7 @@ export default function ProfileScreen() {
                 <Ionicons
                   name="chevron-forward"
                   size={20}
-                  color={theme.colors.textSecondary}
+                  color={styles.secondaryIcon.color}
                   style={{ opacity: 0.5 }}
                 />
               </TouchableOpacity>
@@ -205,13 +225,44 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
+  primary: {
+    color: theme.colors.primary,
+  },
+  error: {
+    color: theme.colors.error,
+  },
+  textSecondary: {
+    color: theme.colors.textSecondary,
+  },
+  whiteIcon: {
+    color: theme.colors.white,
+  },
+  errorIcon: {
+    color: theme.colors.error,
+  },
+  bgPrimary: {
+    backgroundColor: `${theme.colors.primary}15`,
+  },
+  bgError: {
+    backgroundColor: `${theme.colors.error}15`,
+  },
+  bgSecondary: {
+    backgroundColor: `${theme.colors.textSecondary}15`,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: rt.insets.bottom + 100,
   },
 
   headerTop: {

@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Presets } from "react-native-pulsar";
 import { UIText } from "../UIText";
 
 const pickImages = async () => {
@@ -38,13 +39,13 @@ export const ImagesCarousel = ({
   onImagesChange?: (count: number) => void;
   hero?: boolean;
 }) => {
-  const { theme } = useUnistyles();
   const { width } = useWindowDimensions();
   const carouselRef = useRef<ICarouselInstance>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const deleteImage = () => {
+    Presets.System.impactMedium();
     if (!setImages) return;
     setImages((prev) => {
       const updated = [...prev];
@@ -59,6 +60,7 @@ export const ImagesCarousel = ({
     onImagesChange?.(images.length - 1);
   };
   const handlePickImages = async () => {
+    Presets.System.impactLight();
     const newImages = await pickImages();
     setImages!((prev) => {
       const resultImages = [...prev, ...newImages];
@@ -87,6 +89,7 @@ export const ImagesCarousel = ({
             <Pressable
               style={{ flex: 1 }}
               onLongPress={() => {
+                Presets.System.impactMedium();
                 setSelectedImage(imageUrl);
                 setModalVisible(true);
               }}
@@ -112,7 +115,7 @@ export const ImagesCarousel = ({
         </UIText>
         {setImages ? (
           <TouchableOpacity style={styles.trashContainer} onPress={deleteImage}>
-            <Ionicons name="trash" color="red" size={24} />
+            <Ionicons name="trash" color={styles.trashIcon.color} size={24} />
           </TouchableOpacity>
         ) : null}
       </View>
@@ -133,7 +136,10 @@ export const ImagesCarousel = ({
           >
             <TouchableOpacity
               style={{ flex: 1, width: "100%" }}
-              onPress={() => setModalVisible(false)}
+              onPress={() => {
+                Presets.System.selection();
+                setModalVisible(false);
+              }}
             >
               {selectedImage && (
                 <Image
@@ -169,7 +175,7 @@ export const ImagesCarousel = ({
             style={styles.imageUploadButton}
             onPress={handlePickImages}
           >
-            <Ionicons name="camera" size={24} color={theme.colors.primary} />
+            <Ionicons name="camera" size={24} color={styles.primaryIcon.color} />
           </TouchableOpacity>
         </View>
       ) : null}
@@ -183,8 +189,8 @@ export const ImagesCarousel = ({
           <Ionicons
             name="images-outline"
             size={48}
-            color={theme.colors.textSecondary}
-            style={{ opacity: 0.5 }}
+            color={styles.secondaryIcon.color}
+            style={styles.emptyIcon}
           />
           <UIText
             weight="medium"
@@ -234,6 +240,18 @@ export const ImagesCarousel = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
+  trashIcon: {
+    color: theme.colors.error,
+  },
+  emptyIcon: {
+    opacity: 0.5,
+  },
   imageSection: {
     paddingHorizontal: theme.spacing.lg,
     marginBottom: theme.spacing.md,

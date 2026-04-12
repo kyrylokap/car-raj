@@ -3,7 +3,8 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { forwardRef } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Presets } from "react-native-pulsar";
+import { StyleSheet } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCars } from "../../api/car";
 import { UIText } from "../../ui";
@@ -14,15 +15,8 @@ export const MyVehiclesSheet = forwardRef<
   UIBottomSheetRef,
   { onDismiss?: () => void; onSellPress?: () => void }
 >(({ onDismiss, onSellPress }, ref) => {
-  const { theme } = useUnistyles();
   const user = useUser();
-  const {
-    data: cars,
-    refetch,
-    isRefetching,
-    isLoading,
-    isFetching,
-  } = useUserCars(user?.id!);
+  const { data: cars, isLoading } = useUserCars(user?.id!);
   return (
     <UIBottomSheet
       ref={ref}
@@ -51,6 +45,7 @@ export const MyVehiclesSheet = forwardRef<
               style={styles.headerSellBtn}
               activeOpacity={0.8}
               onPress={() => {
+                Presets.System.impactLight();
                 onSellPress?.();
                 (ref as any).current?.dismiss();
               }}
@@ -79,7 +74,7 @@ export const MyVehiclesSheet = forwardRef<
               <Ionicons
                 name="car-sport-outline"
                 size={42}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
             </View>
             <UIText size="lg" weight="bold" style={styles.emptyTitle}>
@@ -97,6 +92,7 @@ export const MyVehiclesSheet = forwardRef<
               style={styles.sellCardCTA}
               activeOpacity={0.8}
               onPress={() => {
+                Presets.System.impactLight();
                 if (onSellPress) {
                   onSellPress();
                 } else {
@@ -114,7 +110,7 @@ export const MyVehiclesSheet = forwardRef<
       />
       {isLoading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <ActivityIndicator size="large" color={styles.primaryIcon.color} />
         </View>
       )}
     </UIBottomSheet>
@@ -122,6 +118,9 @@ export const MyVehiclesSheet = forwardRef<
 });
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
   headerPanel: {
     flexDirection: "row",
     justifyContent: "space-between",

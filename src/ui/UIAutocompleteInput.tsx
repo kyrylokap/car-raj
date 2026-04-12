@@ -3,14 +3,15 @@ import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import { useMemo, useRef, useState } from "react";
 import {
   Keyboard,
-  ScrollView,
   StyleProp,
   TextInput,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { FlashList } from "@shopify/flash-list";
+import { Presets } from "react-native-pulsar";
+import { StyleSheet } from "react-native-unistyles";
 import { useCarSuggestionsFormatted } from "../api/car";
 import { UIText } from "./UIText";
 
@@ -39,7 +40,6 @@ export const UIAutocompleteInput = ({
   initialOptions,
   bottomSheet = false,
 }: UIAutocompleteInputProps) => {
-  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const hasError = !!errorMessage;
@@ -66,6 +66,7 @@ export const UIAutocompleteInput = ({
   }, [options, value]);
 
   const handleSelect = (item: any) => {
+    Presets.System.selection();
     onChangeText(item.id);
     setSearchQuery("");
     setIsOpen(false);
@@ -74,6 +75,7 @@ export const UIAutocompleteInput = ({
 
   const handleOpen = () => {
     if (!isOpen) {
+      Presets.System.selection();
       setIsOpen(true);
       setSearchQuery("");
       inputRef.current?.focus();
@@ -81,6 +83,7 @@ export const UIAutocompleteInput = ({
   };
 
   const handleClose = () => {
+    Presets.System.selection();
     setIsOpen(false);
     setSearchQuery("");
     Keyboard.dismiss();
@@ -106,23 +109,13 @@ export const UIAutocompleteInput = ({
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder={isOpen ? "Type to search..." : ""}
-          placeholderTextColor={theme.colors.textSecondary}
+          placeholderTextColor={styles.placeholderText.color}
           onFocus={handleOpen}
         />
 
         {!isOpen && (
           <View
-            style={[
-              StyleSheet.absoluteFill,
-              {
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-                paddingHorizontal: theme.spacing.md,
-                backgroundColor: theme.colors.surface,
-                borderRadius: theme.borderRadius.lg,
-              },
-            ]}
+            style={styles.selectedOverlay}
             pointerEvents="none"
           >
             <UIText
@@ -134,7 +127,7 @@ export const UIAutocompleteInput = ({
             <Ionicons
               name="chevron-down"
               size={20}
-              color={hasError ? theme.colors.error : theme.colors.textSecondary}
+              color={hasError ? styles.errorIcon.color : styles.placeholderText.color}
             />
           </View>
         )}
@@ -144,7 +137,7 @@ export const UIAutocompleteInput = ({
             <Ionicons
               name="close-circle"
               size={20}
-              color={theme.colors.textSecondary}
+              color={styles.placeholderText.color}
             />
           </TouchableOpacity>
         )}
@@ -154,15 +147,14 @@ export const UIAutocompleteInput = ({
         <>
           {options.length > 0 && (
             <View style={styles.dropdownList}>
-              <ScrollView
-                nestedScrollEnabled
+              <FlashList
+                data={options}
+                keyExtractor={(item: any) => item.id}
                 keyboardShouldPersistTaps="handled"
                 style={styles.scrollView}
                 showsVerticalScrollIndicator={false}
-              >
-                {options.map((item: any) => (
+                renderItem={({ item }: { item: any }) => (
                   <TouchableOpacity
-                    key={item.id}
                     style={[
                       styles.option,
                       item.id === value && styles.optionSelected,
@@ -183,12 +175,12 @@ export const UIAutocompleteInput = ({
                       <Ionicons
                         name="checkmark"
                         size={18}
-                        color={theme.colors.primary}
+                        color={styles.primaryIcon.color}
                       />
                     )}
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                )}
+              />
             </View>
           )}
 
@@ -215,6 +207,21 @@ export const UIAutocompleteInput = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
+  selectedOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.lg,
+  },
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  errorIcon: {
+    color: theme.colors.error,
+  },
   container: {
     marginBottom: theme.spacing.lg,
   },

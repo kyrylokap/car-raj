@@ -1,13 +1,25 @@
 import { useCarFirstImage } from "@/src/api/car";
-import { ChatWithDetails, useCarTitle } from "@/src/api/chat";
+import { ChatWithDetails, useCarTitle, useDeleteChat } from "@/src/api/chat";
 import { formatChatTime } from "@/src/utils/chat";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useCallback } from "react";
+import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Presets } from "react-native-pulsar";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+  interpolate,
+  Extrapolation,
+} from "react-native-reanimated";
+import { GestureDetector, Gesture } from "react-native-gesture-handler";
 import { UIText } from "../UIText";
+
+const SWIPE_THRESHOLD = -100;
 
 export const ChatListItem = ({
   item: chat,
@@ -17,15 +29,69 @@ export const ChatListItem = ({
   onlineUserIdSet?: Set<string>;
 }) => {
   const { data: carTitle } = useCarTitle(chat.car_id);
-  const { data: carImage, isLoading: isCarImageLoading } = useCarFirstImage({
+  const { data: carImage } = useCarFirstImage({
     userId: chat.owner_id ?? "",
     carId: chat.car_id ?? "",
   });
   const router = useRouter();
-  const { theme } = useUnistyles();
-  const handleNavigateToCar = useCallback(() => {
+  const { mutate: deleteChat } = useDeleteChat({ chatId: chat.id });
+
+  const translateX = useSharedValue(0);
+
+  const handlePressChat = () => {
+    if (translateX.value < -20) {
+      translateX.value = withSpring(0);
+      return;
+    }
+    Presets.System.selection();
+    router.push(`/chat/${chat.id}`);
+  };
+
+  const handleNavigateToCarWithHaptic = (e: any) => {
+    e.stopPropagation();
+    Presets.System.selection();
     router.push(`/car/${chat.car_id}`);
-  }, [chat]);
+  };
+
+  const handleDelete = () => {
+    Presets.System.impactMedium();
+    deleteChat();
+    translateX.value = withTiming(-500, { duration: 250 });
+  };
+
+  const gesture = Gesture.Pan()
+    .activeOffsetX([-20, 20]) // Увеличили порог, чтобы не "люфтило" при скролле
+    .failOffsetY([-10, 10])
+    .onChange((event) => {
+      const nextX = translateX.value + event.changeX;
+      translateX.value = Math.min(0, nextX);
+    })
+    .onEnd(() => {
+      if (translateX.value < SWIPE_THRESHOLD / 2) {
+        // Делаем пружину жестче (stiffness) и четче
+        translateX.value = withSpring(SWIPE_THRESHOLD, { damping: 25, stiffness: 180, mass: 0.8 });
+      } else {
+        translateX.value = withSpring(0, { damping: 25, stiffness: 180, mass: 0.8 });
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  const deleteButtonStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(translateX.value, [-100, -20], [1, 0], Extrapolation.CLAMP),
+    transform: [
+      {
+        translateX: interpolate(
+          translateX.value,
+          [SWIPE_THRESHOLD, 0],
+          [0, 100],
+          Extrapolation.CLAMP
+        ),
+      },
+    ],
+  }));
 
   const lastMessageText = chat.last_message_text ?? "";
   const lastMessageTime = formatChatTime(chat.last_message_time);
@@ -39,101 +105,147 @@ export const ChatListItem = ({
     .join("");
 
   return (
-    <TouchableOpacity
-      onPress={() => router.push(`/chat/${chat.id}`)}
-      activeOpacity={0.75}
-      style={styles.row}
-    >
-      <View style={styles.avatarWrap}>
-        {chat.other_details?.image_url ? (
-          <Image
-            style={styles.avatar}
-            source={{ uri: chat.other_details.image_url }}
-            cachePolicy="memory-disk"
-            transition={150}
-            contentFit="cover"
-            priority="normal"
-            recyclingKey={chat.other_details.id}
-            allowDownscaling
-          />
-        ) : (
-          <View style={[styles.avatar, styles.avatarFallback]}>
-            <UIText style={styles.initials}>{initials}</UIText>
-          </View>
-        )}
-        <View
-          style={[
-            styles.onlineDot,
-            isOnline ? styles.onlineDotActive : styles.onlineDotInactive,
-          ]}
-        />
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.topRow}>
-          <UIText
-            size="lg"
-            weight="semibold"
-            numberOfLines={1}
-            style={styles.name}
-          >
-            {name}
-          </UIText>
-        </View>
-
-        <UIText size="xs" color="textSecondary" style={styles.timeTitleRow}>
-          {carTitle ?? "Loading car..."} · {lastMessageTime}
-        </UIText>
-
-        <UIText
-          size="sm"
-          color="textSecondary"
-          numberOfLines={1}
-          style={styles.preview}
+    <View style={styles.container}>
+      <Animated.View style={[styles.deleteButtonContainer, deleteButtonStyle]}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDelete}
+          activeOpacity={0.7}
         >
-          {lastMessageText || "No messages yet"}
-        </UIText>
-      </View>
+          <Ionicons name="trash" size={26} color={styles.whiteIcon.color} />
+          <UIText color="white" size="xs" weight="bold" style={{ marginTop: 4 }}>
+            Delete
+          </UIText>
+        </TouchableOpacity>
+      </Animated.View>
 
-      <TouchableOpacity
-        style={styles.carThumbnailWrap}
-        activeOpacity={0.7}
-        onPress={handleNavigateToCar}
-        hitSlop={8}
-      >
-        {carImage ? (
-          <Image
-            style={styles.carThumbnail}
-            source={{ uri: carImage }}
-            cachePolicy="memory-disk"
-            transition={200}
-            contentFit="cover"
-          />
-        ) : (
-          <View style={[styles.carThumbnail, styles.carThumbnailFallback]}>
-            <Ionicons name="car-sport" size={20} color={theme.colors.primary} />
-          </View>
-        )}
-      </TouchableOpacity>
-    </TouchableOpacity>
+      <GestureDetector gesture={gesture}>
+        <Animated.View style={[styles.row, animatedStyle]}>
+          <TouchableOpacity
+            onPress={handlePressChat}
+            activeOpacity={0.8}
+            style={styles.pressableContent}
+          >
+            <View style={styles.avatarWrap}>
+              {chat.other_details?.image_url ? (
+                <Image
+                  style={styles.avatar}
+                  source={{ uri: chat.other_details.image_url }}
+                  cachePolicy="memory-disk"
+                  transition={150}
+                  contentFit="cover"
+                  priority="normal"
+                  recyclingKey={chat.other_details.id}
+                  allowDownscaling
+                />
+              ) : (
+                <View style={[styles.avatar, styles.avatarFallback]}>
+                  <UIText style={styles.initials}>{initials}</UIText>
+                </View>
+              )}
+              <View
+                style={[
+                  styles.onlineDot,
+                  isOnline ? styles.onlineDotActive : styles.onlineDotInactive,
+                ]}
+              />
+            </View>
+
+            <View style={styles.content}>
+              <View style={styles.topRow}>
+                <UIText
+                  size="lg"
+                  weight="semibold"
+                  numberOfLines={1}
+                  style={styles.name}
+                >
+                  {name}
+                </UIText>
+              </View>
+
+              <UIText size="xs" color="textSecondary" style={styles.timeTitleRow}>
+                {carTitle ?? "Loading car..."} · {lastMessageTime}
+              </UIText>
+
+              <UIText
+                size="sm"
+                color="textSecondary"
+                numberOfLines={1}
+                style={styles.preview}
+              >
+                {lastMessageText || "No messages yet"}
+              </UIText>
+            </View>
+
+            <TouchableOpacity
+              style={styles.carThumbnailWrap}
+              activeOpacity={0.7}
+              onPress={handleNavigateToCarWithHaptic}
+              hitSlop={8}
+            >
+              {carImage ? (
+                <Image
+                  style={styles.carThumbnail}
+                  source={{ uri: carImage }}
+                  cachePolicy="memory-disk"
+                  transition={200}
+                  contentFit="cover"
+                />
+              ) : (
+                <View style={[styles.carThumbnail, styles.carThumbnailFallback]}>
+                  <Ionicons name="car-sport" size={20} color={styles.primaryIcon.color} />
+                </View>
+              )}
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </Animated.View>
+      </GestureDetector>
+    </View>
   );
 };
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  whiteIcon: {
+    color: theme.colors.white,
+  },
+  container: {
+    marginHorizontal: theme.spacing.md,
+    marginVertical: theme.spacing.sm,
+    backgroundColor: theme.colors.error,
+    borderRadius: theme.borderRadius.xl,
+    overflow: "hidden",
+    position: "relative",
+  },
+  deleteButtonContainer: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 100,
+    zIndex: 1,
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: theme.colors.error,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   row: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.borderRadius.xl,
+    ...theme.shadows.sm,
+    zIndex: 2,
+  },
+  pressableContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.lg,
-    borderBottomWidth: 0,
-    backgroundColor: theme.colors.surface,
-    marginHorizontal: theme.spacing.md,
-    marginVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.xl,
-    ...theme.shadows.sm,
   },
-
   avatarWrap: {
     position: "relative",
   },

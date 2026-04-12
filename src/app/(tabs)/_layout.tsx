@@ -7,18 +7,15 @@ import {
 } from "expo-router/unstable-native-tabs";
 import React from "react";
 import { Platform, View } from "react-native";
-import { useUnistyles } from "react-native-unistyles";
-import { useChatsCount } from "../../api/chat";
+import { StyleSheet } from "react-native-unistyles";
 import { CustomTabBar } from "../../ui/components/CustomTabBar";
 
 export default function TabLayout() {
-  const { theme } = useUnistyles();
-  const { data: chatsCount } = useChatsCount();
   const isIOS = Platform.OS === "ios";
 
   if (isIOS) {
     return (
-      <NativeTabs tintColor={theme.colors.primary}>
+      <NativeTabs tintColor={styles.tint.color}>
         <NativeTabs.Trigger name="index">
           <Label>Search</Label>
           <Icon sf="magnifyingglass" />
@@ -26,9 +23,6 @@ export default function TabLayout() {
         <NativeTabs.Trigger name="chats">
           <Label>Chats</Label>
           <Icon sf="bubble.left.and.bubble.right" />
-          {chatsCount !== undefined && chatsCount > 0 && (
-            <Badge>{chatsCount.toString()}</Badge>
-          )}
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="profile">
           <Label>Profile</Label>
@@ -70,3 +64,9 @@ export default function TabLayout() {
     </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  tint: {
+    color: theme.colors.primary,
+  },
+}));

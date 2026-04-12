@@ -1,16 +1,16 @@
 import { ChatListItem } from "@/src/ui/components/ChatListItem";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ActivityIndicator, FlatList, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserChats } from "../../api/chat";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
 import { UIText } from "../../ui";
 
 export default function MessengerScreen() {
-  const { theme, rt } = useUnistyles();
   const user = useUser();
   const userId = user?.id;
 
@@ -45,24 +45,16 @@ export default function MessengerScreen() {
         </View>
       </View>
 
-      <FlatList
+      <FlashList
         onRefresh={refetch}
         refreshing={isFetching}
         data={chats}
         renderItem={({ item }) => (
           <ChatListItem item={item} onlineUserIdSet={onlineUserIdSet} />
         )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={[
-          styles.listContent,
-          { paddingBottom: rt.insets.bottom + 100 },
-        ]}
+        keyExtractor={(item) => item?.id || ""}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={10}
-        windowSize={10}
-        initialNumToRender={10}
-        updateCellsBatchingPeriod={50}
         ListEmptyComponent={
           !isLoading ? (
             <View style={styles.emptyState}>
@@ -70,7 +62,7 @@ export default function MessengerScreen() {
                 <Ionicons
                   name="chatbubble-ellipses-outline"
                   size={40}
-                  color={theme.colors.primary}
+                  color={styles.emptyIcon.color}
                 />
               </View>
               <UIText size="lg" weight="semibold" style={styles.emptyTitle}>
@@ -86,8 +78,8 @@ export default function MessengerScreen() {
       {isLoading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-            <UIText style={{ marginTop: theme.spacing.sm }}>
+            <ActivityIndicator size="large" color={styles.loader.color} />
+            <UIText style={styles.loadingText}>
               Loading chats...
             </UIText>
           </View>
@@ -97,7 +89,7 @@ export default function MessengerScreen() {
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
   loadingOverlay: {
     position: "absolute",
     top: 0,
@@ -113,6 +105,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.md,
     alignItems: "center",
+  },
+  loadingText: {
+    marginTop: theme.spacing.sm,
   },
   safeArea: {
     flex: 1,
@@ -139,6 +134,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   listContent: {
     flexGrow: 1,
+    paddingBottom: rt.insets.bottom + 100,
   },
   emptyState: {
     flex: 1,
@@ -146,6 +142,12 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     paddingVertical: theme.spacing.xxl * 2,
     paddingHorizontal: theme.spacing.xl,
+  },
+  emptyIcon: {
+    color: theme.colors.primary,
+  },
+  loader: {
+    color: theme.colors.primary,
   },
   emptyIconWrap: {
     width: 80,

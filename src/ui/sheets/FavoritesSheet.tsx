@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
+import { FlashList } from "@shopify/flash-list";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -13,7 +13,6 @@ export const FavoritesSheet = forwardRef<
   UIBottomSheetRef,
   { onDismiss?: () => void }
 >(({ onDismiss }, ref) => {
-  const { theme } = useUnistyles();
   const bottomSheetRef = useRef<UIBottomSheetRef>(null);
 
   const {
@@ -37,37 +36,41 @@ export const FavoritesSheet = forwardRef<
       scrollable={true}
       onDismiss={onDismiss}
     >
-      <View style={styles.listContent}>
-        {cars && cars.length > 0 ? (
-          cars.map((item) => (
+        <FlashList
+          data={cars}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
             <CarItem
-              key={item.id}
               item={item}
               onPress={() => {
                 bottomSheetRef.current?.dismiss();
                 router.push(`/car/${item.id}`);
               }}
             />
-          ))
-        ) : !isLoading && !isFetching && (
-          <View style={styles.emptyState}>
-            <Ionicons
-              name="heart-outline"
-              size={64}
-              color={theme.colors.textSecondary}
-            />
-            <UIText size="lg" color="textSecondary" style={styles.emptyText}>
-              No favorites yet
-            </UIText>
-            <UIText size="sm" color="textSecondary" style={styles.emptySubtext}>
-              Add cars to your favorites to see them here
-            </UIText>
-          </View>
-        )}
-      </View>
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            !isLoading && !isFetching ? (
+              <View style={styles.emptyState}>
+                <Ionicons
+                  name="heart-outline"
+                  size={64}
+                  color={styles.secondaryIcon.color}
+                />
+                <UIText size="lg" color="textSecondary" style={styles.emptyText}>
+                  No favorites yet
+                </UIText>
+                <UIText size="sm" color="textSecondary" style={styles.emptySubtext}>
+                  Add cars to your favorites to see them here
+                </UIText>
+              </View>
+            ) : null
+          }
+        />
       {(isLoading || isFetching || isRefetching) && (
         <View style={styles.loadingOverlay} pointerEvents="none">
-          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <ActivityIndicator size="large" color={styles.primaryIcon.color} />
         </View>
       )}
     </UIBottomSheet>
@@ -75,6 +78,12 @@ export const FavoritesSheet = forwardRef<
 });
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
   listContent: {
     paddingHorizontal: theme.spacing.xl,
     paddingBottom: theme.spacing.xl,

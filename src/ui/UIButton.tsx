@@ -6,6 +6,8 @@ import {
 } from "react-native";
 import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
+import { Presets } from "react-native-pulsar";
+
 type ButtonProps = TouchableOpacityProps & {
   loading?: boolean;
   children: React.ReactNode;
@@ -18,6 +20,7 @@ export const UIButton: React.FC<ButtonProps> = ({
   children,
   disabled,
   style,
+  onPress,
   ...props
 }) => {
   styles.useVariants({
@@ -25,11 +28,17 @@ export const UIButton: React.FC<ButtonProps> = ({
     size: size || "medium",
   });
 
+  const handlePress = (e: any) => {
+    Presets.System.impactLight();
+    onPress?.(e);
+  };
+
   return (
     <TouchableOpacity
       style={[styles.button, (disabled || loading) && styles.disabled, style]}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      onPress={handlePress}
       {...props}
     >
       {loading ? (

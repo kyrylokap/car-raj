@@ -2,14 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { UICard, UIText, UIButton } from "../ui";
 import { GoogleButton } from "../ui/components/GoogleButton";
 import { supabase } from "../api/supabase";
 import { useRouter } from "expo-router";
 
 export default function AuthScreen() {
-  const { theme } = useUnistyles();
   const router = useRouter();
 
   return (
@@ -58,7 +57,7 @@ export default function AuthScreen() {
                 <Ionicons
                   name="heart-outline"
                   size={18}
-                  color={theme.colors.textSecondary}
+                  color={styles.secondaryIcon.color}
                 />
               </View>
               <View style={styles.previewDivider} />
@@ -67,7 +66,7 @@ export default function AuthScreen() {
                   <Ionicons
                     name="chatbubble-ellipses-outline"
                     size={14}
-                    color={theme.colors.textSecondary}
+                    color={styles.secondaryIcon.color}
                   />
                   <UIText size="xs" style={styles.previewPillText}>
                     Chat
@@ -130,7 +129,7 @@ export default function AuthScreen() {
                   console.error("Test login failed:", error.message);
                 }
               }}
-              style={{ marginTop: theme.spacing.sm }}
+              style={styles.guestButton}
             >
               <UIText size="xs" color="textSecondary" weight="semibold">
                 Continue as Guest (Dev Only)
@@ -149,6 +148,12 @@ export default function AuthScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
+  guestButton: {
+    marginTop: theme.spacing.sm,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

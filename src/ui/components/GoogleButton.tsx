@@ -7,7 +7,6 @@ import { supabase } from "../../api/supabase";
 import { UIButton } from "../UIButton";
 import { UIText } from "../UIText";
 export const GoogleButton = () => {
-  const { theme } = useUnistyles();
   useEffect(() => {
     const webClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_WEB_ID;
     const iosClientId = process.env.EXPO_PUBLIC_GOOGLE_CAR_RAJ_IOS_ID;
@@ -65,8 +64,8 @@ export const GoogleButton = () => {
     >
       <Ionicons
         name="logo-google"
-        color={theme.colors.text}
-        size={theme.s(24)}
+        color={styles.googleIcon.color}
+        size={styles.googleIcon.size}
       />
       <UIText size="md" weight="semibold">
         Continue with Google
@@ -76,6 +75,10 @@ export const GoogleButton = () => {
 };
 
 const styles = StyleSheet.create((theme) => ({
+  googleIcon: {
+    color: theme.colors.text,
+    size: theme.s(24),
+  },
   button: {
     gap: theme.s(10),
     width: "100%",

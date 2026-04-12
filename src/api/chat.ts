@@ -1,7 +1,6 @@
 import { Database } from "@/src/lib/database.types";
-import { RealtimeChannel } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { useUser } from "./auth";
 import { supabase } from "./supabase";
 import { fetchUserDetailsByIds } from "./userProfile";
@@ -97,26 +96,6 @@ export async function getChatsForUser(
   return prepared;
 }
 
-export async function getChatsCount(userId: string) {
-  const { count, error } = await supabase
-    .from("chat")
-    .select("*", { count: "exact", head: true })
-    .or(`owner_id.eq.${userId},customer_id.eq.${userId}`);
-  if (error) throw error;
-  return count || 0;
-}
-export function useChatsCount() {
-  const user = useUser();
-  const userId = user?.id;
-  return useQuery({
-    queryKey: ["chatsCount", userId],
-    queryFn: async () => {
-      if (!userId) return 0;
-      return await getChatsCount(userId);
-    },
-  });
-}
-
 export function useUserChats(userId?: string) {
   const queryClient = useQueryClient();
 
@@ -208,7 +187,7 @@ export function useUserChats(userId?: string) {
                 last_message_time: newMsg.created_at ?? old.last_message_time,
                 last_message_text: newMsg.text ?? old.last_message_text,
                 last_message_sender_id:
-                   newMsg.sender_id ?? old.last_message_sender_id,
+                  newMsg.sender_id ?? old.last_message_sender_id,
               };
 
               updated.sort((a, b) => {
@@ -306,9 +285,6 @@ export const useDeleteChat = ({ chatId }: { chatId: string }) => {
     mutationKey: ["deleteChat", chatId],
     mutationFn: async () => {
       return await deleteChat(chatId);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["userChats", userId] });
     },
   });
 };

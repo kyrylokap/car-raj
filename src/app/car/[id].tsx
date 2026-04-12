@@ -8,17 +8,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Presets } from "react-native-pulsar";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useUser } from "../../api/auth";
 import { useCarImages } from "../../api/car";
 import { useCarDetails } from "../../hooks/useCarDetails";
 import { UIButton, UIText } from "../../ui";
 import { ImagesCarousel } from "../../ui/components/ImagesCarousel";
 
 export default function CarDetailsScreen() {
-  const { theme } = useUnistyles();
   const router = useRouter();
   const params = useLocalSearchParams();
   const carId = params.id as string;
+  const user = useUser();
+  const userId = user?.id;
 
   const {
     car,
@@ -39,23 +42,24 @@ export default function CarDetailsScreen() {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <ActivityIndicator size="large" color={styles.primaryIcon.color} />
       </View>
     );
   }
 
   const specsWithIcons = getSpecsWithIcons();
+  const isOwner = car?.user_id === userId;
 
   return (
     <View style={styles.root}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.scroll]}
+        contentContainerStyle={styles.scroll}
       >
         <View style={styles.heroContainer}>
           {imagesIsFetching || imagesIsLoading ? (
             <View style={styles.heroPlaceholder}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
+              <ActivityIndicator size="large" color={styles.primaryIcon.color} />
             </View>
           ) : (
             <ImagesCarousel images={carImages!} hero />
@@ -92,7 +96,7 @@ export default function CarDetailsScreen() {
               <Ionicons
                 name="speedometer-outline"
                 size={20}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
               <UIText size="sm" weight="semibold">
                 {car?.mileage?.toLocaleString()}
@@ -106,7 +110,7 @@ export default function CarDetailsScreen() {
               <Ionicons
                 name="flame-outline"
                 size={20}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
               <UIText size="sm" weight="semibold">
                 {car?.fuel}
@@ -120,7 +124,7 @@ export default function CarDetailsScreen() {
               <Ionicons
                 name="git-branch-outline"
                 size={20}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
               <UIText size="sm" weight="semibold">
                 {car?.transmission ?? "—"}
@@ -134,7 +138,7 @@ export default function CarDetailsScreen() {
               <Ionicons
                 name="color-palette-outline"
                 size={20}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
               <UIText size="sm" weight="semibold" numberOfLines={1}>
                 {car?.color ?? "—"}
@@ -150,7 +154,7 @@ export default function CarDetailsScreen() {
               <Ionicons
                 name="list-outline"
                 size={18}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
               <UIText size="md" weight="semibold">
                 Specifications
@@ -180,7 +184,7 @@ export default function CarDetailsScreen() {
                   <Ionicons
                     name={spec.icon as any}
                     size={15}
-                    color={theme.colors.textSecondary}
+                    color={styles.secondaryIcon.color}
                   />
                   <UIText size="sm" color="textSecondary">
                     {spec.label}
@@ -199,7 +203,7 @@ export default function CarDetailsScreen() {
                 <Ionicons
                   name="document-text-outline"
                   size={18}
-                  color={theme.colors.primary}
+                  color={styles.primaryIcon.color}
                 />
                 <UIText size="md" weight="semibold">
                   Description
@@ -217,7 +221,10 @@ export default function CarDetailsScreen() {
         <TouchableOpacity
           testID="car-detail-back-button"
           style={styles.headerBtn}
-          onPress={() => router.back()}
+          onPress={() => {
+            Presets.System.impactLight();
+            router.back();
+          }}
           hitSlop={14}
         >
           <Ionicons name="arrow-back" size={22} color="#fff" />
@@ -225,7 +232,10 @@ export default function CarDetailsScreen() {
         <TouchableOpacity
           testID="car-detail-favorite-button"
           style={styles.headerBtn}
-          onPress={handleToggleFavorite}
+          onPress={() => {
+            Presets.System.selection();
+            handleToggleFavorite();
+          }}
           hitSlop={14}
         >
           <Ionicons
@@ -236,31 +246,43 @@ export default function CarDetailsScreen() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.cta}>
-        <UIButton
-          variant="outline"
-          style={styles.ctaBtn}
-          onPress={handleContactSeller}
-        >
-          <Ionicons
-            name="chatbubble-outline"
-            size={18}
-            color={theme.colors.primary}
-          />
-          <UIText weight="semibold">Message</UIText>
-        </UIButton>
-        <UIButton variant="primary" style={styles.ctaBtn} onPress={handleCall}>
-          <Ionicons name="call-outline" size={18} color="#fff" />
-          <UIText color="white" weight="semibold">
-            Call Now
-          </UIText>
-        </UIButton>
-      </View>
+      {!isOwner && (
+        <View style={styles.cta}>
+          <UIButton
+            variant="outline"
+            style={styles.ctaBtn}
+            onPress={handleContactSeller}
+          >
+            <Ionicons
+              name="chatbubble-outline"
+              size={18}
+              color={styles.primaryIcon.color}
+            />
+            <UIText weight="semibold">Message</UIText>
+          </UIButton>
+          <UIButton
+            variant="primary"
+            style={styles.ctaBtn}
+            onPress={handleCall}
+          >
+            <Ionicons name="call-outline" size={18} color="#fff" />
+            <UIText color="white" weight="semibold">
+              Call Now
+            </UIText>
+          </UIButton>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create((theme, rt) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
   root: {
     flex: 1,
     backgroundColor: theme.colors.background,

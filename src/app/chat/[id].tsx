@@ -6,6 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
+  Platform,
   Pressable,
   TouchableOpacity,
   View,
@@ -17,8 +18,9 @@ import {
   InputToolbar,
   Send,
 } from "react-native-gifted-chat";
+import { Presets } from "react-native-pulsar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
 import { Message } from "../../api/message";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
@@ -35,7 +37,6 @@ function toGiftedMessage(msg: Message): IMessage {
 }
 
 export default function ChatScreen() {
-  const { theme } = useUnistyles();
   const { isOnlineByUserId } = useOnlineUsersContext();
 
   const router = useRouter();
@@ -61,7 +62,7 @@ export default function ChatScreen() {
   });
 
   const chattingUserId = useMemo(() => {
-    if (!chat) return null;
+    if (!chat || !userId) return null;
     return chat.owner_id === userId ? chat.customer_id : chat.owner_id;
   }, [chat, userId]);
 
@@ -82,6 +83,7 @@ export default function ChatScreen() {
 
   const onSend = useCallback(
     (newMessages: IMessage[]) => {
+      Presets.System.impactMedium();
       onSendAsync(newMessages);
     },
     [onSendAsync],
@@ -90,15 +92,18 @@ export default function ChatScreen() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
-    const show = Keyboard.addListener("keyboardWillShow", (e) => {
+    if (Platform.OS !== "ios") return;
+
+    const showSubscription = Keyboard.addListener("keyboardWillShow", (e) => {
       setKeyboardHeight(e.endCoordinates.height);
     });
-    const hide = Keyboard.addListener("keyboardWillHide", () => {
+    const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
       setKeyboardHeight(0);
     });
+
     return () => {
-      show.remove();
-      hide.remove();
+      showSubscription.remove();
+      hideSubscription.remove();
     };
   }, []);
 
@@ -106,7 +111,10 @@ export default function ChatScreen() {
     <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={handleLeaveChat}
+          onPress={() => {
+            Presets.System.impactLight();
+            handleLeaveChat();
+          }}
           style={styles.backButton}
           hitSlop={14}
         >
@@ -114,12 +122,15 @@ export default function ChatScreen() {
             hitSlop={14}
             name="arrow-back"
             size={24}
-            color={theme.colors.text}
+            color={styles.headerIcon.color}
           />
         </TouchableOpacity>
         <Pressable
           style={styles.headerInfo}
-          onPress={() => router.push(`/user/${chattingUserId ?? ""}/user-cars`)}
+          onPress={() => {
+            Presets.System.selection();
+            router.push(`/user/${chattingUserId ?? ""}/user-cars`);
+          }}
         >
           <Image
             style={styles.headerAvatar}
@@ -132,7 +143,7 @@ export default function ChatScreen() {
 
           <View style={styles.headerText}>
             <UIText size="lg" numberOfLines={1} ellipsizeMode="tail">
-              {owner?.fullname || "Owner"}
+              {owner?.fullname || (chattingUserId ? "Loading..." : "User")}
             </UIText>
             {showStatus && (
               <View style={styles.subRow}>
@@ -168,13 +179,15 @@ export default function ChatScreen() {
         </Pressable>
       </View>
 
-      <View style={[styles.chatContainer, { marginBottom: keyboardHeight }]}>
+      <View style={[styles.chatContainer, { paddingBottom: keyboardHeight }]}>
         <GiftedChat
           messages={giftedMessages}
           onSend={onSend}
           user={{ _id: userId ?? "" }}
           isTyping={userTyping}
-          keyboardAvoidingViewProps={{ enabled: false }}
+          keyboardAvoidingViewProps={{
+            enabled: false,
+          }}
           loadEarlierMessagesProps={{
             isAvailable: hasNextPage ?? false,
             isLoading: isLoadingMessages,
@@ -188,21 +201,21 @@ export default function ChatScreen() {
           renderAvatar={null}
           maxComposerHeight={120}
           timeTextStyle={{
-            right: { color: theme.colors.white, opacity: 0.7 },
-            left: { color: theme.colors.textSecondary },
+            right: { color: styles.chatTime.color, opacity: 0.7 },
+            left: { color: styles.chatTimeLeft.color },
           }}
           textInputProps={{
             placeholder: "Type a message...",
-            placeholderTextColor: theme.colors.textSecondary,
+            placeholderTextColor: styles.textInputPlaceholder.color,
             onChangeText: onInputTextChanged,
             style: {
-              color: theme.colors.text,
-              backgroundColor: theme.colors.surface,
+              color: styles.textInput.color,
+              backgroundColor: styles.textInput.backgroundColor,
               borderRadius: 22,
               borderWidth: 1,
-              borderColor: theme.colors.borderLight,
-              paddingHorizontal: theme.spacing.md,
-              fontSize: theme.s(15),
+              borderColor: styles.textInput.borderColor,
+              paddingHorizontal: styles.textInput.paddingHorizontal,
+              fontSize: styles.textInput.fontSize,
             },
           }}
           renderBubble={(props) => (
@@ -210,17 +223,17 @@ export default function ChatScreen() {
               {...props}
               wrapperStyle={{
                 right: {
-                  backgroundColor: theme.colors.primary,
+                  backgroundColor: styles.bubbleRight.backgroundColor,
                   borderBottomRightRadius: 4,
                 },
                 left: {
-                  backgroundColor: theme.colors.surface,
+                  backgroundColor: styles.bubbleLeft.backgroundColor,
                   borderBottomLeftRadius: 4,
                 },
               }}
               textStyle={{
-                right: { color: theme.colors.white },
-                left: { color: theme.colors.text },
+                right: { color: styles.bubbleRight.color },
+                left: { color: styles.bubbleLeft.color },
               }}
             />
           )}
@@ -236,8 +249,8 @@ export default function ChatScreen() {
               <View style={styles.sendButton}>
                 <Ionicons
                   name="send"
-                  size={theme.s(18)}
-                  color={theme.colors.white}
+                  size={styles.sendIcon.size}
+                  color={styles.sendIcon.color}
                 />
               </View>
             </Send>
@@ -245,7 +258,7 @@ export default function ChatScreen() {
           renderLoading={() => (
             <ActivityIndicator
               size="large"
-              color={theme.colors.primary}
+              color={styles.loader.color}
               style={{ flex: 1 }}
             />
           )}
@@ -256,6 +269,40 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create((theme, rt) => ({
+  headerIcon: {
+    color: theme.colors.text,
+  },
+  chatTime: {
+    color: theme.colors.white,
+  },
+  chatTimeLeft: {
+    color: theme.colors.textSecondary,
+  },
+  textInputPlaceholder: {
+    color: theme.colors.textSecondary,
+  },
+  sendIcon: {
+    color: theme.colors.white,
+    size: theme.s(18),
+  },
+  textInput: {
+    color: theme.colors.text,
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.borderLight,
+    paddingHorizontal: theme.spacing.md,
+    fontSize: theme.s(15),
+  },
+  bubbleRight: {
+    backgroundColor: theme.colors.primary,
+    color: theme.colors.white,
+  },
+  bubbleLeft: {
+    backgroundColor: theme.colors.surface,
+    color: theme.colors.text,
+  },
+  loader: {
+    color: theme.colors.primary,
+  },
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,

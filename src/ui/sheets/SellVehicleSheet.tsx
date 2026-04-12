@@ -22,7 +22,6 @@ export const SellVehicleSheet = forwardRef<
   SellVehicleSheetProps
 >(({ onSuccess, onDismiss }, ref) => {
   const bottomSheetRef = useRef<UIBottomSheetRef>(null);
-  const { theme } = useUnistyles();
 
   const {
     formData,
@@ -66,7 +65,7 @@ export const SellVehicleSheet = forwardRef<
         onPress={handleApply}
         loading={isPending}
       >
-        <Ionicons name="paper-plane" size={18} color={theme.colors.white} />
+        <Ionicons name="paper-plane" size={18} color={styles.whiteIcon.color} />
         <UIText color="white" weight="bold">
           List vehicle
         </UIText>
@@ -84,7 +83,7 @@ export const SellVehicleSheet = forwardRef<
               <Ionicons
                 name="car-sport"
                 size={22}
-                color={theme.colors.primary}
+                color={styles.primaryIcon.color}
               />
             </View>
             <UIText size="xl" weight="bold">
@@ -109,7 +108,7 @@ export const SellVehicleSheet = forwardRef<
           />
           {errors.images && (
             <View style={styles.imageError}>
-              <Ionicons name="warning" size={16} color={theme.colors.error} />
+              <Ionicons name="warning" size={16} color={styles.errorIcon.color} />
               <UIText size="xs" weight="medium" color="error">
                 {errors.images}
               </UIText>
@@ -124,7 +123,7 @@ export const SellVehicleSheet = forwardRef<
                 <Ionicons
                   name="information-circle"
                   size={18}
-                  color={theme.colors.primary}
+                  color={styles.primaryIcon.color}
                 />
               </View>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
@@ -171,7 +170,7 @@ export const SellVehicleSheet = forwardRef<
                 <Ionicons
                   name="options"
                   size={18}
-                  color={theme.colors.primary}
+                  color={styles.primaryIcon.color}
                 />
               </View>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
@@ -240,7 +239,7 @@ export const SellVehicleSheet = forwardRef<
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionIcon}>
-                <Ionicons name="cash" size={18} color={theme.colors.primary} />
+                <Ionicons name="cash" size={18} color={styles.primaryIcon.color} />
               </View>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Pricing & Location
@@ -273,7 +272,7 @@ export const SellVehicleSheet = forwardRef<
                 <Ionicons
                   name="create"
                   size={18}
-                  color={theme.colors.primary}
+                  color={styles.primaryIcon.color}
                 />
               </View>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
@@ -299,7 +298,7 @@ export const SellVehicleSheet = forwardRef<
                     <Ionicons
                       name="alert-circle"
                       size={18}
-                      color={theme.colors.error}
+                      color={styles.errorIcon.color}
                     />
                     <UIText size="sm" weight="semibold" color="error">
                       Some fields need attention
@@ -315,6 +314,16 @@ export const SellVehicleSheet = forwardRef<
 });
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  errorIcon: {
+    color: theme.colors.error,
+    marginTop: theme.s(2),
+  },
+  whiteIcon: {
+    color: theme.colors.white,
+  },
   titleContainer: {
     paddingTop: theme.s(8),
     paddingBottom: theme.spacing.sm,
@@ -411,9 +420,6 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "flex-start",
     gap: theme.spacing.sm,
     paddingLeft: theme.s(4),
-  },
-  errorIcon: {
-    marginTop: theme.s(2),
   },
   errorText: {
     color: theme.colors.error,

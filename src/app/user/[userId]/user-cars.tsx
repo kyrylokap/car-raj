@@ -4,19 +4,19 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
-  FlatList,
   TouchableOpacity,
   View,
 } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Presets } from "react-native-pulsar";
+import { StyleSheet } from "react-native-unistyles";
 import { useUserCars } from "../../../api/car";
 import { useUserDetailsById } from "../../../api/userProfile";
 import { UIText } from "../../../ui";
 import { CarItem } from "../../../ui/components/CarItem";
 
 export default function UserProfileWithCarsScreen() {
-  const { theme } = useUnistyles();
   const router = useRouter();
   const params = useLocalSearchParams();
   const { data: userDetails } = useUserDetailsById(params.userId as string);
@@ -32,7 +32,10 @@ export default function UserProfileWithCarsScreen() {
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={() => {
+            Presets.System.impactLight();
+            router.back();
+          }}
           style={styles.backButton}
           hitSlop={14}
         >
@@ -40,7 +43,7 @@ export default function UserProfileWithCarsScreen() {
             name="arrow-back"
             hitSlop={14}
             size={24}
-            color={theme.colors.text}
+            color={styles.headerIcon.color}
           />
         </TouchableOpacity>
         <View style={styles.headerInfo}>
@@ -64,7 +67,7 @@ export default function UserProfileWithCarsScreen() {
         </View>
       </View>
 
-      <FlatList
+      <FlashList
         onRefresh={refetch}
         refreshing={isRefetching}
         data={userCars}
@@ -74,17 +77,12 @@ export default function UserProfileWithCarsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.listContent]}
         showsVerticalScrollIndicator={false}
-        removeClippedSubviews={true}
-        maxToRenderPerBatch={10}
-        windowSize={10}
-        initialNumToRender={10}
-        updateCellsBatchingPeriod={50}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons
               name="car-outline"
               size={64}
-              color={theme.colors.textSecondary}
+              color={styles.secondaryIcon.color}
             />
             <UIText size="lg" color="textSecondary" style={styles.emptyText}>
               No cars listed yet
@@ -95,8 +93,8 @@ export default function UserProfileWithCarsScreen() {
       {isLoading && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
-            <ActivityIndicator size="large" color={theme.colors.primary} />
-            <UIText style={{ marginTop: theme.spacing.sm }}>
+            <ActivityIndicator size="large" color={styles.primaryIcon.color} />
+            <UIText style={styles.loadingText}>
               Loading cars...
             </UIText>
           </View>
@@ -107,6 +105,18 @@ export default function UserProfileWithCarsScreen() {
 }
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
+  headerIcon: {
+    color: theme.colors.text,
+  },
+  loadingText: {
+    marginTop: theme.spacing.sm,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,

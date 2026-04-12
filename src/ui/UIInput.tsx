@@ -23,7 +23,6 @@ export const UIInput = ({
   focused: variantFocused,
   ...props
 }: InputProps) => {
-  const { theme } = useUnistyles();
   const hasError = !!errorMessage || variantHasError;
 
   return (
@@ -36,18 +35,11 @@ export const UIInput = ({
       <BottomSheetTextInput
         style={[
           styles.input,
-          {
-            backgroundColor: theme.colors.surface,
-            borderColor: hasError
-              ? theme.colors.error
-              : theme.colors.borderLight,
-            color: theme.colors.text,
-          },
           hasError && styles.inputError,
-          variantFocused && styles.inputFocused, // Manual focus style if needed
+          variantFocused && styles.inputFocused,
           style,
         ] as StyleProp<TextStyle>}
-        placeholderTextColor={theme.colors.textSecondary}
+        placeholderTextColor={styles.placeholder.color}
         {...props}
       />
       {errorMessage && (
@@ -65,6 +57,9 @@ export const UIInput = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
+  placeholder: {
+    color: theme.colors.textSecondary,
+  },
   container: {
     marginBottom: theme.spacing.lg,
   },

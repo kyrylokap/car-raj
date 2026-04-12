@@ -4,15 +4,12 @@ import {
   FiltersBottomSheetRef,
 } from "@/src/ui/sheets/FiltersBottomSheet";
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import React, { useRef } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { Presets } from "react-native-pulsar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { useInfiniteSearchCars } from "../../api/car";
 import { useSearchFilters } from "../../hooks/useSearchFilters";
 import { UIContainer, UIText } from "../../ui";
@@ -26,7 +23,6 @@ const sortingTypes = [
 ];
 
 export default function SearchScreen() {
-  const { theme, rt } = useUnistyles();
   const filtersBottomSheetRef = useRef<FiltersBottomSheetRef>(null);
 
   const {
@@ -80,9 +76,12 @@ export default function SearchScreen() {
           <TouchableOpacity
             testID="filter-button"
             style={styles.filterButton}
-            onPress={() => filtersBottomSheetRef.current?.present()}
+            onPress={() => {
+              Presets.System.impactLight();
+              filtersBottomSheetRef.current?.present();
+            }}
           >
-            <Ionicons name="filter" size={20} color={theme.colors.primary} />
+            <Ionicons name="filter" size={20} color={styles.filterIcon.color} />
           </TouchableOpacity>
         </View>
         <FiltersBottomSheet
@@ -93,7 +92,7 @@ export default function SearchScreen() {
           handleChangeFilters={handleChangeFilters}
         />
 
-        <FlatList
+        <FlashList
           testID="search-car-list"
           onRefresh={() => {
             refetchInfiniteData();
@@ -104,10 +103,7 @@ export default function SearchScreen() {
             return <CarItem item={item} testID={`car-item-${index}`} />;
           }}
           keyExtractor={(item) => item?.id || ""}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingBottom: rt.insets.bottom + 100 },
-          ]}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           onEndReachedThreshold={0.5}
           onEndReached={() => {
@@ -115,15 +111,10 @@ export default function SearchScreen() {
               fetchNextPage();
             }
           }}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          windowSize={10}
-          initialNumToRender={10}
-          updateCellsBatchingPeriod={50}
           ListFooterComponent={() =>
             isFetchingNextPage ? (
-              <View style={{ padding: theme.spacing.md, alignItems: "center" }}>
-                <ActivityIndicator color={theme.colors.primary} />
+              <View style={styles.footerLoader}>
+                <ActivityIndicator color={styles.filterIcon.color} />
               </View>
             ) : null
           }
@@ -131,13 +122,7 @@ export default function SearchScreen() {
             return (
               <View style={styles.emptyListWrapper}>
                 <UIText style={styles.emptyListText}>No cars found.</UIText>
-                <UIText
-                  size="sm"
-                  style={{
-                    marginTop: theme.spacing.xs,
-                    color: theme.colors.textSecondary,
-                  }}
-                >
+                <UIText size="sm" style={styles.emptyListSubtitle}>
                   Try adjusting filters or press Reset.
                 </UIText>
               </View>
@@ -148,10 +133,8 @@ export default function SearchScreen() {
         {isLoading && (
           <View style={styles.loadingOverlay} pointerEvents="none">
             <View style={styles.loadingCard}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-              <UIText style={{ marginTop: theme.spacing.sm }}>
-                Loading cars...
-              </UIText>
+              <ActivityIndicator size="large" color={styles.filterIcon.color} />
+              <UIText style={styles.loadingText}>Loading cars...</UIText>
             </View>
           </View>
         )}
@@ -160,7 +143,21 @@ export default function SearchScreen() {
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
+  filterIcon: {
+    color: theme.colors.primary,
+  },
+  footerLoader: {
+    padding: theme.spacing.md,
+    alignItems: "center",
+  },
+  emptyListSubtitle: {
+    marginTop: theme.spacing.xs,
+    color: theme.colors.textSecondary,
+  },
+  loadingText: {
+    marginTop: theme.spacing.sm,
+  },
   emptyListWrapper: {
     alignItems: "center",
     paddingTop: theme.spacing.xxl,
@@ -236,6 +233,7 @@ const styles = StyleSheet.create((theme) => ({
   listContent: {
     padding: theme.spacing.md,
     paddingTop: theme.spacing.sm,
+    paddingBottom: rt.insets.bottom + 100,
   },
   sortPicker: {
     flex: 1,

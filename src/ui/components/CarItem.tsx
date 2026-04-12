@@ -3,12 +3,20 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
+import { Presets } from "react-native-pulsar";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Car, useCarFirstImage } from "../../api/car";
 import { UIText } from "../UIText";
 
-export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => void; testID?: string }) => {
-  const { theme } = useUnistyles();
+export const CarItem = ({
+  item,
+  onPress,
+  testID,
+}: {
+  item: Car;
+  onPress?: () => void;
+  testID?: string;
+}) => {
   const {
     data: firstImageUrl,
     isLoading: isFirstImageLoading,
@@ -21,6 +29,7 @@ export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => 
   const isLoading = isFirstImageFetching || isFirstImageLoading;
 
   const handlePress = () => {
+    Presets.System.impactMedium();
     if (onPress) {
       onPress();
     } else {
@@ -41,7 +50,7 @@ export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => 
             <Ionicons
               name="car-outline"
               size={52}
-              color={theme.colors.textSecondary}
+              color={styles.secondaryIcon.color}
             />
           </View>
         ) : (
@@ -94,7 +103,7 @@ export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => 
             <Ionicons
               name="calendar-outline"
               size={12}
-              color={theme.colors.textSecondary}
+              color={styles.secondaryIcon.color}
             />
             <UIText size="xs" color="textSecondary">
               {item?.year}
@@ -107,7 +116,7 @@ export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => 
             <Ionicons
               name="speedometer-outline"
               size={12}
-              color={theme.colors.textSecondary}
+              color={styles.secondaryIcon.color}
             />
             <UIText size="xs" color="textSecondary">
               {item?.mileage?.toLocaleString()} km
@@ -120,7 +129,7 @@ export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => 
             <Ionicons
               name="flame-outline"
               size={12}
-              color={theme.colors.textSecondary}
+              color={styles.secondaryIcon.color}
             />
             <UIText size="xs" color="textSecondary">
               {item?.fuel}
@@ -133,6 +142,9 @@ export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => 
 };
 
 const styles = StyleSheet.create((theme) => ({
+  secondaryIcon: {
+    color: theme.colors.textSecondary,
+  },
   wrapper: {
     marginBottom: theme.spacing.lg,
     borderRadius: theme.borderRadius.xxl,

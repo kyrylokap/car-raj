@@ -5,8 +5,8 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleProp, TextStyle, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { useUpdatePhoneNumber } from "../../api/userProfile";
 import { UIBottomSheet, UIBottomSheetRef } from "../UIBottomSheet";
 import { UIButton } from "../UIButton";
@@ -27,7 +27,6 @@ export const PhoneNumberModal = forwardRef<
   const [loading, setLoading] = useState(false);
   const { mutateAsync } = useUpdatePhoneNumber();
   const bottomSheetRef = useRef<UIBottomSheetRef>(null);
-  const { theme } = useUnistyles();
 
   useImperativeHandle(ref, () => bottomSheetRef.current!);
 
@@ -50,19 +49,15 @@ export const PhoneNumberModal = forwardRef<
       onDismiss={onClose}
       enableDynamicSizing={true}
     >
-      <View style={styles.container as StyleProp<ViewStyle>}>
-        <View style={styles.header as StyleProp<ViewStyle>}>
-          <View style={styles.iconContainer as StyleProp<ViewStyle>}>
-            <Ionicons name="call" size={28} color={theme.colors.primary} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.iconContainer}>
+            <Ionicons name="call" size={28} color={styles.primaryIcon.color} />
           </View>
         </View>
 
-        <View style={styles.body as StyleProp<ViewStyle>}>
-          <UIText
-            weight="bold"
-            size="lg"
-            style={styles.title as StyleProp<TextStyle>}
-          >
+        <View style={styles.body}>
+          <UIText weight="bold" size="lg" style={styles.title}>
             Phone Number
           </UIText>
           <UIText
@@ -79,20 +74,15 @@ export const PhoneNumberModal = forwardRef<
             onChangeText={setPhone}
             placeholder="e.g. +48 123 456 789"
             keyboardType="phone-pad"
-            containerStyle={styles.inputContainer as StyleProp<ViewStyle>}
+            containerStyle={styles.inputContainer}
           />
         </View>
 
-        <View style={styles.footer as StyleProp<ViewStyle>}>
+        <View style={styles.footer}>
           <UIButton
             variant="primary"
             onPress={onPress}
-            style={
-              [
-                styles.submitBtn,
-                !phone.trim() && { opacity: 0.6 },
-              ] as StyleProp<ViewStyle>
-            }
+            style={[styles.submitBtn, !phone.trim() && { opacity: 0.6 }]}
             disabled={!phone.trim() || loading}
           >
             <UIText color="white" weight="bold">
@@ -106,6 +96,9 @@ export const PhoneNumberModal = forwardRef<
 });
 
 const styles = StyleSheet.create((theme) => ({
+  primaryIcon: {
+    color: theme.colors.primary,
+  },
   container: {
     paddingHorizontal: theme.spacing.xl,
     paddingBottom: theme.spacing.xl,

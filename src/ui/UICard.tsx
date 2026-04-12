@@ -1,5 +1,6 @@
 import React from "react";
 import { TouchableOpacity, View, ViewProps } from "react-native";
+import { Presets } from "react-native-pulsar";
 import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
 type CardProps = ViewProps & {
@@ -18,10 +19,17 @@ export const UICard: React.FC<CardProps> = ({
 
   const Component = onPress ? TouchableOpacity : View;
 
+  const handlePress = () => {
+    if (onPress) {
+      Presets.System.selection();
+      onPress();
+    }
+  };
+
   return (
     <Component
       style={[styles.card, style]}
-      onPress={onPress}
+      onPress={handlePress}
       activeOpacity={0.7}
       {...(props as any)}
     >

@@ -2,9 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
+import { Presets } from "react-native-pulsar";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useChatsCount } from "../../api/chat";
+import { StyleSheet } from "react-native-unistyles";
 import { UIText } from "../UIText";
 
 type TabItem = {
@@ -40,21 +40,15 @@ const tabs: TabItem[] = [
 ];
 
 export const CustomTabBar = () => {
-  const { theme } = useUnistyles();
   const router = useRouter();
   const pathname = usePathname();
-  const { data: chatsCount } = useChatsCount();
   const isActive = (route: string) => {
     return route.endsWith(pathname);
   };
 
   const handlePress = (route: string) => {
+    Presets.System.selection();
     router.push(route as any);
-  };
-
-  const getBadgeCount = (tabName: string) => {
-    if (tabName === "chats") return chatsCount;
-    return null;
   };
 
   return (
@@ -75,12 +69,19 @@ export const CustomTabBar = () => {
               activeOpacity={0.7}
             >
               <View style={styles.tabItemContent}>
-                <View style={[styles.iconWrapper, active && styles.iconWrapperActive]}>
+                <View
+                  style={[
+                    styles.iconWrapper,
+                    active && styles.iconWrapperActive,
+                  ]}
+                >
                   <Ionicons
                     name={active ? tab.activeIcon : tab.icon}
                     size={24}
                     color={
-                      active ? theme.colors.primary : theme.colors.textSecondary
+                      active
+                        ? styles.iconActive.color
+                        : styles.iconInactive.color
                     }
                     style={styles.icon}
                   />
@@ -99,6 +100,12 @@ export const CustomTabBar = () => {
 };
 
 const styles = StyleSheet.create((theme) => ({
+  iconActive: {
+    color: theme.colors.primary,
+  },
+  iconInactive: {
+    color: theme.colors.textSecondary,
+  },
   container: {
     position: "absolute",
     bottom: 0,
