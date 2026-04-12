@@ -11,16 +11,16 @@ import { UIText } from "../UIText";
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
 
-interface FiltersModalProps {
+interface FiltersBottomSheetProps {
   draftFilters: Filter;
   updateDraftFilter: <K extends keyof Filter>(key: K, value: Filter[K]) => void;
   handleResetFilters: () => void;
   handleChangeFilters: () => void;
 }
 
-export type { UIBottomSheetRef as FiltersModalRef } from "../UIBottomSheet";
+export type { UIBottomSheetRef as FiltersBottomSheetRef } from "../UIBottomSheet";
 
-export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
+export const FiltersBottomSheet = forwardRef<UIBottomSheetRef, FiltersBottomSheetProps>(
   (
     {
       draftFilters,
@@ -184,6 +184,7 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
               value={draftFilters.location || ""}
               onChangeText={(text) => updateDraftFilter("location", text)}
               type="location"
+              bottomSheet
             />
           </View>
         </View>

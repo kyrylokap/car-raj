@@ -10,12 +10,14 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { Presets } from "react-native-pulsar";
 import { UnistylesRuntime } from "react-native-unistyles";
 import { useUser } from "../api/auth";
 import { useNotifications } from "../api/useNotifications";
 import { OnlineUsersProvider } from "../contexts/OnlineUsersContext";
 
 const queryClient = new QueryClient();
+Presets.engineRev();
 
 export default function RootLayout() {
   return (

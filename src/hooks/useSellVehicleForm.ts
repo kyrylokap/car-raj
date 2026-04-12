@@ -44,8 +44,11 @@ export const FormDataSchema = z.object({
   description: z.string().optional().default(""),
   vin: z
     .string()
-    .length(17, { message: "*VIN number must contain exactly 17 characters" })
-    .regex(/^[A-HJ-NPR-Z0-9]+$/, {
+    .optional()
+    .refine((val) => !val || val.length === 17, {
+      message: "*VIN number must contain exactly 17 characters",
+    })
+    .refine((val) => !val || /^[A-HJ-NPR-Z0-9]+$/i.test(val), {
       message: "*Please, provide valid VIN number",
     }),
   transmission: z.enum(transmissions as [string, ...string[]]),

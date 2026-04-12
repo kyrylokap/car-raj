@@ -1,8 +1,8 @@
 import { CarItem } from "@/src/ui/components/CarItem";
 import {
-  FiltersModal,
-  FiltersModalRef,
-} from "@/src/ui/components/FiltersModal";
+  FiltersBottomSheet,
+  FiltersBottomSheetRef,
+} from "@/src/ui/sheets/FiltersBottomSheet";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useRef } from "react";
 import {
@@ -27,7 +27,7 @@ const sortingTypes = [
 
 export default function SearchScreen() {
   const { theme, rt } = useUnistyles();
-  const filtersModalRef = useRef<FiltersModalRef>(null);
+  const filtersBottomSheetRef = useRef<FiltersBottomSheetRef>(null);
 
   const {
     draftFilters,
@@ -51,7 +51,7 @@ export default function SearchScreen() {
 
   const handleChangeFilters = () => {
     applyFilters();
-    filtersModalRef.current?.dismiss();
+    filtersBottomSheetRef.current?.dismiss();
   };
 
   return (
@@ -79,13 +79,13 @@ export default function SearchScreen() {
           })()}
           <TouchableOpacity
             style={styles.filterButton}
-            onPress={() => filtersModalRef.current?.present()}
+            onPress={() => filtersBottomSheetRef.current?.present()}
           >
             <Ionicons name="filter" size={20} color={theme.colors.primary} />
           </TouchableOpacity>
         </View>
-        <FiltersModal
-          ref={filtersModalRef}
+        <FiltersBottomSheet
+          ref={filtersBottomSheetRef}
           draftFilters={draftFilters}
           updateDraftFilter={updateDraftFilter}
           handleResetFilters={handleResetFilters}

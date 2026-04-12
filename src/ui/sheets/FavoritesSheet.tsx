@@ -34,29 +34,22 @@ export const FavoritesSheet = forwardRef<
       title="My favorites"
       snapPoints={["90%"]}
       enableDynamicSizing={false}
-      scrollable={false}
+      scrollable={true}
       onDismiss={onDismiss}
     >
-      <BottomSheetFlatList
-        data={cars}
-        onRefresh={refetch}
-        refreshing={isRefetching}
-        renderItem={({ item }) => (
-          <CarItem
-            item={item}
-            onPress={() => {
-              bottomSheetRef.current?.dismiss();
-              router.push(`/car/${item.id}`);
-            }}
-          />
-        )}
-        keyExtractor={(item) => item?.id || ""}
-        contentContainerStyle={[
-          styles.listContent,
-          !cars?.length && { flexGrow: 1 },
-        ]}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
+      <View style={styles.listContent}>
+        {cars && cars.length > 0 ? (
+          cars.map((item) => (
+            <CarItem
+              key={item.id}
+              item={item}
+              onPress={() => {
+                bottomSheetRef.current?.dismiss();
+                router.push(`/car/${item.id}`);
+              }}
+            />
+          ))
+        ) : !isLoading && !isFetching && (
           <View style={styles.emptyState}>
             <Ionicons
               name="heart-outline"
@@ -70,8 +63,8 @@ export const FavoritesSheet = forwardRef<
               Add cars to your favorites to see them here
             </UIText>
           </View>
-        }
-      />
+        )}
+      </View>
       {(isLoading || isFetching || isRefetching) && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <ActivityIndicator size="large" color={theme.colors.primary} />

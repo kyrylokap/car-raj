@@ -20,7 +20,7 @@ interface UIAutocompleteInputProps {
   placeholder?: string;
   value: string;
   onChangeText: (text: string) => void;
-  type?: "brand" | "model" | "location";
+  type?: "brand" | "model" | "location" | "color";
   brandFilter?: string;
   containerStyle?: StyleProp<ViewStyle>;
   initialOptions?: string[];
@@ -73,9 +73,11 @@ export const UIAutocompleteInput = ({
   };
 
   const handleOpen = () => {
-    setIsOpen(true);
-    setSearchQuery("");
-    setTimeout(() => inputRef.current?.focus(), 100);
+    if (!isOpen) {
+      setIsOpen(true);
+      setSearchQuery("");
+      inputRef.current?.focus();
+    }
   };
 
   const handleClose = () => {
@@ -92,44 +94,64 @@ export const UIAutocompleteInput = ({
         </UIText>
       )}
 
-      {!isOpen ? (
-        <TouchableOpacity
-          style={[styles.selector, hasError && styles.selectorError]}
-          onPress={handleOpen}
-          activeOpacity={0.7}
-        >
-          <UIText
-            style={value ? styles.selectedText : styles.placeholderText}
-            numberOfLines={1}
+      <View
+        style={[
+          styles.selector,
+          isOpen ? styles.selectorFocused : hasError && styles.selectorError,
+        ]}
+      >
+        <InputComponent
+          ref={inputRef}
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder={isOpen ? "Type to search..." : ""}
+          placeholderTextColor={theme.colors.textSecondary}
+          onFocus={handleOpen}
+        />
+
+        {!isOpen && (
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: theme.spacing.md,
+                backgroundColor: theme.colors.surface,
+                borderRadius: theme.borderRadius.lg,
+              },
+            ]}
+            pointerEvents="none"
           >
-            {value ? selectedLabel : placeholder || "Select item"}
-          </UIText>
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={hasError ? theme.colors.error : theme.colors.textSecondary}
-          />
-        </TouchableOpacity>
-      ) : (
-        <View>
-          <View style={[styles.selector, styles.selectorFocused]}>
-            <InputComponent
-              ref={inputRef}
-              style={styles.searchInput}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Type to search..."
-              placeholderTextColor={theme.colors.textSecondary}
-              autoFocus
+            <UIText
+              style={value ? styles.selectedText : styles.placeholderText}
+              numberOfLines={1}
+            >
+              {value ? selectedLabel : placeholder || "Select item"}
+            </UIText>
+            <Ionicons
+              name="chevron-down"
+              size={20}
+              color={hasError ? theme.colors.error : theme.colors.textSecondary}
             />
-            <TouchableOpacity onPress={handleClose} hitSlop={8}>
-              <Ionicons
-                name="close-circle"
-                size={20}
-                color={theme.colors.textSecondary}
-              />
-            </TouchableOpacity>
           </View>
+        )}
+
+        {isOpen && (
+          <TouchableOpacity onPress={handleClose} hitSlop={8}>
+            <Ionicons
+              name="close-circle"
+              size={20}
+              color={theme.colors.textSecondary}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {isOpen && (
+        <>
           {options.length > 0 && (
             <View style={styles.dropdownList}>
               <ScrollView
@@ -175,7 +197,7 @@ export const UIAutocompleteInput = ({
               <UIText style={styles.emptyText}>No results found</UIText>
             </View>
           )}
-        </View>
+        </>
       )}
 
       {errorMessage && (
@@ -252,6 +274,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surfaceElevated,
     borderRadius: theme.borderRadius.xl,
     overflow: "hidden",
+    marginTop: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
     ...theme.shadows.md,
@@ -285,6 +308,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.xl,
     padding: theme.spacing.lg,
     alignItems: "center",
+    marginTop: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
     ...theme.shadows.md,

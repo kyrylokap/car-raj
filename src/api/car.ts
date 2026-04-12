@@ -1,4 +1,3 @@
-import React from "react";
 import { Database } from "@/src/lib/database.types";
 import {
   useInfiniteQuery,
@@ -8,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { decode } from "base64-arraybuffer";
 import * as FileSystem from "expo-file-system/legacy";
+import React from "react";
 
 import mime from "mime";
 import { useUser } from "./auth";
@@ -67,9 +67,7 @@ export function useCarSuggestions(
           .filter((name: string) =>
             name.toLowerCase().includes(query.toLowerCase()),
           );
-        return Array.from(new Set(results))
-          .sort()
-          .slice(0, 15);
+        return Array.from(new Set(results)).sort().slice(0, 15);
       }
 
       if (type === "model" && brandFilter) {
@@ -82,9 +80,7 @@ export function useCarSuggestions(
           .filter((name: string) =>
             name.toLowerCase().includes(query.toLowerCase()),
           );
-        return Array.from(new Set(results))
-          .sort()
-          .slice(0, 15);
+        return Array.from(new Set(results)).sort().slice(0, 15);
       }
 
       if (type === "color") {
@@ -124,7 +120,7 @@ export function useCarSuggestionsFormatted(
       data: data.map((item) => ({ id: item, title: item })),
       isLoading,
     }),
-    [data, isLoading]
+    [data, isLoading],
   );
 }
 
@@ -276,7 +272,8 @@ async function getUserCarsById(userId: string) {
   const { data, error } = await supabase
     .from("car")
     .select("*")
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
 
   if (error) throw error;
 
@@ -300,7 +297,7 @@ async function insertCar(car: Car, userId: string) {
 async function uploadCarImages(
   userId: string,
   carId: string,
-  photos: string[]
+  photos: string[],
 ) {
   const folderPath = `${userId}/${carId}`;
 

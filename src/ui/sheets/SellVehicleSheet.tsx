@@ -7,6 +7,7 @@ import { UIButton, UIInput, UIText } from "../../ui";
 import { UIAutocompleteInput } from "../UIAutocompleteInput";
 import { UIBottomSheet, UIBottomSheetRef } from "../UIBottomSheet";
 import { ImagesCarousel } from "../components/ImagesCarousel";
+import { Presets } from "react-native-pulsar";
 
 const fuelTypes = ["Petrol", "Diesel", "Electric", "Hybrid", "Other"];
 const transmissions = ["Manual", "Automatic", "Cvt", "Semi-automatic"];
@@ -38,6 +39,7 @@ export const SellVehicleSheet = forwardRef<
   const handleApply = async () => {
     const success = await handleSubmit();
     if (success) {
+      Presets.passingCar();
       if (onSuccess) {
         onSuccess();
       }
@@ -156,6 +158,7 @@ export const SellVehicleSheet = forwardRef<
               placeholder="e.g., Black"
               value={formData.color}
               onChangeText={(text) => handleInputChange("color", text)}
+              type="color"
               containerStyle={styles.inputSpacing}
               errorMessage={errors.color}
               bottomSheet
