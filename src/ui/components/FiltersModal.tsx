@@ -1,6 +1,6 @@
 import { Filter } from "@/src/api/car";
 import React, { forwardRef } from "react";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { UIAutocompleteInput } from "../UIAutocompleteInput";
 import { UIBottomSheet, UIBottomSheetRef } from "../UIBottomSheet";
@@ -35,32 +35,25 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
         ref={ref}
         title="Filters"
         enableDynamicSizing={false}
-        snapPoints={["50%", "90%"]}
+        snapPoints={["90%"]}
         footer={
-          <View style={styles.footerRow as StyleProp<ViewStyle>}>
+          <View style={styles.footerRow}>
             <UIButton
               variant="ghost"
               onPress={handleResetFilters}
-              style={styles.resetBtn as StyleProp<ViewStyle>}
+              style={styles.resetBtn}
             >
               <UIText color="text">Reset</UIText>
             </UIButton>
-            <UIButton
-              onPress={handleChangeFilters}
-              style={styles.applyBtn as StyleProp<ViewStyle>}
-            >
+            <UIButton onPress={handleChangeFilters} style={styles.applyBtn}>
               <UIText color="white">Show Results</UIText>
             </UIButton>
           </View>
         }
       >
-        <View style={{ paddingTop: 20 }}>
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <UIText
-              size="md"
-              weight="semibold"
-              style={styles.sectionTitle as StyleProp<TextStyle>}
-            >
+        <View style={styles.content}>
+          <View style={styles.section}>
+            <UIText size="md" weight="semibold" style={styles.sectionTitle}>
               Make & Model
             </UIText>
             <UIAutocompleteInput
@@ -69,7 +62,8 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
               value={draftFilters.brand || ""}
               onChangeText={(text) => updateDraftFilter("brand", text)}
               type="brand"
-              containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
+              containerStyle={styles.inputSpacing}
+              bottomSheet
             />
             <UIAutocompleteInput
               label="Model"
@@ -78,26 +72,23 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
               onChangeText={(text) => updateDraftFilter("model", text)}
               type="model"
               brandFilter={draftFilters.brand}
+              bottomSheet
             />
           </View>
 
-          <View style={styles.divider as StyleProp<ViewStyle>} />
+          <View style={styles.divider} />
 
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <UIText
-              size="md"
-              weight="semibold"
-              style={styles.sectionTitle as StyleProp<TextStyle>}
-            >
+          <View style={styles.section}>
+            <UIText size="md" weight="semibold" style={styles.sectionTitle}>
               Price & Year
             </UIText>
-            <View style={styles.row as StyleProp<ViewStyle>}>
+            <View style={styles.row}>
               <UIInput
                 label="Min Price"
                 placeholder="0"
                 value={draftFilters.minPrice}
                 onChangeText={(text) => updateDraftFilter("minPrice", text)}
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 keyboardType="numeric"
               />
               <UIInput
@@ -105,17 +96,17 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
                 placeholder="50,000+"
                 value={draftFilters.maxPrice}
                 onChangeText={(text) => updateDraftFilter("maxPrice", text)}
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 keyboardType="numeric"
               />
             </View>
-            <View style={styles.row as StyleProp<ViewStyle>}>
+            <View style={styles.row}>
               <UIInput
                 label="Min Year"
                 placeholder="1990"
                 value={draftFilters.minYear}
                 onChangeText={(text) => updateDraftFilter("minYear", text)}
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 keyboardType="numeric"
               />
               <UIInput
@@ -123,29 +114,25 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
                 placeholder={`${new Date().getFullYear()}`}
                 value={draftFilters.maxYear}
                 onChangeText={(text) => updateDraftFilter("maxYear", text)}
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 keyboardType="numeric"
               />
             </View>
           </View>
 
-          <View style={styles.divider as StyleProp<ViewStyle>} />
+          <View style={styles.divider} />
 
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <UIText
-              size="md"
-              weight="semibold"
-              style={styles.sectionTitle as StyleProp<TextStyle>}
-            >
+          <View style={styles.section}>
+            <UIText size="md" weight="semibold" style={styles.sectionTitle}>
               Details & Location
             </UIText>
-            <View style={styles.row as StyleProp<ViewStyle>}>
+            <View style={styles.row}>
               <UIInput
                 label="Min Mileage"
                 placeholder="0"
                 value={draftFilters.minMileage}
                 onChangeText={(text) => updateDraftFilter("minMileage", text)}
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 keyboardType="numeric"
               />
               <UIInput
@@ -153,15 +140,13 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
                 placeholder="200,000+"
                 value={draftFilters.maxMileage}
                 onChangeText={(text) => updateDraftFilter("maxMileage", text)}
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 keyboardType="numeric"
               />
             </View>
 
-            <View
-              style={[styles.row, { marginBottom: 12 }] as StyleProp<ViewStyle>}
-            >
-              <View style={styles.halfInput as StyleProp<ViewStyle>}>
+            <View style={[styles.row, { marginBottom: 12 }]}>
+              <View style={styles.halfInput}>
                 <UIAutocompleteInput
                   label="Fuel Type"
                   placeholder="Any"
@@ -173,9 +158,10 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
                       value === "Any" ? "" : (value as any),
                     )
                   }
+                  bottomSheet
                 />
               </View>
-              <View style={styles.halfInput as StyleProp<ViewStyle>}>
+              <View style={styles.halfInput}>
                 <UIAutocompleteInput
                   label="Transmission"
                   placeholder="Any"
@@ -187,6 +173,7 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
                       value === "Any" ? "" : (value as any),
                     )
                   }
+                  bottomSheet
                 />
               </View>
             </View>
@@ -206,16 +193,16 @@ export const FiltersModal = forwardRef<UIBottomSheetRef, FiltersModalProps>(
 );
 
 const styles = StyleSheet.create((theme) => ({
+  content: {
+    paddingTop: 20,
+    paddingBottom: 300,
+  },
   section: {
     paddingHorizontal: theme.spacing.lg,
     marginBottom: theme.spacing.lg,
   },
   sectionTitle: {
-    color: theme.colors.text,
     marginBottom: theme.spacing.md,
-    fontWeight: "600",
-    fontSize: theme.s(15),
-    letterSpacing: 0.2,
   },
   inputSpacing: {
     marginBottom: theme.spacing.md,
@@ -236,7 +223,6 @@ const styles = StyleSheet.create((theme) => ({
   footerRow: {
     flexDirection: "row",
     gap: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
   },
   resetBtn: {
     flex: 1,

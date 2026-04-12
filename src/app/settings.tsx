@@ -11,7 +11,10 @@ import {
 } from "react-native-unistyles";
 import { handleSignOut } from "../api/auth";
 import { UICard, UIContainer, UIText } from "../ui";
-import { PhoneNumberModal, PhoneNumberModalRef } from "../ui/components/PhoneNumberModal";
+import {
+  PhoneNumberModal,
+  PhoneNumberModalRef,
+} from "../ui/components/PhoneNumberModal";
 
 type SettingItem = {
   icon: string;
@@ -177,17 +180,18 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
+        <TouchableOpacity
+          style={styles.backButton}
           onPress={() => router.back()}
         >
           <Ionicons name="chevron-back" size={28} color={theme.colors.text} />
         </TouchableOpacity>
-        <UIText size="xl" weight="bold">Settings</UIText>
-        <View style={{ width: 28 }} />
+        <UIText size="xxl" weight="bold">
+          Settings
+        </UIText>
       </View>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
@@ -252,10 +256,7 @@ export default function SettingsScreen() {
         </UIContainer>
       </ScrollView>
 
-      <PhoneNumberModal
-        ref={phoneNumberModalRef}
-        onClose={() => {}}
-      />
+      <PhoneNumberModal ref={phoneNumberModalRef} onClose={() => {}} />
     </SafeAreaView>
   );
 }
@@ -268,12 +269,9 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     height: 56,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderLight,
-    backgroundColor: theme.colors.card,
   },
   backButton: {
     padding: 4,
@@ -288,6 +286,7 @@ const styles = StyleSheet.create((theme) => ({
   settingsCard: {
     marginBottom: theme.spacing.md,
     overflow: "hidden",
+    padding: 0,
   },
   sectionHeader: {
     paddingHorizontal: theme.spacing.md,

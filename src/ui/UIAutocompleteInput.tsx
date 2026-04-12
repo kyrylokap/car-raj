@@ -1,8 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import { StyleSheet } from "react-native-unistyles";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { useMemo, useRef, useState } from "react";
+import {
+  Keyboard,
+  ScrollView,
+  StyleProp,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useCarSuggestionsFormatted } from "../api/car";
 import { UIText } from "./UIText";
 
@@ -16,6 +24,7 @@ interface UIAutocompleteInputProps {
   brandFilter?: string;
   containerStyle?: StyleProp<ViewStyle>;
   initialOptions?: string[];
+  bottomSheet?: boolean;
 }
 
 export const UIAutocompleteInput = ({
@@ -28,44 +37,51 @@ export const UIAutocompleteInput = ({
   brandFilter,
   containerStyle,
   initialOptions,
+  bottomSheet = false,
 }: UIAutocompleteInputProps) => {
+  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isFocus, setIsFocus] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const hasError = !!errorMessage;
+  const inputRef = useRef<any>(null);
 
-  const { data: suggestionsData = [], isLoading } = useCarSuggestionsFormatted(
+  const InputComponent = bottomSheet ? BottomSheetTextInput : TextInput;
+
+  const { data: suggestionsData = [] } = useCarSuggestionsFormatted(
     type || "brand",
     searchQuery,
     brandFilter,
   );
 
-  const remoteData = type
-    ? suggestionsData
-    : initialOptions?.map((opt) => ({ id: opt, title: opt })) || [];
+  const options = useMemo(() => {
+    return type
+      ? suggestionsData
+      : initialOptions?.map((opt) => ({ id: opt, title: opt })) || [];
+  }, [type, suggestionsData, initialOptions]);
 
-  const suggestions = React.useMemo(() => {
-    const list = remoteData || [];
-    if (value && !list.find((item: any) => item.id === value)) {
-      list.unshift({ id: value, title: value });
-    }
-    return list;
-  }, [remoteData, value]);
+  const selectedLabel = useMemo((): string => {
+    if (!value) return "";
+    const found = options.find((item: any) => item.id === value);
+    return found ? String(found.title) : value;
+  }, [options, value]);
 
-  const renderItem = (item: any) => {
-    return (
-      <View style={styles.item}>
-        <UIText style={styles.textItem as StyleProp<TextStyle>}>
-          {item.title}
-        </UIText>
-        {item.id === value && (
-          <Ionicons
-            color={styles.primaryColor.color}
-            name="checkmark"
-            size={20}
-          />
-        )}
-      </View>
-    );
+  const handleSelect = (item: any) => {
+    onChangeText(item.id);
+    setSearchQuery("");
+    setIsOpen(false);
+    Keyboard.dismiss();
+  };
+
+  const handleOpen = () => {
+    setIsOpen(true);
+    setSearchQuery("");
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setSearchQuery("");
+    Keyboard.dismiss();
   };
 
   return (
@@ -75,62 +91,96 @@ export const UIAutocompleteInput = ({
           {label}
         </UIText>
       )}
-      <Dropdown
-        style={
-          [
-            styles.dropdown,
-            isFocus && { borderColor: styles.primaryColor.color },
-            hasError && styles.dropdownError,
-          ] as StyleProp<ViewStyle>
-        }
-        placeholderStyle={styles.placeholderStyle as StyleProp<TextStyle>}
-        selectedTextStyle={
-          [
-            styles.selectedTextStyle,
-            isFocus && { color: styles.textSecondaryColor.color, opacity: 0.3 },
-          ] as StyleProp<TextStyle>
-        }
-        inputSearchStyle={styles.inputSearchStyle as StyleProp<TextStyle>}
-        iconStyle={styles.iconStyle}
-        data={suggestions}
-        search
-        maxHeight={250}
-        labelField="title"
-        valueField="id"
-        placeholder={!isFocus ? placeholder || "Select item" : ""}
-        searchPlaceholder="Type to search..."
-        value={value}
-        onFocus={() => setIsFocus(true)}
-        onBlur={() => setIsFocus(false)}
-        onChange={(item) => {
-          onChangeText(item.id);
-          setIsFocus(false);
-          setSearchQuery("");
-        }}
-        onChangeText={(text) => setSearchQuery(text)}
-        renderItem={renderItem}
-        containerStyle={styles.dropdownContainer as StyleProp<ViewStyle>}
-        dropdownPosition="bottom"
-        activeColor={styles.surfaceColor.backgroundColor}
-        flatListProps={{
-          keyboardShouldPersistTaps: "handled",
-          nestedScrollEnabled: true,
-        }}
-        renderRightIcon={() => (
+
+      {!isOpen ? (
+        <TouchableOpacity
+          style={[styles.selector, hasError && styles.selectorError]}
+          onPress={handleOpen}
+          activeOpacity={0.7}
+        >
+          <UIText
+            style={value ? styles.selectedText : styles.placeholderText}
+            numberOfLines={1}
+          >
+            {value ? selectedLabel : placeholder || "Select item"}
+          </UIText>
           <Ionicons
             name="chevron-down"
             size={20}
-            color={
-              hasError
-                ? styles.errorColor.color
-                : styles.textSecondaryColor.color
-            }
+            color={hasError ? theme.colors.error : theme.colors.textSecondary}
           />
-        )}
-      />
+        </TouchableOpacity>
+      ) : (
+        <View>
+          <View style={[styles.selector, styles.selectorFocused]}>
+            <InputComponent
+              ref={inputRef}
+              style={styles.searchInput}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder="Type to search..."
+              placeholderTextColor={theme.colors.textSecondary}
+              autoFocus
+            />
+            <TouchableOpacity onPress={handleClose} hitSlop={8}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={theme.colors.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
+          {options.length > 0 && (
+            <View style={styles.dropdownList}>
+              <ScrollView
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled"
+                style={styles.scrollView}
+                showsVerticalScrollIndicator={false}
+              >
+                {options.map((item: any) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={[
+                      styles.option,
+                      item.id === value && styles.optionSelected,
+                    ]}
+                    onPress={() => handleSelect(item)}
+                    activeOpacity={0.6}
+                  >
+                    <UIText
+                      style={[
+                        styles.optionText,
+                        item.id === value && styles.optionTextSelected,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {item.title}
+                    </UIText>
+                    {item.id === value && (
+                      <Ionicons
+                        name="checkmark"
+                        size={18}
+                        color={theme.colors.primary}
+                      />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
+          {options.length === 0 && searchQuery.length > 0 && (
+            <View style={styles.emptyState}>
+              <UIText style={styles.emptyText}>No results found</UIText>
+            </View>
+          )}
+        </View>
+      )}
+
       {errorMessage && (
         <UIText
-          style={styles.errorText as StyleProp<TextStyle>}
+          style={styles.errorText}
           size="xs"
           weight="medium"
           color="error"
@@ -143,12 +193,6 @@ export const UIAutocompleteInput = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
-  surfaceColor: {
-    backgroundColor: theme.colors.surface,
-  },
-  errorColor: {
-    color: theme.colors.error,
-  },
   container: {
     marginBottom: theme.spacing.lg,
   },
@@ -159,73 +203,95 @@ const styles = StyleSheet.create((theme) => ({
     fontWeight: "600",
     letterSpacing: 0.2,
   },
-  textSecondaryColor: {
-    color: theme.colors.textSecondary,
+  labelError: {
+    color: theme.colors.error,
   },
-  primaryColor: {
-    color: theme.colors.primary,
-  },
-  dropdown: {
+  selector: {
     height: theme.s(52),
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: theme.colors.surface,
     borderColor: theme.colors.borderLight,
     borderWidth: theme.s(1.5),
     borderRadius: theme.borderRadius.lg,
     paddingHorizontal: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
     shadowColor: theme.colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
   },
-  dropdownContainer: {
-    backgroundColor: theme.colors.surfaceElevated,
-    borderRadius: theme.borderRadius.xl,
-    borderWidth: 0,
-    marginTop: theme.s(6),
-    overflow: "hidden",
-    ...theme.shadows.xl,
+  selectorError: {
+    borderColor: theme.colors.error,
+    backgroundColor: `${theme.colors.error}08`,
   },
-  item: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.md,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottomWidth: 0.5,
-    borderBottomColor: theme.colors.borderLight,
+  selectorFocused: {
+    borderColor: theme.colors.primary,
+    shadowColor: theme.colors.primary,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  textItem: {
+  selectedText: {
+    ...theme.typography.body,
+    color: theme.colors.text,
+    flex: 1,
+  },
+  placeholderText: {
+    ...theme.typography.body,
+    color: theme.colors.textSecondary,
+    flex: 1,
+  },
+  searchInput: {
     flex: 1,
     ...theme.typography.body,
     color: theme.colors.text,
   },
-  placeholderStyle: {
+  dropdownList: {
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.borderRadius.xl,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    ...theme.shadows.md,
+  },
+  scrollView: {
+    maxHeight: 250,
+  },
+  option: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: 0.5,
+    borderBottomColor: theme.colors.borderLight,
+  },
+  optionSelected: {
+    backgroundColor: `${theme.colors.primary}10`,
+  },
+  optionText: {
+    ...theme.typography.body,
+    color: theme.colors.text,
+    flex: 1,
+  },
+  optionTextSelected: {
+    color: theme.colors.primary,
+    fontWeight: "600",
+  },
+  emptyState: {
+    backgroundColor: theme.colors.surfaceElevated,
+    borderRadius: theme.borderRadius.xl,
+    padding: theme.spacing.lg,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: theme.colors.borderLight,
+    ...theme.shadows.md,
+  },
+  emptyText: {
     ...theme.typography.body,
     color: theme.colors.textSecondary,
-  },
-  selectedTextStyle: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-  },
-  iconStyle: {
-    width: theme.s(20),
-    height: theme.s(20),
-  },
-  inputSearchStyle: {
-    ...theme.typography.body,
-    color: theme.colors.text,
-    borderRadius: theme.borderRadius.sm,
-    borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surfaceVariant,
-    paddingHorizontal: theme.spacing.sm,
-  },
-  labelError: {
-    color: theme.colors.error,
-  },
-  dropdownError: {
-    borderColor: theme.colors.error,
-    backgroundColor: `${theme.colors.error}08`,
   },
   errorText: {
     color: theme.colors.error,

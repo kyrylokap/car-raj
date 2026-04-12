@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { StyleProp, TextStyle, View, ViewStyle } from "react-native";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useSellVehicleForm } from "../../hooks/useSellVehicleForm";
 import { UIButton, UIInput, UIText } from "../../ui";
@@ -46,10 +46,10 @@ export const SellVehicleSheet = forwardRef<
   };
 
   const footer = (
-    <View style={styles.actionRow as StyleProp<ViewStyle>}>
+    <View style={styles.actionRow}>
       <UIButton
         variant="ghost"
-        style={styles.cancelButton as StyleProp<ViewStyle>}
+        style={styles.cancelButton}
         onPress={() => bottomSheetRef.current?.dismiss()}
         disabled={isPending}
       >
@@ -60,7 +60,7 @@ export const SellVehicleSheet = forwardRef<
 
       <UIButton
         variant="primary"
-        style={styles.submitButton as StyleProp<ViewStyle>}
+        style={styles.submitButton}
         onPress={handleApply}
         loading={isPending}
       >
@@ -76,9 +76,9 @@ export const SellVehicleSheet = forwardRef<
     <UIBottomSheet
       ref={bottomSheetRef}
       title={
-        <View style={styles.titleContainer as StyleProp<ViewStyle>}>
-          <View style={styles.titleRow as StyleProp<ViewStyle>}>
-            <View style={styles.iconContainer as StyleProp<ViewStyle>}>
+        <View style={styles.titleContainer}>
+          <View style={styles.titleRow}>
+            <View style={styles.iconContainer}>
               <Ionicons
                 name="car-sport"
                 size={22}
@@ -96,8 +96,8 @@ export const SellVehicleSheet = forwardRef<
       onDismiss={onDismiss}
       footer={footer}
     >
-      <View style={styles.scrollContent as StyleProp<ViewStyle>}>
-        <View style={styles.imagesContainer as StyleProp<ViewStyle>}>
+      <View style={styles.scrollContent}>
+        <View style={styles.imagesContainer}>
           <ImagesCarousel
             images={images}
             setImages={setImages}
@@ -106,7 +106,7 @@ export const SellVehicleSheet = forwardRef<
             }
           />
           {errors.images && (
-            <View style={styles.imageError as StyleProp<ViewStyle>}>
+            <View style={styles.imageError}>
               <Ionicons name="warning" size={16} color={theme.colors.error} />
               <UIText size="xs" weight="medium" color="error">
                 {errors.images}
@@ -115,21 +115,17 @@ export const SellVehicleSheet = forwardRef<
           )}
         </View>
 
-        <View style={styles.formContainer as StyleProp<ViewStyle>}>
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
-              <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
+        <View style={styles.formContainer}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIcon}>
                 <Ionicons
                   name="information-circle"
                   size={18}
                   color={theme.colors.primary}
                 />
               </View>
-              <UIText
-                size="md"
-                weight="semibold"
-                style={styles.sectionTitle as StyleProp<TextStyle>}
-              >
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Basic Information
               </UIText>
             </View>
@@ -140,8 +136,9 @@ export const SellVehicleSheet = forwardRef<
               value={formData.brand}
               onChangeText={(text) => handleInputChange("brand", text)}
               type="brand"
-              containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
+              containerStyle={styles.inputSpacing}
               errorMessage={errors.brand}
+              bottomSheet
             />
             <UIAutocompleteInput
               label="Model"
@@ -150,47 +147,43 @@ export const SellVehicleSheet = forwardRef<
               onChangeText={(text) => handleInputChange("model", text)}
               type="model"
               brandFilter={formData.brand}
-              containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
+              containerStyle={styles.inputSpacing}
               errorMessage={errors.model}
+              bottomSheet
             />
             <UIAutocompleteInput
               label="Color"
               placeholder="e.g., Black"
               value={formData.color}
               onChangeText={(text) => handleInputChange("color", text)}
-              containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
+              containerStyle={styles.inputSpacing}
               errorMessage={errors.color}
+              bottomSheet
             />
           </View>
 
-          <View style={styles.divider as StyleProp<ViewStyle>} />
-
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
-              <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIcon}>
                 <Ionicons
                   name="options"
                   size={18}
                   color={theme.colors.primary}
                 />
               </View>
-              <UIText
-                size="md"
-                weight="semibold"
-                style={styles.sectionTitle as StyleProp<TextStyle>}
-              >
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Specs & Details
               </UIText>
             </View>
 
-            <View style={styles.row as StyleProp<ViewStyle>}>
+            <View style={styles.row}>
               <UIInput
                 label="Year"
                 placeholder="2020"
                 value={String(formData.year || "")}
                 onChangeText={(text) => handleInputChange("year", text)}
                 keyboardType="numeric"
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 errorMessage={errors.year}
               />
               <UIInput
@@ -199,15 +192,13 @@ export const SellVehicleSheet = forwardRef<
                 value={String(formData.mileage || "")}
                 onChangeText={(text) => handleInputChange("mileage", text)}
                 keyboardType="numeric"
-                containerStyle={styles.halfInput as StyleProp<ViewStyle>}
+                containerStyle={styles.halfInput}
                 errorMessage={errors.mileage}
               />
             </View>
 
-            <View
-              style={[styles.row, { marginBottom: 12 }] as StyleProp<ViewStyle>}
-            >
-              <View style={styles.halfInput as StyleProp<ViewStyle>}>
+            <View style={[styles.row, { marginBottom: 12 }]}>
+              <View style={styles.halfInput}>
                 <UIAutocompleteInput
                   label="Fuel Type"
                   placeholder="Select"
@@ -215,10 +206,11 @@ export const SellVehicleSheet = forwardRef<
                   value={formData.fuel}
                   onChangeText={(value) => handleInputChange("fuel", value)}
                   errorMessage={errors.fuel}
+                  bottomSheet
                 />
               </View>
 
-              <View style={styles.halfInput as StyleProp<ViewStyle>}>
+              <View style={styles.halfInput}>
                 <UIAutocompleteInput
                   label="Transmission"
                   placeholder="Select"
@@ -228,6 +220,7 @@ export const SellVehicleSheet = forwardRef<
                     handleInputChange("transmission", value)
                   }
                   errorMessage={errors.transmission}
+                  bottomSheet
                 />
               </View>
             </View>
@@ -241,18 +234,12 @@ export const SellVehicleSheet = forwardRef<
             />
           </View>
 
-          <View style={styles.divider as StyleProp<ViewStyle>} />
-
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
-              <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIcon}>
                 <Ionicons name="cash" size={18} color={theme.colors.primary} />
               </View>
-              <UIText
-                size="md"
-                weight="semibold"
-                style={styles.sectionTitle as StyleProp<TextStyle>}
-              >
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Pricing & Location
               </UIText>
             </View>
@@ -263,7 +250,7 @@ export const SellVehicleSheet = forwardRef<
               value={String(formData.price || "")}
               onChangeText={(text) => handleInputChange("price", text)}
               keyboardType="numeric"
-              containerStyle={styles.inputSpacing as StyleProp<ViewStyle>}
+              containerStyle={styles.inputSpacing}
               errorMessage={errors.price}
             />
             <UIAutocompleteInput
@@ -273,25 +260,20 @@ export const SellVehicleSheet = forwardRef<
               onChangeText={(text) => handleInputChange("location", text)}
               type="location"
               errorMessage={errors.location}
+              bottomSheet
             />
           </View>
 
-          <View style={styles.divider as StyleProp<ViewStyle>} />
-
-          <View style={styles.section as StyleProp<ViewStyle>}>
-            <View style={styles.sectionHeader as StyleProp<ViewStyle>}>
-              <View style={styles.sectionIcon as StyleProp<ViewStyle>}>
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionIcon}>
                 <Ionicons
                   name="create"
                   size={18}
                   color={theme.colors.primary}
                 />
               </View>
-              <UIText
-                size="md"
-                weight="semibold"
-                style={styles.sectionTitle as StyleProp<TextStyle>}
-              >
+              <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Description
               </UIText>
             </View>
@@ -301,7 +283,7 @@ export const SellVehicleSheet = forwardRef<
               value={formData.description}
               onChangeText={(text) => handleInputChange("description", text)}
               multiline
-              style={styles.descriptionInput as StyleProp<TextStyle>}
+              style={styles.descriptionInput}
               errorMessage={errors.description}
             />
 
@@ -309,8 +291,8 @@ export const SellVehicleSheet = forwardRef<
               Object.entries(errors).some(
                 ([k, v]) => v !== "" && k !== "images",
               ) && (
-                <View style={styles.errorsContainer as StyleProp<ViewStyle>}>
-                  <View style={styles.errorHeader as StyleProp<ViewStyle>}>
+                <View style={styles.errorsContainer}>
+                  <View style={styles.errorHeader}>
                     <Ionicons
                       name="alert-circle"
                       size={18}
@@ -372,15 +354,11 @@ const styles = StyleSheet.create((theme) => ({
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
+
     gap: theme.spacing.sm,
     marginBottom: theme.spacing.md,
   },
   sectionTitle: {
-    marginBottom: theme.spacing.md,
-    color: theme.colors.text,
-    fontWeight: "600",
-    fontSize: theme.s(16),
-    letterSpacing: 0.2,
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.sm,
@@ -393,11 +371,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  divider: {
-    height: theme.s(1),
-    backgroundColor: theme.colors.borderLight,
-    marginVertical: theme.spacing.lg,
-  },
+
   inputSpacing: {
     marginBottom: theme.spacing.md,
   },

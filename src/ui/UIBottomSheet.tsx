@@ -1,13 +1,16 @@
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
+  BottomSheetFooter,
+  BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetModalProps,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
 import React, { forwardRef, memo, useCallback } from "react";
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
 import { UIText } from "./UIText";
 
 export type { BottomSheetModal as UIBottomSheetRef } from "@gorhom/bottom-sheet";
@@ -35,20 +38,47 @@ export const UIBottomSheet = memo(
         [],
       );
 
+      const renderFooter = useCallback(
+        (footerProps: BottomSheetFooterProps) => {
+          if (!footer) return null;
+          return (
+            <BottomSheetFooter {...footerProps} bottomInset={0}>
+              <BlurView
+                intensity={50}
+                tint={UnistylesRuntime.themeName === "dark" ? "dark" : "light"}
+                style={styles.footerContainer}
+              >
+                {footer}
+              </BlurView>
+            </BottomSheetFooter>
+          );
+        },
+        [footer],
+      );
+
       const content = scrollable ? (
         <BottomSheetScrollView
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          automaticallyAdjustKeyboardInsets={true}
+          contentContainerStyle={
+            footer ? styles.scrollContentWithFooter : undefined
+          }
         >
           {children}
         </BottomSheetScrollView>
       ) : (
-        children
+        <View style={footer ? styles.scrollContentWithFooter : undefined}>
+          {children}
+        </View>
       );
 
       return (
         <BottomSheetModal
+          keyboardBehavior="interactive"
+          keyboardBlurBehavior="restore"
           backdropComponent={renderBackdrop}
+          footerComponent={footer ? renderFooter : undefined}
           handleStyle={styles.handleStyle}
           backgroundStyle={styles.backgroundStyle}
           ref={ref}
@@ -69,8 +99,6 @@ export const UIBottomSheet = memo(
           )}
 
           {content}
-
-          {footer && <View style={styles.footerContainer}>{footer}</View>}
         </BottomSheetModal>
       );
     },
@@ -79,7 +107,6 @@ export const UIBottomSheet = memo(
 
 const styles = StyleSheet.create((theme) => ({
   header: {
-    color: theme.colors.text,
     textAlign: "center",
     fontWeight: "700",
     letterSpacing: -0.3,
@@ -109,8 +136,8 @@ const styles = StyleSheet.create((theme) => ({
   footerContainer: {
     padding: theme.spacing.lg,
     paddingBottom: theme.spacing.xl,
-    borderTopWidth: 0,
-    backgroundColor: "transparent",
+  },
+  scrollContentWithFooter: {
+    paddingBottom: theme.s(100),
   },
 }));
-

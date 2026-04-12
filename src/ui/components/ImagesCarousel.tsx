@@ -82,10 +82,7 @@ export const ImagesCarousel = ({
           width={width}
           style={hero ? styles.heroImageContainer : styles.imageContainer}
           data={images}
-          onProgressChange={(_, absoluteProgress) => {
-            const currentItemIndex = Math.round(absoluteProgress);
-            setCurrentIndex(currentItemIndex);
-          }}
+          onSnapToItem={(index) => setCurrentIndex(index)}
           renderItem={({ item: imageUrl }) => (
             <Pressable
               style={{ flex: 1 }}
