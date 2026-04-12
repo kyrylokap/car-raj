@@ -55,7 +55,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView testID="profile-screen" style={styles.safeArea} edges={["top"]}>
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,

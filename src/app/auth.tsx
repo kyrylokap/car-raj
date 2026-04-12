@@ -3,15 +3,19 @@ import React from "react";
 import { View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { UICard, UIText } from "../ui";
+import { UICard, UIText, UIButton } from "../ui";
 import { GoogleButton } from "../ui/components/GoogleButton";
+import { supabase } from "../api/supabase";
+import { useRouter } from "expo-router";
 
 export default function AuthScreen() {
   const { theme } = useUnistyles();
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView 
+        testID="auth-scroll-view"
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -111,6 +115,27 @@ export default function AuthScreen() {
             </UIText>
 
             <GoogleButton />
+
+            <UIButton
+              variant="ghost"
+              testID="guest-login-button"
+              onPress={async () => {
+                const { error } = await supabase.auth.signInWithPassword({
+                  email: "test@example.com",
+                  password: "password123",
+                });
+                if (!error) {
+                  router.replace("/");
+                } else {
+                  console.error("Test login failed:", error.message);
+                }
+              }}
+              style={{ marginTop: theme.spacing.sm }}
+            >
+              <UIText size="xs" color="textSecondary" weight="semibold">
+                Continue as Guest (Dev Only)
+              </UIText>
+            </UIButton>
 
             <UIText size="xxs" color="textSecondary" style={styles.disclaimer}>
               By continuing, you agree to our Terms and acknowledge our Privacy

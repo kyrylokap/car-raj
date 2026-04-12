@@ -125,6 +125,7 @@ export default function SettingsScreen() {
         </View>
         {item.type === "toggle" && (
           <Switch
+            testID="dark-mode-switch"
             value={
               item.label === "Dark Mode"
                 ? UnistylesRuntime.themeName === "dark"
@@ -181,6 +182,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
         <TouchableOpacity
+          testID="settings-back-button"
           style={styles.backButton}
           onPress={() => router.back()}
         >

@@ -7,7 +7,9 @@
     "generate": "npx supabase@latest gen types typescript --project-id qghsumfghyjfwyghpalc --schema public > src/lib/database.types.ts",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "e2e:build": "detox build -c ios.sim.debug",
+    "e2e:test": "detox test -c ios.sim.debug"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -64,8 +66,13 @@
     "@types/react": "~19.1.0",
     "@types/react-native-typing-animation": "^0.1.5",
     "babel-plugin-react-compiler": "^1.0.0",
+    "detox": "^20.50.1",
     "expo-build-properties": "^1.0.10",
+    "jest": "^29.7.0",
+    "jest-circus": "^29.7.0",
     "react-test-renderer": "19.1.0",
+    "ts-jest": "^29.1.1",
+    "@types/jest": "^29.5.11",
     "typescript": "~5.9.2"
   },
   "private": true

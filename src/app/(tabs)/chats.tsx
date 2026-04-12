@@ -27,7 +27,7 @@ export default function MessengerScreen() {
     : onlineUserIdSet.size;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <SafeAreaView testID="chats-screen" style={styles.safeArea} edges={["top"]}>
       <View style={styles.header}>
         <View>
           <UIText size="xxl" weight="bold">

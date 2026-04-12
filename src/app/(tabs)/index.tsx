@@ -78,6 +78,7 @@ export default function SearchScreen() {
             );
           })()}
           <TouchableOpacity
+            testID="filter-button"
             style={styles.filterButton}
             onPress={() => filtersBottomSheetRef.current?.present()}
           >
@@ -93,13 +94,14 @@ export default function SearchScreen() {
         />
 
         <FlatList
+          testID="search-car-list"
           onRefresh={() => {
             refetchInfiniteData();
           }}
           refreshing={isRefetching}
           data={cars}
-          renderItem={({ item }) => {
-            return <CarItem item={item} />;
+          renderItem={({ item, index }) => {
+            return <CarItem item={item} testID={`car-item-${index}`} />;
           }}
           keyExtractor={(item) => item?.id || ""}
           contentContainerStyle={[

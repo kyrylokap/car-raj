@@ -215,6 +215,7 @@ export default function CarDetailsScreen() {
 
       <View style={[styles.floatingHeader]} pointerEvents="box-none">
         <TouchableOpacity
+          testID="car-detail-back-button"
           style={styles.headerBtn}
           onPress={() => router.back()}
           hitSlop={14}
@@ -222,6 +223,7 @@ export default function CarDetailsScreen() {
           <Ionicons name="arrow-back" size={22} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity
+          testID="car-detail-favorite-button"
           style={styles.headerBtn}
           onPress={handleToggleFavorite}
           hitSlop={14}

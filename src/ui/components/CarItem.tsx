@@ -7,7 +7,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Car, useCarFirstImage } from "../../api/car";
 import { UIText } from "../UIText";
 
-export const CarItem = ({ item, onPress }: { item: Car; onPress?: () => void }) => {
+export const CarItem = ({ item, onPress, testID }: { item: Car; onPress?: () => void; testID?: string }) => {
   const { theme } = useUnistyles();
   const {
     data: firstImageUrl,
@@ -30,6 +30,7 @@ export const CarItem = ({ item, onPress }: { item: Car; onPress?: () => void }) 
 
   return (
     <TouchableOpacity
+      testID={testID}
       onPress={handlePress}
       activeOpacity={0.88}
       style={styles.wrapper}
