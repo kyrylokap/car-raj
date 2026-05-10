@@ -1,0 +1,25 @@
+appId: com.kyrylokap.autoraj
+---
+- launchApp:
+    clearState: true
+
+- startRecording: app-launch-login
+
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Allow"
+
+- assertVisible: "Continue as Guest"
+
+- tapOn: "Continue as Guest"
+
+- assertVisible:
+    id: "search-car-list"
+    timeout: 20000
+
+- assertVisible:
+    id: "filter-button"
+
+- stopRecording

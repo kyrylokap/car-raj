@@ -1,0 +1,36 @@
+appId: com.kyrylokap.autoraj
+---
+- launchApp
+
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Allow"
+
+- runFlow:
+    when:
+      visible: "Continue as Guest"
+    commands:
+      - tapOn: "Continue as Guest"
+      - assertVisible:
+          id: "search-car-list"
+          timeout: 20000
+
+- assertVisible:
+    id: "search-car-list"
+
+- tapOn: "Chats"
+- assertVisible:
+    id: "chats-screen"
+    timeout: 8000
+
+- tapOn: "Profile"
+- assertVisible:
+    id: "profile-screen"
+    timeout: 8000
+
+- tapOn: "Search"
+- assertVisible:
+    id: "search-car-list"
+    timeout: 8000

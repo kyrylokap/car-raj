@@ -1,9 +1,4 @@
 import "@/src/theme/unistyles";
-import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -11,13 +6,20 @@ import "react-native-reanimated";
 
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Presets } from "react-native-pulsar";
-import { UnistylesRuntime } from "react-native-unistyles";
 import { useUser } from "../api/auth";
 import { useNotifications } from "../api/useNotifications";
 import { OnlineUsersProvider } from "../contexts/OnlineUsersContext";
+import { StatusBar } from "expo-status-bar";
+import { View } from "react-native";
+import { StyleSheet, withUnistyles, useUnistyles } from "react-native-unistyles";
 
 const queryClient = new QueryClient();
 Presets.engineRev();
+
+const ThemeStatusBar = () => {
+  const { rt } = useUnistyles();
+  return <StatusBar style={rt.themeName === "dark" ? "light" : "dark"} />;
+};
 
 export default function RootLayout() {
   return (
@@ -38,11 +40,10 @@ function RootLayoutNav() {
     return null;
   }
   return (
-    <ThemeProvider
-      value={UnistylesRuntime.themeName === "dark" ? DarkTheme : DefaultTheme}
-    >
-      <OnlineUsersProvider>
-        <BottomSheetModalProvider>
+    <OnlineUsersProvider>
+      <BottomSheetModalProvider>
+        <View style={styles.container}>
+          <ThemeStatusBar />
           <Stack screenOptions={{ headerShown: false }}>
             <Stack.Protected guard={!!user}>
               <Stack.Screen name="(tabs)" />
@@ -50,8 +51,15 @@ function RootLayoutNav() {
             </Stack.Protected>
             <Stack.Screen name="auth" />
           </Stack>
-        </BottomSheetModalProvider>
-      </OnlineUsersProvider>
-    </ThemeProvider>
+        </View>
+      </BottomSheetModalProvider>
+    </OnlineUsersProvider>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+}));

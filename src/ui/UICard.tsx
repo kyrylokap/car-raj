@@ -8,13 +8,13 @@ type CardProps = ViewProps & {
   onPress?: () => void;
 } & UnistylesVariants<typeof styles>;
 
-export const UICard: React.FC<CardProps> = ({
+export const UICard = ({
   variant,
   children,
   onPress,
   style,
   ...props
-}) => {
+}: CardProps) => {
   styles.useVariants({ variant: variant || "elevated" });
 
   const Component = onPress ? TouchableOpacity : View;

@@ -1,6 +1,6 @@
 import React from "react";
 import { TextProps as RNTextProps, Text } from "react-native";
-import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
+import { StyleSheet, UnistylesRuntime, UnistylesVariants } from "react-native-unistyles";
 
 type UITextProps = RNTextProps & UnistylesVariants<typeof styles>;
 

@@ -2,18 +2,17 @@ import React from "react";
 import { View, ViewProps } from "react-native";
 import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
-type ContainerProps = ViewProps & {
+type UIContainerProps = ViewProps & {
   children: React.ReactNode;
 } & UnistylesVariants<typeof styles>;
 
-export const UIContainer: React.FC<ContainerProps> = ({
+export const UIContainer = ({
   padding,
   children,
   style,
   ...props
-}) => {
+}: UIContainerProps) => {
   styles.useVariants({ padding: padding || "md" });
-
   return (
     <View style={[styles.container, style]} {...props}>
       {children}

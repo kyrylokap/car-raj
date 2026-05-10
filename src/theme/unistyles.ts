@@ -1,5 +1,5 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StyleSheet } from "react-native-unistyles";
+import { useThemeStore } from "../store/themeStore";
 import { darkTheme, lightTheme } from "./themes";
 
 type AppThemes = {
@@ -11,20 +11,14 @@ declare module "react-native-unistyles" {
   export interface UnistylesThemes extends AppThemes {}
 }
 
-const initializeUnistyles = async () => {
-  const persistedTheme =
-    ((await AsyncStorage.getItem("@auto_raj_theme_mode")) as
-      | "light"
-      | "dark") || "light";
-  StyleSheet.configure({
-    settings: {
-      initialTheme: persistedTheme || "light",
+StyleSheet.configure({
+  settings: {
+    initialTheme: () => {
+      return useThemeStore.getState().theme;
     },
-    themes: {
-      light: lightTheme,
-      dark: darkTheme,
-    },
-  });
-};
-
-initializeUnistyles();
+  },
+  themes: {
+    light: lightTheme,
+    dark: darkTheme,
+  },
+});

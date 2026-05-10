@@ -8,7 +8,6 @@ import { FlashList } from "@shopify/flash-list";
 import React, { useRef } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { Presets } from "react-native-pulsar";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { useInfiniteSearchCars } from "../../api/car";
 import { useSearchFilters } from "../../hooks/useSearchFilters";
@@ -37,7 +36,6 @@ export default function SearchScreen() {
     data: infiniteData,
     refetch: refetchInfiniteData,
     isLoading,
-    isFetching,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
@@ -51,7 +49,7 @@ export default function SearchScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <UIContainer>
         <View style={styles.header}>
           {(() => {
@@ -139,7 +137,7 @@ export default function SearchScreen() {
           </View>
         )}
       </UIContainer>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -189,6 +187,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
   },
   header: {
     flexDirection: "row",

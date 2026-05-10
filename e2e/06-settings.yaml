@@ -1,0 +1,39 @@
+appId: com.kyrylokap.autoraj
+---
+- launchApp
+
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Allow"
+
+- runFlow:
+    when:
+      visible: "Continue as Guest"
+    commands:
+      - tapOn: "Continue as Guest"
+      - assertVisible:
+          id: "search-car-list"
+          timeout: 20000
+
+- tapOn: "Profile"
+- assertVisible:
+    id: "profile-screen"
+    timeout: 8000
+
+- tapOn: "Settings"
+
+- assertVisible:
+    text: "Dark Mode"
+    timeout: 5000
+
+- tapOn:
+    id: "dark-mode-switch"
+
+- tapOn:
+    id: "settings-back-button"
+
+- assertVisible:
+    id: "profile-screen"
+    timeout: 5000

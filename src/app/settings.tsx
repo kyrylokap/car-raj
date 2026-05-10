@@ -1,16 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
 import { Presets } from "react-native-pulsar";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  StyleSheet,
-  UnistylesRuntime,
-  useUnistyles,
-} from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { handleSignOut } from "../api/auth";
+import { useThemeStore } from "../store/themeStore";
 import { UICard, UIContainer, UIText } from "../ui";
 import {
   PhoneNumberModal,
@@ -30,6 +25,7 @@ type SettingItem = {
 export default function SettingsScreen() {
   const router = useRouter();
   const phoneNumberModalRef = useRef<PhoneNumberModalRef>(null);
+  const { theme, setTheme } = useThemeStore();
 
   const accountSettings: SettingItem[] = [
     {
@@ -110,8 +106,8 @@ export default function SettingsScreen() {
             name={item.icon as any}
             size={20}
             color={
-              item.color === "primary" 
-                ? styles.primaryIcon.color 
+              item.color === "primary"
+                ? styles.primaryIcon.color
                 : styles.secondaryIcon.color
             }
           />
@@ -133,19 +129,11 @@ export default function SettingsScreen() {
         {item.type === "toggle" && (
           <Switch
             testID="dark-mode-switch"
-            value={
-              item.label === "Dark Mode"
-                ? UnistylesRuntime.themeName === "dark"
-                : false
-            }
-            onValueChange={async (value) => {
+            value={item.label === "Dark Mode" ? theme === "dark" : false}
+            onValueChange={(value) => {
               Presets.System.selection();
               if (item.label === "Dark Mode") {
-                UnistylesRuntime.setTheme(value ? "dark" : "light");
-                await AsyncStorage.setItem(
-                  "@auto_raj_theme_mode",
-                  value ? "dark" : "light"
-                );
+                setTheme(value ? "dark" : "light");
               }
             }}
             trackColor={{
@@ -154,7 +142,7 @@ export default function SettingsScreen() {
             }}
             thumbColor={
               item.label === "Dark Mode"
-                ? UnistylesRuntime.themeName === "dark"
+                ? theme === "dark"
                   ? styles.primaryIcon.color
                   : styles.secondaryIcon.color
                 : styles.secondaryIcon.color
@@ -187,7 +175,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <View style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity
           testID="settings-back-button"
@@ -197,7 +185,11 @@ export default function SettingsScreen() {
             router.back();
           }}
         >
-          <Ionicons name="chevron-back" size={28} color={styles.headerIcon.color} />
+          <Ionicons
+            name="chevron-back"
+            size={28}
+            color={styles.headerIcon.color}
+          />
         </TouchableOpacity>
         <UIText size="xxl" weight="bold">
           Settings
@@ -271,11 +263,11 @@ export default function SettingsScreen() {
       </ScrollView>
 
       <PhoneNumberModal ref={phoneNumberModalRef} onClose={() => {}} />
-    </SafeAreaView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
   primaryIcon: {
     color: theme.colors.primary,
   },
@@ -307,6 +299,7 @@ const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
   },
   header: {
     flexDirection: "row",

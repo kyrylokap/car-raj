@@ -1,19 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { View, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
-import { UICard, UIText, UIButton } from "../ui";
-import { GoogleButton } from "../ui/components/GoogleButton";
-import { supabase } from "../api/supabase";
 import { useRouter } from "expo-router";
+import React from "react";
+import { ScrollView, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+import { supabase } from "../api/supabase";
+import { UIButton, UICard, UIText } from "../ui";
+import { GoogleButton } from "../ui/components/GoogleButton";
 
 export default function AuthScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView 
+    <View style={styles.safeArea}>
+      <ScrollView
         testID="auth-scroll-view"
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -22,11 +21,7 @@ export default function AuthScreen() {
           <View style={styles.header}>
             <View style={styles.brandRow}>
               <View style={styles.logoCircle}>
-                <Ionicons
-                  name="car-sport"
-                  size={28}
-                  color="#FFF"
-                />
+                <Ionicons name="car-sport" size={28} color="#FFF" />
               </View>
               <UIText size="lg" weight="bold">
                 Auto Raj
@@ -143,11 +138,11 @@ export default function AuthScreen() {
           </UICard>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
   secondaryIcon: {
     color: theme.colors.textSecondary,
   },
@@ -157,6 +152,8 @@ const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
+
+    paddingTop: rt.insets.top,
   },
   scrollContent: {
     flexGrow: 1,

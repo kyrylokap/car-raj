@@ -1,10 +1,5 @@
 import { Tabs } from "expo-router";
-import {
-  Badge,
-  Icon,
-  Label,
-  NativeTabs,
-} from "expo-router/unstable-native-tabs";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 import React from "react";
 import { Platform, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -17,16 +12,16 @@ export default function TabLayout() {
     return (
       <NativeTabs tintColor={styles.tint.color}>
         <NativeTabs.Trigger name="index">
-          <Label>Search</Label>
-          <Icon sf="magnifyingglass" />
+          <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="magnifyingglass" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="chats">
-          <Label>Chats</Label>
-          <Icon sf="bubble.left.and.bubble.right" />
+          <NativeTabs.Trigger.Label>Chats</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="bubble.left.and.bubble.right" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="profile">
-          <Label>Profile</Label>
-          <Icon sf="person" />
+          <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="person" />
         </NativeTabs.Trigger>
       </NativeTabs>
     );

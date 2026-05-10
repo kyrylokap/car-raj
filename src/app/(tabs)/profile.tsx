@@ -3,9 +3,8 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Presets } from "react-native-pulsar";
+import { StyleSheet } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCarsCount } from "../../api/car";
 import { UIText } from "../../ui";
@@ -13,6 +12,30 @@ import { UIBottomSheetRef } from "../../ui/UIBottomSheet";
 import { FavoritesSheet } from "../../ui/sheets/FavoritesSheet";
 import { MyVehiclesSheet } from "../../ui/sheets/MyVehiclesSheet";
 import { SellVehicleSheet } from "../../ui/sheets/SellVehicleSheet";
+
+const menuItems = [
+  {
+    icon: "car-outline",
+    label: "My vehicles",
+    subtitle: "Manage your active listings",
+    color: "primary",
+    action: "my-vehicles",
+  },
+  {
+    icon: "heart-outline",
+    label: "Favorites",
+    subtitle: "Cars you've saved",
+    color: "error",
+    action: "favorites",
+  },
+  {
+    icon: "settings-outline",
+    label: "Settings",
+    subtitle: "Preferences & privacy",
+    color: "textSecondary",
+    action: "settings",
+  },
+];
 
 export default function ProfileScreen() {
   const user = useUser();
@@ -30,41 +53,8 @@ export default function ProfileScreen() {
     .map((w: string) => w[0]?.toUpperCase() ?? "")
     .join("");
 
-  const menuItems = [
-    {
-      icon: "car-outline",
-      label: "My vehicles",
-      subtitle: "Manage your active listings",
-      color: "primary",
-      onPress: () => {
-        Presets.System.impactLight();
-        myVehiclesSheetRef.current?.present();
-      },
-    },
-    {
-      icon: "heart-outline",
-      label: "Favorites",
-      subtitle: "Cars you've saved",
-      color: "error",
-      onPress: () => {
-        Presets.System.selection();
-        favoritesSheetRef.current?.present();
-      },
-    },
-    {
-      icon: "settings-outline",
-      label: "Settings",
-      subtitle: "Preferences & privacy",
-      color: "textSecondary",
-      onPress: () => {
-        Presets.System.selection();
-        router.push("/settings");
-      },
-    },
-  ];
-
   return (
-    <SafeAreaView testID="profile-screen" style={styles.safeArea} edges={["top"]}>
+    <View testID="profile-screen" style={styles.safeArea}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -165,7 +155,18 @@ export default function ProfileScreen() {
                   index === menuItems.length - 1 && styles.menuItemLast,
                 ]}
                 activeOpacity={0.7}
-                onPress={item.onPress}
+                onPress={() => {
+                  if (item.action === "settings") {
+                    Presets.System.selection();
+                    router.push("/settings");
+                  } else if (item.action === "favorites") {
+                    Presets.System.selection();
+                    favoritesSheetRef.current?.present();
+                  } else if (item.action === "my-vehicles") {
+                    Presets.System.impactLight();
+                    myVehiclesSheetRef.current?.present();
+                  }
+                }}
               >
                 <View
                   style={[
@@ -179,10 +180,10 @@ export default function ProfileScreen() {
                     name={item.icon as any}
                     size={22}
                     color={
-                      item.color === "primary" 
-                        ? styles.primaryIcon.color 
-                        : item.color === "error" 
-                          ? styles.errorIcon.color 
+                      item.color === "primary"
+                        ? styles.primaryIcon.color
+                        : item.color === "error"
+                          ? styles.errorIcon.color
                           : styles.secondaryIcon.color
                     }
                   />
@@ -221,7 +222,7 @@ export default function ProfileScreen() {
       />
       <FavoritesSheet ref={favoritesSheetRef} />
       <SellVehicleSheet ref={sellVehicleSheetRef} />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -259,6 +260,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
   },
   scrollContent: {
     flexGrow: 1,
@@ -374,7 +376,6 @@ const styles = StyleSheet.create((theme, rt) => ({
     fontWeight: "600",
   },
   menuList: {
-    backgroundColor: theme.colors.surfaceElevated,
     borderRadius: theme.borderRadius.xxl,
     overflow: "hidden",
     ...theme.shadows.md,

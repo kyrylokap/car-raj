@@ -1,16 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
-import {
-  ActivityIndicator,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { FlashList } from "@shopify/flash-list";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { Presets } from "react-native-pulsar";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useUserCars } from "../../../api/car";
 import { useUserDetailsById } from "../../../api/userProfile";
 import { UIText } from "../../../ui";
@@ -29,7 +25,7 @@ export default function UserProfileWithCarsScreen() {
   } = useUserCars(params.userId as string);
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+    <View style={styles.safeArea}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
@@ -94,17 +90,15 @@ export default function UserProfileWithCarsScreen() {
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color={styles.primaryIcon.color} />
-            <UIText style={styles.loadingText}>
-              Loading cars...
-            </UIText>
+            <UIText style={styles.loadingText}>Loading cars...</UIText>
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme, rt) => ({
   primaryIcon: {
     color: theme.colors.primary,
   },
@@ -120,6 +114,7 @@ const styles = StyleSheet.create((theme) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
   },
   header: {
     flexDirection: "row",

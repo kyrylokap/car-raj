@@ -1,0 +1,35 @@
+appId: com.kyrylokap.autoraj
+tags:
+  - manual
+---
+- launchApp:
+    clearState: true
+
+- startRecording: google-login
+
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Allow"
+
+- assertVisible: "Continue with Google"
+
+- tapOn: "Continue with Google"
+
+- assertVisible:
+    text: "Choose an account"
+    timeout: 10000
+
+- tapOn:
+    text: ".*@.*"
+    index: 0
+
+- assertVisible:
+    id: "search-car-list"
+    timeout: 20000
+
+- assertVisible:
+    id: "filter-button"
+
+- stopRecording

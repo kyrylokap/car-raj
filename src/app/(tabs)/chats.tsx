@@ -1,9 +1,8 @@
 import { ChatListItem } from "@/src/ui/components/ChatListItem";
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import React from "react";
 import { ActivityIndicator, View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserChats } from "../../api/chat";
@@ -14,12 +13,7 @@ export default function MessengerScreen() {
   const user = useUser();
   const userId = user?.id;
 
-  const {
-    data: chats,
-    refetch,
-    isLoading,
-    isFetching,
-  } = useUserChats(userId);
+  const { data: chats, refetch, isLoading, isFetching } = useUserChats(userId);
 
   const { onlineUserIdSet } = useOnlineUsersContext();
   const otherOnlineCount = onlineUserIdSet.has(userId || "")
@@ -27,7 +21,7 @@ export default function MessengerScreen() {
     : onlineUserIdSet.size;
 
   return (
-    <SafeAreaView testID="chats-screen" style={styles.safeArea} edges={["top"]}>
+    <View testID="chats-screen" style={styles.safeArea}>
       <View style={styles.header}>
         <View>
           <UIText size="xxl" weight="bold">
@@ -79,13 +73,11 @@ export default function MessengerScreen() {
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color={styles.loader.color} />
-            <UIText style={styles.loadingText}>
-              Loading chats...
-            </UIText>
+            <UIText style={styles.loadingText}>Loading chats...</UIText>
           </View>
         </View>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -112,6 +104,8 @@ const styles = StyleSheet.create((theme, rt) => ({
   safeArea: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
+    paddingBottom: rt.insets.bottom,
   },
   header: {
     paddingHorizontal: theme.spacing.md,

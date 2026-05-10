@@ -19,7 +19,6 @@ import {
   Send,
 } from "react-native-gifted-chat";
 import { Presets } from "react-native-pulsar";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
 import { Message } from "../../api/message";
@@ -108,7 +107,7 @@ export default function ChatScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
@@ -264,7 +263,7 @@ export default function ChatScreen() {
           )}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -306,6 +305,10 @@ const styles = StyleSheet.create((theme, rt) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+    paddingTop: rt.insets.top,
+    paddingBottom: rt.insets.bottom,
+    paddingLeft: rt.insets.left,
+    paddingRight: rt.insets.right,
   },
   chatContainer: {
     flex: 1,

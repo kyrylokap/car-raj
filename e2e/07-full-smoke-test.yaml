@@ -1,0 +1,111 @@
+appId: com.kyrylokap.autoraj
+---
+- launchApp:
+    clearState: true
+
+- startRecording: full-smoke-test
+
+- runFlow:
+    when:
+      visible: "Allow"
+    commands:
+      - tapOn: "Allow"
+
+- assertVisible: "Continue as Guest"
+- tapOn: "Continue as Guest"
+
+- assertVisible:
+    id: "search-car-list"
+    timeout: 20000
+
+- assertVisible:
+    id: "filter-button"
+
+- tapOn:
+    id: "filter-button"
+
+- assertVisible:
+    text: "Filters"
+    timeout: 5000
+
+- tapOn: "Reset"
+- tapOn: "Show Results"
+
+- assertVisible:
+    id: "filter-button"
+    timeout: 5000
+
+- assertVisible:
+    id: "car-item-0"
+    timeout: 15000
+
+- tapOn:
+    id: "car-item-0"
+
+- assertVisible:
+    text: "Specifications"
+    timeout: 10000
+
+- tapOn:
+    id: "car-detail-favorite-button"
+
+- tapOn:
+    id: "car-detail-back-button"
+
+- assertVisible:
+    id: "search-car-list"
+    timeout: 5000
+
+- tapOn: "Chats"
+- assertVisible:
+    id: "chats-screen"
+    timeout: 8000
+
+- tapOn: "Profile"
+- assertVisible:
+    id: "profile-screen"
+    timeout: 8000
+
+- tapOn: "My vehicles"
+- assertVisible:
+    text: "My cars"
+    timeout: 5000
+- swipe:
+    direction: down
+
+- assertVisible:
+    id: "profile-screen"
+    timeout: 5000
+
+- tapOn: "Favorites"
+- assertVisible:
+    text: "Favorites"
+    timeout: 5000
+- swipe:
+    direction: down
+
+- assertVisible:
+    id: "profile-screen"
+    timeout: 5000
+
+- tapOn: "Settings"
+- assertVisible:
+    text: "Dark Mode"
+    timeout: 5000
+
+- tapOn:
+    id: "dark-mode-switch"
+
+- tapOn:
+    id: "settings-back-button"
+
+- assertVisible:
+    id: "profile-screen"
+    timeout: 5000
+
+- tapOn: "Search"
+- assertVisible:
+    id: "search-car-list"
+    timeout: 8000
+
+- stopRecording
