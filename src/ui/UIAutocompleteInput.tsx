@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { FlashList } from "@shopify/flash-list";
 import { useMemo, useRef, useState } from "react";
 import {
   Keyboard,
@@ -9,7 +10,6 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { FlashList } from "@shopify/flash-list";
 import { Presets } from "react-native-pulsar";
 import { StyleSheet } from "react-native-unistyles";
 import { useCarSuggestionsFormatted } from "../api/car";
@@ -90,107 +90,116 @@ export const UIAutocompleteInput = ({
   };
 
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View
+      style={[
+        styles.container,
+        containerStyle,
+        isOpen && { zIndex: 1000 }, // Ensure open dropdown is above all other content
+      ]}
+    >
       {label && (
         <UIText style={[styles.label, hasError && styles.labelError]}>
           {label}
         </UIText>
       )}
 
-      <View
-        style={[
-          styles.selector,
-          isOpen ? styles.selectorFocused : hasError && styles.selectorError,
-        ]}
-      >
-        <InputComponent
-          ref={inputRef}
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder={isOpen ? "Type to search..." : ""}
-          placeholderTextColor={styles.placeholderText.color}
-          onFocus={handleOpen}
-        />
+      <View style={styles.inputAnchor}>
+        <View
+          style={[
+            styles.selector,
+            isOpen ? styles.selectorFocused : hasError && styles.selectorError,
+          ]}
+        >
+          <InputComponent
+            ref={inputRef}
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder={isOpen ? "Type to search..." : ""}
+            placeholderTextColor={styles.placeholderText.color}
+            onFocus={handleOpen}
+          />
 
-        {!isOpen && (
-          <View
-            style={styles.selectedOverlay}
-            pointerEvents="none"
-          >
-            <UIText
-              style={value ? styles.selectedText : styles.placeholderText}
-              numberOfLines={1}
-            >
-              {value ? selectedLabel : placeholder || "Select item"}
-            </UIText>
-            <Ionicons
-              name="chevron-down"
-              size={20}
-              color={hasError ? styles.errorIcon.color : styles.placeholderText.color}
-            />
-          </View>
-        )}
-
-        {isOpen && (
-          <TouchableOpacity onPress={handleClose} hitSlop={8}>
-            <Ionicons
-              name="close-circle"
-              size={20}
-              color={styles.placeholderText.color}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {isOpen && (
-        <>
-          {options.length > 0 && (
-            <View style={styles.dropdownList}>
-              <FlashList
-                data={options}
-                keyExtractor={(item: any) => item.id}
-                keyboardShouldPersistTaps="handled"
-                style={styles.scrollView}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item }: { item: any }) => (
-                  <TouchableOpacity
-                    style={[
-                      styles.option,
-                      item.id === value && styles.optionSelected,
-                    ]}
-                    onPress={() => handleSelect(item)}
-                    activeOpacity={0.6}
-                  >
-                    <UIText
-                      style={[
-                        styles.optionText,
-                        item.id === value && styles.optionTextSelected,
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {item.title}
-                    </UIText>
-                    {item.id === value && (
-                      <Ionicons
-                        name="checkmark"
-                        size={18}
-                        color={styles.primaryIcon.color}
-                      />
-                    )}
-                  </TouchableOpacity>
-                )}
+          {!isOpen && (
+            <View style={styles.selectedOverlay} pointerEvents="none">
+              <UIText
+                style={value ? styles.selectedText : styles.placeholderText}
+                numberOfLines={1}
+              >
+                {value ? selectedLabel : placeholder || "Select item"}
+              </UIText>
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={
+                  hasError
+                    ? styles.errorIcon.color
+                    : styles.placeholderText.color
+                }
               />
             </View>
           )}
 
-          {options.length === 0 && searchQuery.length > 0 && (
-            <View style={styles.emptyState}>
-              <UIText style={styles.emptyText}>No results found</UIText>
-            </View>
+          {isOpen && (
+            <TouchableOpacity onPress={handleClose} hitSlop={8}>
+              <Ionicons
+                name="close-circle"
+                size={20}
+                color={styles.placeholderText.color}
+              />
+            </TouchableOpacity>
           )}
-        </>
-      )}
+        </View>
+
+        {isOpen && (
+          <>
+            {options.length > 0 && (
+              <View style={styles.dropdownList}>
+                <FlashList
+                  data={options}
+                  keyExtractor={(item: any) => item.id}
+                  keyboardShouldPersistTaps="handled"
+                  style={styles.scrollView}
+                  showsVerticalScrollIndicator={false}
+                  renderItem={({ item }: { item: any }) => (
+                    <TouchableOpacity
+                      style={[
+                        styles.option,
+                        item.id === value && styles.optionSelected,
+                      ]}
+                      onPress={() => handleSelect(item)}
+                      activeOpacity={0.6}
+                    >
+                      <UIText
+                        style={[
+                          styles.optionText,
+                          item.id === value && styles.optionTextSelected,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {item.title}
+                      </UIText>
+                      {item.id === value && (
+                        <Ionicons
+                          name="checkmark"
+                          size={18}
+                          color={styles.primaryIcon.color}
+                        />
+                      )}
+                    </TouchableOpacity>
+                  )}
+                />
+              </View>
+            )}
+
+            {options.length === 0 && searchQuery.length > 0 && (
+              <View style={styles.emptyState}>
+                <UIText style={styles.emptyText}>No results found</UIText>
+              </View>
+            )}
+          </>
+        )}
+      </View>
 
       {errorMessage && (
         <UIText
@@ -216,6 +225,10 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.lg,
   },
+  inputAnchor: {
+    position: "relative",
+    zIndex: 1,
+  },
   primaryIcon: {
     color: theme.colors.primary,
   },
@@ -224,6 +237,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   container: {
     marginBottom: theme.spacing.lg,
+    zIndex: 1,
   },
   label: {
     ...theme.typography.bodySmall,
@@ -278,13 +292,18 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.text,
   },
   dropdownList: {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    right: 0,
     backgroundColor: theme.colors.surfaceElevated,
     borderRadius: theme.borderRadius.xl,
-    overflow: "hidden",
-    marginTop: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.borderLight,
-    ...theme.shadows.md,
+    ...theme.shadows.lg,
+    zIndex: 1000,
+    overflow: "hidden",
+    marginTop: theme.spacing.xs,
   },
   scrollView: {
     maxHeight: 250,
