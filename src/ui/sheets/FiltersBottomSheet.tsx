@@ -40,12 +40,21 @@ export const FiltersBottomSheet = forwardRef<UIBottomSheetRef, FiltersBottomShee
           <View style={styles.footerRow}>
             <UIButton
               variant="ghost"
+              testID="filter-reset-button"
+              accessibilityLabel="filter-reset-button"
+              accessible={true}
               onPress={handleResetFilters}
               style={styles.resetBtn}
             >
               <UIText color="text">Reset</UIText>
             </UIButton>
-            <UIButton onPress={handleChangeFilters} style={styles.applyBtn}>
+            <UIButton
+              testID="filter-apply-button"
+              accessibilityLabel="filter-apply-button"
+              accessible={true}
+              onPress={handleChangeFilters}
+              style={styles.applyBtn}
+            >
               <UIText color="white">Show Results</UIText>
             </UIButton>
           </View>

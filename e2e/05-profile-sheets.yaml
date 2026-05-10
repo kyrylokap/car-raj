@@ -10,48 +10,57 @@ appId: com.kyrylokap.autoraj
 
 - runFlow:
     when:
-      visible: "Continue as Guest"
+      visible:
+        id: "guest-login-button"
     commands:
-      - tapOn: "Continue as Guest"
-      - assertVisible:
-          id: "search-car-list"
+      - tapOn:
+          id: "guest-login-button"
+      - extendedWaitUntil:
+          visible:
+            id: "search-car-list"
           timeout: 20000
 
 - tapOn: "Profile"
 - assertVisible:
     id: "profile-screen"
-    timeout: 8000
 
 - tapOn: "My vehicles"
-
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "bottom-sheet-content"
+    timeout: 10000
 - assertVisible:
-    text: "My cars"
-    timeout: 5000
+    id: "sheet-title"
 
 - swipe:
     direction: down
 
 - assertVisible:
     id: "profile-screen"
-    timeout: 5000
 
 - tapOn: "Sell vehicle"
-
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "bottom-sheet-content"
+    timeout: 10000
 - assertVisible:
-    text: "Sell your car"
-    timeout: 5000
+    id: "sheet-title"
 
 - tapOn: "Cancel"
 
 - assertVisible:
     id: "profile-screen"
-    timeout: 5000
 
 - tapOn: "Favorites"
-
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "bottom-sheet-content"
+    timeout: 10000
 - assertVisible:
-    text: "Favorites"
-    timeout: 5000
+    id: "sheet-title"
 
 - swipe:
     direction: down

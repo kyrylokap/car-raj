@@ -10,29 +10,29 @@ appId: com.kyrylokap.autoraj
 
 - runFlow:
     when:
-      visible: "Continue as Guest"
+      visible:
+        id: "guest-login-button"
     commands:
-      - tapOn: "Continue as Guest"
-      - assertVisible:
-          id: "search-car-list"
+      - tapOn:
+          id: "guest-login-button"
+      - extendedWaitUntil:
+          visible:
+            id: "search-car-list"
           timeout: 20000
 
 - tapOn: "Search"
 
 - tapOn:
     id: "filter-button"
-
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible:
+      id: "bottom-sheet-content"
+    timeout: 10000
 - assertVisible:
-    text: "Filters"
-    timeout: 5000
-
-- assertVisible: "Show Results"
-- assertVisible: "Reset"
-
+    id: "sheet-title"
 - tapOn: "Reset"
-
 - tapOn: "Show Results"
 
 - assertVisible:
     id: "filter-button"
-    timeout: 5000

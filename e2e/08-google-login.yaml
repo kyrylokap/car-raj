@@ -19,14 +19,14 @@ tags:
 
 - assertVisible:
     text: "Choose an account"
-    timeout: 10000
 
 - tapOn:
     text: ".*@.*"
     index: 0
 
-- assertVisible:
-    id: "search-car-list"
+- extendedWaitUntil:
+    visible:
+      id: "search-car-list"
     timeout: 20000
 
 - assertVisible:

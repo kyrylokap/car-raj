@@ -10,25 +10,26 @@ appId: com.kyrylokap.autoraj
 
 - runFlow:
     when:
-      visible: "Continue as Guest"
+      visible:
+        id: "guest-login-button"
     commands:
-      - tapOn: "Continue as Guest"
-      - assertVisible:
-          id: "search-car-list"
+      - tapOn:
+          id: "guest-login-button"
+      - extendedWaitUntil:
+          visible:
+            id: "search-car-list"
           timeout: 20000
 
 - tapOn: "Search"
 
 - assertVisible:
     id: "car-item-0"
-    timeout: 15000
 
 - tapOn:
     id: "car-item-0"
 
 - assertVisible:
     text: "Specifications"
-    timeout: 10000
 
 - assertVisible:
     id: "car-detail-back-button"
@@ -41,4 +42,3 @@ appId: com.kyrylokap.autoraj
 
 - assertVisible:
     id: "search-car-list"
-    timeout: 5000

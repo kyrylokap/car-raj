@@ -11,12 +11,15 @@ appId: com.kyrylokap.autoraj
     commands:
       - tapOn: "Allow"
 
-- assertVisible: "Continue as Guest"
-
-- tapOn: "Continue as Guest"
-
 - assertVisible:
-    id: "search-car-list"
+    id: "guest-login-button"
+
+- tapOn:
+    id: "guest-login-button"
+
+- extendedWaitUntil:
+    visible:
+      id: "search-car-list"
     timeout: 20000
 
 - assertVisible:
