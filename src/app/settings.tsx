@@ -12,127 +12,10 @@ import {
   PhoneNumberModalRef,
 } from "../ui/components/PhoneNumberModal";
 
-type SettingItem = {
-  icon: string;
-  label: string;
-  subtitle?: string;
-  type: "navigation" | "toggle";
-  onPress?: () => void;
-  color?: string;
-};
-
 export default function SettingsScreen() {
   const router = useRouter();
   const phoneNumberModalRef = useRef<PhoneNumberModalRef>(null);
   const { theme, setTheme } = useThemeStore();
-
-  const accountSettings: SettingItem[] = [
-    {
-      icon: "phone-portrait",
-      label: "Phone number",
-      subtitle: "Allow customers call you",
-      type: "navigation",
-      color: "primary",
-      onPress: () => phoneNumberModalRef.current?.present(),
-    },
-  ];
-
-  const appSettings: SettingItem[] = [
-    {
-      icon: "moon-outline",
-      label: "Dark Mode",
-      subtitle: "Switch between light and dark theme",
-      type: "toggle",
-      color: "textSecondary",
-    },
-  ];
-
-  const renderSettingItem = (
-    item: SettingItem,
-    index: number,
-    array: SettingItem[],
-  ) => {
-    const isLast = index === array.length - 1;
-
-    return (
-      <TouchableOpacity
-        key={index}
-        style={[styles.settingItem, isLast && styles.settingItemLast]}
-        activeOpacity={item.type === "toggle" ? 1 : 0.7}
-        onPress={() => {
-          if (item.type === "navigation") {
-            Presets.System.selection();
-            if (item.onPress) {
-              item.onPress();
-            }
-          }
-        }}
-        disabled={item.type === "toggle"}
-      >
-        <View
-          style={[
-            styles.settingIconContainer,
-            item.color === "primary" ? styles.bgPrimary : styles.bgSecondary,
-          ]}
-        >
-          <Ionicons
-            name={item.icon as any}
-            size={20}
-            color={
-              item.color === "primary"
-                ? styles.primaryIcon.color
-                : styles.secondaryIcon.color
-            }
-          />
-        </View>
-        <View style={styles.settingContent}>
-          <UIText weight="medium" style={styles.settingLabel}>
-            {item.label}
-          </UIText>
-          {item.subtitle && (
-            <UIText
-              size="xs"
-              color="textSecondary"
-              style={styles.settingSubtitle}
-            >
-              {item.subtitle}
-            </UIText>
-          )}
-        </View>
-        {item.type === "toggle" && (
-          <Switch
-            testID="dark-mode-switch"
-            value={item.label === "Dark Mode" ? theme === "dark" : false}
-            onValueChange={(value) => {
-              Presets.System.selection();
-              if (item.label === "Dark Mode") {
-                setTheme(value ? "dark" : "light");
-              }
-            }}
-            trackColor={{
-              false: styles.switchTrack.borderColor,
-              true: styles.switchTrack.color,
-            }}
-            thumbColor={
-              item.label === "Dark Mode"
-                ? theme === "dark"
-                  ? styles.primaryIcon.color
-                  : styles.secondaryIcon.color
-                : styles.secondaryIcon.color
-            }
-          />
-        )}
-        {item.type === "navigation" && (
-          <Ionicons
-            name="chevron-forward"
-            hitSlop={14}
-            size={18}
-            color={styles.secondaryIcon.color}
-          />
-        )}
-      </TouchableOpacity>
-    );
-  };
 
   return (
     <View style={styles.safeArea}>
@@ -148,7 +31,7 @@ export default function SettingsScreen() {
           <Ionicons
             name="chevron-back"
             size={28}
-            color={styles.headerIcon.color}
+            color={`${styles.headerIcon.color}`}
           />
         </TouchableOpacity>
         <UIText size="xxl" weight="bold">
@@ -170,9 +53,40 @@ export default function SettingsScreen() {
             >
               ACCOUNT
             </UIText>
-            {accountSettings.map((item, index) =>
-              renderSettingItem(item, index, accountSettings),
-            )}
+            <TouchableOpacity
+              style={styles.settingItem}
+              activeOpacity={0.7}
+              onPress={() => {
+                Presets.System.selection();
+                phoneNumberModalRef.current?.present();
+              }}
+            >
+              <View style={[styles.settingIconContainer, styles.bgPrimary]}>
+                <Ionicons
+                  name="phone-portrait"
+                  size={20}
+                  color={styles.primaryIcon.color}
+                />
+              </View>
+              <View style={styles.settingContent}>
+                <UIText weight="medium" style={styles.settingLabel}>
+                  Phone number
+                </UIText>
+                <UIText
+                  size="xs"
+                  color="textSecondary"
+                  style={styles.settingSubtitle}
+                >
+                  Allow customers call you
+                </UIText>
+              </View>
+              <Ionicons
+                name="chevron-forward"
+                hitSlop={14}
+                size={18}
+                color={styles.secondaryIcon.color}
+              />
+            </TouchableOpacity>
           </UICard>
 
           <UICard variant="outlined" style={styles.settingsCard}>
@@ -183,9 +97,44 @@ export default function SettingsScreen() {
             >
               APP SETTINGS
             </UIText>
-            {appSettings.map((item, index) =>
-              renderSettingItem(item, index, appSettings),
-            )}
+            <TouchableOpacity style={styles.settingItem} activeOpacity={1}>
+              <View style={[styles.settingIconContainer, styles.bgSecondary]}>
+                <Ionicons
+                  name="moon-outline"
+                  size={20}
+                  color={styles.secondaryIcon.color}
+                />
+              </View>
+              <View style={styles.settingContent}>
+                <UIText weight="medium" style={styles.settingLabel}>
+                  Dark Mode
+                </UIText>
+                <UIText
+                  size="xs"
+                  color="textSecondary"
+                  style={styles.settingSubtitle}
+                >
+                  Switch between light and dark theme
+                </UIText>
+              </View>
+              <Switch
+                testID="dark-mode-switch"
+                value={theme === "dark"}
+                onValueChange={(value) => {
+                  Presets.System.selection();
+                  setTheme(value ? "dark" : "light");
+                }}
+                trackColor={{
+                  false: styles.switchTrack.borderColor,
+                  true: styles.switchTrack.color,
+                }}
+                thumbColor={
+                  theme === "dark"
+                    ? styles.primaryIcon.color
+                    : styles.secondaryIcon.color
+                }
+              />
+            </TouchableOpacity>
           </UICard>
 
           <TouchableOpacity
@@ -227,14 +176,8 @@ const styles = StyleSheet.create((theme, rt) => ({
   bgSecondary: {
     backgroundColor: `${theme.colors.textSecondary}15`,
   },
-  textSecondary: {
-    color: theme.colors.textSecondary,
-  },
-  primary: {
-    color: theme.colors.primary,
-  },
   headerIcon: {
-    color: theme.colors.text,
+    color: theme.colors.primary,
   },
   logoutIcon: {
     color: theme.colors.error,
@@ -283,11 +226,6 @@ const styles = StyleSheet.create((theme, rt) => ({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     gap: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.borderLight,
-  },
-  settingItemLast: {
-    borderBottomWidth: 0,
   },
   settingIconContainer: {
     width: 40,

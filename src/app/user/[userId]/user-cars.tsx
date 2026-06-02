@@ -21,7 +21,6 @@ export default function UserProfileWithCarsScreen() {
     refetch,
     isRefetching,
     isLoading,
-    isFetching,
   } = useUserCars(params.userId as string);
 
   return (

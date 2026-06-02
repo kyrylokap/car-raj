@@ -1,6 +1,12 @@
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React from "react";
-import { StyleProp, TextInputProps, TextStyle, View, ViewStyle } from "react-native";
+import {
+  StyleProp,
+  TextInputProps,
+  TextStyle,
+  View,
+  ViewStyle,
+} from "react-native";
 import {
   StyleSheet,
   UnistylesVariants,
@@ -24,22 +30,32 @@ export const UIInput = ({
   ...props
 }: InputProps) => {
   const hasError = !!errorMessage || variantHasError;
+  const { theme } = useUnistyles();
 
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
-        <UIText style={[styles.label, hasError && styles.labelError] as StyleProp<TextStyle>}>
+        <UIText
+          style={
+            [
+              styles.label,
+              hasError && styles.labelError,
+            ] as StyleProp<TextStyle>
+          }
+        >
           {label}
         </UIText>
       )}
       <BottomSheetTextInput
-        style={[
-          styles.input,
-          hasError && styles.inputError,
-          variantFocused && styles.inputFocused,
-          style,
-        ] as StyleProp<TextStyle>}
-        placeholderTextColor={styles.placeholder.color}
+        style={
+          [
+            styles.input,
+            hasError && styles.inputError,
+            variantFocused && styles.inputFocused,
+            style,
+          ] as StyleProp<TextStyle>
+        }
+        placeholderTextColor={theme.colors.textSecondary}
         {...props}
       />
       {errorMessage && (
@@ -57,9 +73,6 @@ export const UIInput = ({
 };
 
 const styles = StyleSheet.create((theme) => ({
-  placeholder: {
-    color: theme.colors.textSecondary,
-  },
   container: {
     marginBottom: theme.spacing.lg,
   },
@@ -133,4 +146,3 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing.xs,
   },
 }));
-
