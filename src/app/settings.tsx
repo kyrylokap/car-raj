@@ -16,8 +16,7 @@ type SettingItem = {
   icon: string;
   label: string;
   subtitle?: string;
-  value?: string;
-  type: "navigation" | "toggle" | "value";
+  type: "navigation" | "toggle";
   onPress?: () => void;
   color?: string;
 };
@@ -44,32 +43,6 @@ export default function SettingsScreen() {
       label: "Dark Mode",
       subtitle: "Switch between light and dark theme",
       type: "toggle",
-      color: "textSecondary",
-    },
-    {
-      icon: "language-outline",
-      label: "Language",
-      subtitle: "English",
-      value: "English",
-      type: "value",
-      color: "textSecondary",
-    },
-  ];
-
-  const supportSettings: SettingItem[] = [
-    {
-      icon: "help-circle-outline",
-      label: "Help & Support",
-      subtitle: "Get help and contact support",
-      type: "navigation",
-      color: "textSecondary",
-    },
-
-    {
-      icon: "information-circle-outline",
-      label: "About",
-      subtitle: "App version 1.0.0",
-      type: "navigation",
       color: "textSecondary",
     },
   ];
@@ -149,19 +122,6 @@ export default function SettingsScreen() {
             }
           />
         )}
-        {item.type === "value" && (
-          <View style={styles.settingValue}>
-            <UIText size="sm" color="textSecondary">
-              {item.value}
-            </UIText>
-            <Ionicons
-              hitSlop={14}
-              name="chevron-forward"
-              size={18}
-              color={styles.secondaryIcon.color}
-            />
-          </View>
-        )}
         {item.type === "navigation" && (
           <Ionicons
             name="chevron-forward"
@@ -225,19 +185,6 @@ export default function SettingsScreen() {
             </UIText>
             {appSettings.map((item, index) =>
               renderSettingItem(item, index, appSettings),
-            )}
-          </UICard>
-
-          <UICard variant="outlined" style={styles.settingsCard}>
-            <UIText
-              size="sm"
-              color="textSecondary"
-              style={styles.sectionHeader}
-            >
-              SUPPORT & LEGAL
-            </UIText>
-            {supportSettings.map((item, index) =>
-              renderSettingItem(item, index, supportSettings),
             )}
           </UICard>
 
@@ -358,11 +305,6 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
   settingSubtitle: {
     marginTop: 2,
-  },
-  settingValue: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.xs,
   },
   logoutButton: {
     flexDirection: "row",

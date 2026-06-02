@@ -2,11 +2,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Keyboard,
-  Platform,
   Pressable,
   TouchableOpacity,
   View,
@@ -21,10 +19,11 @@ import {
 import { Presets } from "react-native-pulsar";
 import { StyleSheet } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
-import { Message } from "../../api/message";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
 import { useChatScreen } from "../../hooks/useChatScreen";
-import { UIText } from "../../ui";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { UIText } from "@/src/ui";
+import { Message } from "@/src/api/message";
 
 function toGiftedMessage(msg: Message): IMessage {
   return {
@@ -41,7 +40,7 @@ export default function ChatScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const chatId = id as string;
-
+  const { top } = useSafeAreaInsets();
   const {
     userId,
     messages,
@@ -88,27 +87,14 @@ export default function ChatScreen() {
     [onSendAsync],
   );
 
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
-
-  useEffect(() => {
-    if (Platform.OS !== "ios") return;
-
-    const showSubscription = Keyboard.addListener("keyboardWillShow", (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-    });
-    const hideSubscription = Keyboard.addListener("keyboardWillHide", () => {
-      setKeyboardHeight(0);
-    });
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+      >
         <TouchableOpacity
           onPress={() => {
             Presets.System.impactLight();
@@ -178,91 +164,89 @@ export default function ChatScreen() {
         </Pressable>
       </View>
 
-      <View style={[styles.chatContainer, { paddingBottom: keyboardHeight }]}>
-        <GiftedChat
-          messages={giftedMessages}
-          onSend={onSend}
-          user={{ _id: userId ?? "" }}
-          isTyping={userTyping}
-          keyboardAvoidingViewProps={{
-            enabled: false,
-          }}
-          loadEarlierMessagesProps={{
-            isAvailable: hasNextPage ?? false,
-            isLoading: isLoadingMessages,
-            onPress: () => {
-              fetchNextPage();
-            },
-            isInfiniteScrollEnabled: true,
-          }}
-          isAvatarOnTop
-          isAvatarVisibleForEveryMessage={false}
-          renderAvatar={null}
-          maxComposerHeight={120}
-          timeTextStyle={{
-            right: { color: styles.chatTime.color, opacity: 0.7 },
-            left: { color: styles.chatTimeLeft.color },
-          }}
-          textInputProps={{
-            placeholder: "Type a message...",
-            placeholderTextColor: styles.textInputPlaceholder.color,
-            onChangeText: onInputTextChanged,
-            style: {
-              color: styles.textInput.color,
-              backgroundColor: styles.textInput.backgroundColor,
-              borderRadius: 22,
-              borderWidth: 1,
-              borderColor: styles.textInput.borderColor,
-              paddingHorizontal: styles.textInput.paddingHorizontal,
-              fontSize: styles.textInput.fontSize,
-            },
-          }}
-          renderBubble={(props) => (
-            <Bubble
-              {...props}
-              wrapperStyle={{
-                right: {
-                  backgroundColor: styles.bubbleRight.backgroundColor,
-                  borderBottomRightRadius: 4,
-                },
-                left: {
-                  backgroundColor: styles.bubbleLeft.backgroundColor,
-                  borderBottomLeftRadius: 4,
-                },
-              }}
-              textStyle={{
-                right: { color: styles.bubbleRight.color },
-                left: { color: styles.bubbleLeft.color },
-              }}
-            />
-          )}
-          renderInputToolbar={(props) => (
-            <InputToolbar
-              {...props}
-              containerStyle={styles.inputToolbar}
-              primaryStyle={styles.inputPrimary}
-            />
-          )}
-          renderSend={(props) => (
-            <Send {...props} containerStyle={styles.sendContainer}>
-              <View style={styles.sendButton}>
-                <Ionicons
-                  name="send"
-                  size={styles.sendIcon.size}
-                  color={styles.sendIcon.color}
-                />
-              </View>
-            </Send>
-          )}
-          renderLoading={() => (
-            <ActivityIndicator
-              size="large"
-              color={styles.loader.color}
-              style={{ flex: 1 }}
-            />
-          )}
-        />
-      </View>
+      <GiftedChat
+        messages={giftedMessages}
+        onSend={onSend}
+        user={{ _id: userId ?? "" }}
+        isTyping={userTyping}
+        keyboardAvoidingViewProps={{
+          keyboardVerticalOffset: headerHeight + top,
+        }}
+        loadEarlierMessagesProps={{
+          isAvailable: hasNextPage ?? false,
+          isLoading: isLoadingMessages,
+          onPress: () => {
+            fetchNextPage();
+          },
+          isInfiniteScrollEnabled: true,
+        }}
+        isAvatarOnTop
+        isAvatarVisibleForEveryMessage={false}
+        renderAvatar={null}
+        timeTextStyle={{
+          right: { color: styles.chatTime.color, opacity: 0.7 },
+          left: { color: styles.chatTimeLeft.color },
+        }}
+        textInputProps={{
+          placeholder: "Type a message...",
+          placeholderTextColor: styles.textInputPlaceholder.color,
+          onChangeText: onInputTextChanged,
+          style: {
+            color: styles.textInput.color,
+            backgroundColor: styles.textInput.backgroundColor,
+            borderRadius: 22,
+            borderWidth: 1,
+            borderColor: styles.textInput.borderColor,
+            paddingHorizontal: styles.textInput.paddingHorizontal,
+            fontSize: styles.textInput.fontSize,
+            maxHeight: 120,
+          },
+        }}
+        renderBubble={(props) => (
+          <Bubble
+            {...props}
+            wrapperStyle={{
+              right: {
+                backgroundColor: styles.bubbleRight.backgroundColor,
+                borderBottomRightRadius: 4,
+              },
+              left: {
+                backgroundColor: styles.bubbleLeft.backgroundColor,
+                borderBottomLeftRadius: 4,
+              },
+            }}
+            textStyle={{
+              right: { color: styles.bubbleRight.color },
+              left: { color: styles.bubbleLeft.color },
+            }}
+          />
+        )}
+        renderInputToolbar={(props) => (
+          <InputToolbar
+            {...props}
+            containerStyle={styles.inputToolbar}
+            primaryStyle={styles.inputPrimary}
+          />
+        )}
+        renderSend={(props) => (
+          <Send {...props} containerStyle={styles.sendContainer}>
+            <View style={styles.sendButton}>
+              <Ionicons
+                name="send"
+                size={styles.sendIcon.size}
+                color={styles.sendIcon.color}
+              />
+            </View>
+          </Send>
+        )}
+        renderLoading={() => (
+          <ActivityIndicator
+            size="large"
+            color={styles.loader.color}
+            style={{ flex: 1 }}
+          />
+        )}
+      />
     </View>
   );
 }
@@ -305,20 +289,16 @@ const styles = StyleSheet.create((theme, rt) => ({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    paddingTop: rt.insets.top,
     paddingBottom: rt.insets.bottom,
     paddingLeft: rt.insets.left,
     paddingRight: rt.insets.right,
   },
-  chatContainer: {
-    flex: 1,
-  },
   header: {
+    paddingTop: rt.insets.top,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.lg,
-    minHeight: theme.vs(70),
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
     backgroundColor: theme.colors.background,
@@ -374,7 +354,6 @@ const styles = StyleSheet.create((theme, rt) => ({
     borderTopColor: theme.colors.borderLight,
     paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm + rt.insets.bottom,
   },
   inputPrimary: {
     flexDirection: "row",
@@ -393,10 +372,5 @@ const styles = StyleSheet.create((theme, rt) => ({
     backgroundColor: theme.colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
-    shadowRadius: 8,
-    elevation: 6,
   },
 }));

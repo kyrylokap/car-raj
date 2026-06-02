@@ -13,7 +13,13 @@ export default function MessengerScreen() {
   const user = useUser();
   const userId = user?.id;
 
-  const { data: chats, refetch, isLoading, isFetching } = useUserChats(userId);
+  const {
+    data: chats,
+    refetch,
+    isLoading,
+    isFetching,
+    isRefetching,
+  } = useUserChats(userId);
 
   const { onlineUserIdSet } = useOnlineUsersContext();
   const otherOnlineCount = onlineUserIdSet.has(userId || "")
@@ -50,7 +56,7 @@ export default function MessengerScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          !isLoading ? (
+          !isRefetching ? (
             <View style={styles.emptyState}>
               <View style={styles.emptyIconWrap}>
                 <Ionicons
@@ -69,7 +75,7 @@ export default function MessengerScreen() {
           ) : null
         }
       />
-      {isLoading && (
+      {isRefetching && (
         <View style={styles.loadingOverlay} pointerEvents="none">
           <View style={styles.loadingCard}>
             <ActivityIndicator size="large" color={styles.loader.color} />
