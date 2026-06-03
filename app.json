@@ -4,12 +4,12 @@
     "slug": "auto-raj",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/car-raj-icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "com.kyrylokap.autoraj",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/car-raj-icon.png",
+      "image": "./assets/images/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -29,8 +29,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/car-raj-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#f9f9f9"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.kyrylokap.autoraj",
@@ -39,7 +39,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/car-raj-icon.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
