@@ -158,7 +158,7 @@ export default function SettingsScreen() {
         </UIContainer>
       </ScrollView>
 
-      <PhoneNumberModal ref={phoneNumberModalRef} onClose={() => {}} />
+      <PhoneNumberModal ref={phoneNumberModalRef} />
     </View>
   );
 }

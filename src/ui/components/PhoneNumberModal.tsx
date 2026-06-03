@@ -13,16 +13,9 @@ import { UIButton } from "../UIButton";
 import { UIInput } from "../UIInput";
 import { UIText } from "../UIText";
 
-interface PhoneNumberModalProps {
-  onClose: () => void;
-}
-
 export type { UIBottomSheetRef as PhoneNumberModalRef } from "../UIBottomSheet";
 
-export const PhoneNumberModal = forwardRef<
-  UIBottomSheetRef,
-  PhoneNumberModalProps
->(({ onClose }, ref) => {
+export const PhoneNumberModal = forwardRef<UIBottomSheetRef>((_, ref) => {
   const [phone, setPhone] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { mutateAsync } = useUpdatePhoneNumber();
@@ -44,11 +37,7 @@ export const PhoneNumberModal = forwardRef<
   };
 
   return (
-    <UIBottomSheet
-      ref={bottomSheetRef}
-      onDismiss={onClose}
-      enableDynamicSizing={true}
-    >
+    <UIBottomSheet ref={bottomSheetRef} enableDynamicSizing={true}>
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.iconContainer}>
