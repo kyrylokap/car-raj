@@ -170,7 +170,7 @@ export default function ChatScreen() {
         user={{ _id: userId ?? "" }}
         isTyping={userTyping}
         keyboardAvoidingViewProps={{
-          keyboardVerticalOffset: headerHeight + top,
+          keyboardVerticalOffset: headerHeight / 2 + top,
         }}
         loadEarlierMessagesProps={{
           isAvailable: hasNextPage ?? false,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.borderLight,
     backgroundColor: theme.colors.background,

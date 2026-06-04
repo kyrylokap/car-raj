@@ -10,7 +10,11 @@ import {
 import { BlurView } from "expo-blur";
 import React, { forwardRef, memo, useCallback } from "react";
 import { View } from "react-native";
-import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
+import {
+  StyleSheet,
+  UnistylesRuntime,
+  useUnistyles,
+} from "react-native-unistyles";
 import { UIText } from "./UIText";
 
 export type { BottomSheetModal as UIBottomSheetRef } from "@gorhom/bottom-sheet";
@@ -21,6 +25,36 @@ type UIBottomSheetProps = {
   footer?: React.ReactNode;
   scrollable?: boolean;
 } & BottomSheetModalProps;
+
+const ThemedBottomSheetModal = forwardRef<
+  BottomSheetModal,
+  BottomSheetModalProps
+>((props, ref) => {
+  const { theme } = useUnistyles();
+
+  return (
+    <BottomSheetModal
+      {...props}
+      ref={ref}
+      backgroundStyle={{
+        backgroundColor: theme.colors.background,
+        borderTopLeftRadius: theme.borderRadius.xl,
+        borderTopRightRadius: theme.borderRadius.xl,
+      }}
+      handleStyle={{
+        backgroundColor: theme.colors.background,
+        borderTopLeftRadius: theme.borderRadius.xl,
+        borderTopRightRadius: theme.borderRadius.xl,
+      }}
+      handleIndicatorStyle={{
+        backgroundColor: theme.colors.borderDark,
+        width: theme.s(56),
+        height: theme.s(5),
+        borderRadius: theme.borderRadius.full,
+      }}
+    />
+  );
+});
 
 export const UIBottomSheet = memo(
   forwardRef<BottomSheetModal, UIBottomSheetProps>(
@@ -74,16 +108,13 @@ export const UIBottomSheet = memo(
       );
 
       return (
-        <BottomSheetModal
+        <ThemedBottomSheetModal
           keyboardBehavior="interactive"
           keyboardBlurBehavior="restore"
           backdropComponent={renderBackdrop}
           footerComponent={footer ? renderFooter : undefined}
-          handleStyle={styles.handleStyle}
-          backgroundStyle={styles.backgroundStyle}
           ref={ref}
           enableDynamicSizing={props.enableDynamicSizing ?? true}
-          handleIndicatorStyle={styles.handleIndicatorStyle}
           {...props}
         >
           {title != null && (
@@ -99,7 +130,7 @@ export const UIBottomSheet = memo(
           )}
 
           {content}
-        </BottomSheetModal>
+        </ThemedBottomSheetModal>
       );
     },
   ),
@@ -116,22 +147,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingBottom: theme.spacing.sm,
     width: "100%",
     alignItems: "center",
-  },
-  handleStyle: {
-    borderTopLeftRadius: theme.borderRadius.xl,
-    borderTopRightRadius: theme.borderRadius.xl,
-    backgroundColor: theme.colors.background,
-  },
-  backgroundStyle: {
-    backgroundColor: theme.colors.background,
-    borderTopLeftRadius: theme.borderRadius.xl,
-    borderTopRightRadius: theme.borderRadius.xl,
-  },
-  handleIndicatorStyle: {
-    backgroundColor: theme.colors.borderDark,
-    width: theme.s(56),
-    height: theme.s(5),
-    borderRadius: theme.borderRadius.full,
   },
   footerContainer: {
     padding: theme.spacing.lg,
