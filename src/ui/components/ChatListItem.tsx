@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -43,18 +43,18 @@ export const ChatListItem = ({
       translateX.value = withSpring(0);
       return;
     }
-    Presets.System.selection();
+    Haptics.selectionAsync();
     router.push(`/chat/${chat.id}`);
   };
 
   const handleNavigateToCarWithHaptic = (e: any) => {
     e.stopPropagation();
-    Presets.System.selection();
+    Haptics.selectionAsync();
     router.push(`/car/${chat.car_id}`);
   };
 
   const handleDelete = () => {
-    Presets.System.impactMedium();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     deleteChat();
     translateX.value = withTiming(-500, { duration: 250 });
   };
@@ -69,9 +69,17 @@ export const ChatListItem = ({
     .onEnd(() => {
       if (translateX.value < SWIPE_THRESHOLD / 2) {
         // Делаем пружину жестче (stiffness) и четче
-        translateX.value = withSpring(SWIPE_THRESHOLD, { damping: 25, stiffness: 180, mass: 0.8 });
+        translateX.value = withSpring(SWIPE_THRESHOLD, {
+          damping: 25,
+          stiffness: 180,
+          mass: 0.8,
+        });
       } else {
-        translateX.value = withSpring(0, { damping: 25, stiffness: 180, mass: 0.8 });
+        translateX.value = withSpring(0, {
+          damping: 25,
+          stiffness: 180,
+          mass: 0.8,
+        });
       }
     });
 
@@ -80,14 +88,19 @@ export const ChatListItem = ({
   }));
 
   const deleteButtonStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(translateX.value, [-100, -20], [1, 0], Extrapolation.CLAMP),
+    opacity: interpolate(
+      translateX.value,
+      [-100, -20],
+      [1, 0],
+      Extrapolation.CLAMP,
+    ),
     transform: [
       {
         translateX: interpolate(
           translateX.value,
           [SWIPE_THRESHOLD, 0],
           [0, 100],
-          Extrapolation.CLAMP
+          Extrapolation.CLAMP,
         ),
       },
     ],
@@ -113,7 +126,12 @@ export const ChatListItem = ({
           activeOpacity={0.7}
         >
           <Ionicons name="trash" size={26} color={styles.whiteIcon.color} />
-          <UIText color="white" size="xs" weight="bold" style={{ marginTop: 4 }}>
+          <UIText
+            color="white"
+            size="xs"
+            weight="bold"
+            style={{ marginTop: 4 }}
+          >
             Delete
           </UIText>
         </TouchableOpacity>
@@ -163,7 +181,11 @@ export const ChatListItem = ({
                 </UIText>
               </View>
 
-              <UIText size="xs" color="textSecondary" style={styles.timeTitleRow}>
+              <UIText
+                size="xs"
+                color="textSecondary"
+                style={styles.timeTitleRow}
+              >
                 {carTitle ?? "Loading car..."} · {lastMessageTime}
               </UIText>
 
@@ -192,8 +214,14 @@ export const ChatListItem = ({
                   contentFit="cover"
                 />
               ) : (
-                <View style={[styles.carThumbnail, styles.carThumbnailFallback]}>
-                  <Ionicons name="car-sport" size={20} color={styles.primaryIcon.color} />
+                <View
+                  style={[styles.carThumbnail, styles.carThumbnailFallback]}
+                >
+                  <Ionicons
+                    name="car-sport"
+                    size={20}
+                    color={styles.primaryIcon.color}
+                  />
                 </View>
               )}
             </TouchableOpacity>

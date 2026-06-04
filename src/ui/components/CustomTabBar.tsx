@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet } from "react-native-unistyles";
 import { UIText } from "../UIText";
@@ -47,7 +47,7 @@ export const CustomTabBar = () => {
   };
 
   const handlePress = (route: string) => {
-    Presets.System.selection();
+    Haptics.selectionAsync();
     router.push(route as any);
   };
 

@@ -3,7 +3,7 @@ import { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { forwardRef } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCars } from "../../api/car";
@@ -45,7 +45,7 @@ export const MyVehiclesSheet = forwardRef<
               style={styles.headerSellBtn}
               activeOpacity={0.8}
               onPress={() => {
-                Presets.System.impactLight();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 onSellPress?.();
                 (ref as any).current?.dismiss();
               }}
@@ -92,7 +92,7 @@ export const MyVehiclesSheet = forwardRef<
               style={styles.sellCardCTA}
               activeOpacity={0.8}
               onPress={() => {
-                Presets.System.impactLight();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 if (onSellPress) {
                   onSellPress();
                 } else {

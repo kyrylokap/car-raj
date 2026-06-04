@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useUserCars } from "../../../api/car";
@@ -28,7 +28,7 @@ export default function UserProfileWithCarsScreen() {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => {
-            Presets.System.impactLight();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.back();
           }}
           style={styles.backButton}

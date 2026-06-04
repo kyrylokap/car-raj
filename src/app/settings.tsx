@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { ScrollView, Switch, TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 import { handleSignOut } from "../api/auth";
 import { useThemeStore } from "../store/themeStore";
@@ -24,7 +24,7 @@ export default function SettingsScreen() {
           testID="settings-back-button"
           style={styles.backButton}
           onPress={() => {
-            Presets.System.impactLight();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.back();
           }}
         >
@@ -57,7 +57,7 @@ export default function SettingsScreen() {
               style={styles.settingItem}
               activeOpacity={0.7}
               onPress={() => {
-                Presets.System.selection();
+                Haptics.selectionAsync();
                 phoneNumberModalRef.current?.present();
               }}
             >
@@ -121,7 +121,7 @@ export default function SettingsScreen() {
                 testID="dark-mode-switch"
                 value={theme === "dark"}
                 onValueChange={(value) => {
-                  Presets.System.selection();
+                  Haptics.selectionAsync();
                   setTheme(value ? "dark" : "light");
                 }}
                 trackColor={{
@@ -139,7 +139,7 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             onPress={() => {
-              Presets.System.impactMedium();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
               handleSignOut();
               router.replace("/auth");
             }}

@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useCarImages } from "../../api/car";
@@ -59,7 +59,10 @@ export default function CarDetailsScreen() {
         <View style={styles.heroContainer}>
           {imagesIsFetching || imagesIsLoading ? (
             <View style={styles.heroPlaceholder}>
-              <ActivityIndicator size="large" color={styles.primaryIcon.color} />
+              <ActivityIndicator
+                size="large"
+                color={styles.primaryIcon.color}
+              />
             </View>
           ) : (
             <ImagesCarousel images={carImages!} hero />
@@ -222,7 +225,7 @@ export default function CarDetailsScreen() {
           testID="car-detail-back-button"
           style={styles.headerBtn}
           onPress={() => {
-            Presets.System.impactLight();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.back();
           }}
           hitSlop={14}
@@ -233,7 +236,7 @@ export default function CarDetailsScreen() {
           testID="car-detail-favorite-button"
           style={styles.headerBtn}
           onPress={() => {
-            Presets.System.selection();
+            Haptics.selectionAsync();
             handleToggleFavorite();
           }}
           hitSlop={14}

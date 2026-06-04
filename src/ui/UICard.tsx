@@ -1,11 +1,12 @@
+import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 import React from "react";
 import { TouchableOpacity, View, ViewProps } from "react-native";
-import { Presets } from "react-native-pulsar";
 import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
 type CardProps = ViewProps & {
   children: React.ReactNode;
   onPress?: () => void;
+  hapticsFeedbackStyle?: ImpactFeedbackStyle;
 } & UnistylesVariants<typeof styles>;
 
 export const UICard = ({
@@ -13,6 +14,7 @@ export const UICard = ({
   children,
   onPress,
   style,
+  hapticsFeedbackStyle = ImpactFeedbackStyle.Light,
   ...props
 }: CardProps) => {
   styles.useVariants({ variant: variant || "elevated" });
@@ -21,7 +23,7 @@ export const UICard = ({
 
   const handlePress = () => {
     if (onPress) {
-      Presets.System.selection();
+      impactAsync(hapticsFeedbackStyle);
       onPress();
     }
   };

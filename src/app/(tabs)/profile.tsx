@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCarsCount } from "../../api/car";
@@ -105,7 +105,7 @@ export default function ProfileScreen() {
             style={styles.statCard}
             activeOpacity={0.7}
             onPress={() => {
-              Presets.System.impactLight();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               myVehiclesSheetRef.current?.present();
             }}
           >
@@ -130,7 +130,7 @@ export default function ProfileScreen() {
             style={styles.sellBtn}
             activeOpacity={0.8}
             onPress={() => {
-              Presets.System.impactLight();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               sellVehicleSheetRef.current?.present();
             }}
           >
@@ -157,13 +157,13 @@ export default function ProfileScreen() {
                 activeOpacity={0.7}
                 onPress={() => {
                   if (item.action === "settings") {
-                    Presets.System.selection();
+                    Haptics.selectionAsync();
                     router.push("/settings");
                   } else if (item.action === "favorites") {
-                    Presets.System.selection();
+                    Haptics.selectionAsync();
                     favoritesSheetRef.current?.present();
                   } else if (item.action === "my-vehicles") {
-                    Presets.System.impactLight();
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     myVehiclesSheetRef.current?.present();
                   }
                 }}

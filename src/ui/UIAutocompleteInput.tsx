@@ -10,7 +10,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 import { useCarSuggestionsFormatted } from "../api/car";
 import { UIText } from "./UIText";
@@ -66,7 +66,7 @@ export const UIAutocompleteInput = ({
   }, [options, value]);
 
   const handleSelect = (item: any) => {
-    Presets.System.selection();
+    Haptics.selectionAsync();
     onChangeText(item.id);
     setSearchQuery("");
     setIsOpen(false);
@@ -75,7 +75,7 @@ export const UIAutocompleteInput = ({
 
   const handleOpen = () => {
     if (!isOpen) {
-      Presets.System.selection();
+      Haptics.selectionAsync();
       setIsOpen(true);
       setSearchQuery("");
       inputRef.current?.focus();
@@ -83,7 +83,7 @@ export const UIAutocompleteInput = ({
   };
 
   const handleClose = () => {
-    Presets.System.selection();
+    Haptics.selectionAsync();
     setIsOpen(false);
     setSearchQuery("");
     Keyboard.dismiss();

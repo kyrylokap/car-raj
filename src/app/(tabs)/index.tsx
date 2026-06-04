@@ -7,7 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import React, { useRef } from "react";
 import { ActivityIndicator, TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 import { useInfiniteSearchCars } from "../../api/car";
 import { useSearchFilters } from "../../hooks/useSearchFilters";
@@ -75,7 +75,7 @@ export default function SearchScreen() {
             testID="filter-button"
             style={styles.filterButton}
             onPress={() => {
-              Presets.System.impactLight();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               filtersBottomSheetRef.current?.present();
             }}
           >

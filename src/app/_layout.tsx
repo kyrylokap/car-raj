@@ -11,7 +11,7 @@ import { useNotifications } from "../api/useNotifications";
 import { OnlineUsersProvider } from "../contexts/OnlineUsersContext";
 import { StatusBar } from "expo-status-bar";
 import { View } from "react-native";
-import { StyleSheet, withUnistyles, useUnistyles } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 const queryClient = new QueryClient();
 Presets.engineRev();

@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import Carousel, { ICarouselInstance } from "react-native-reanimated-carousel";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { UIText } from "../UIText";
 
 const pickImages = async () => {
@@ -45,7 +45,7 @@ export const ImagesCarousel = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const deleteImage = () => {
-    Presets.System.impactMedium();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (!setImages) return;
     setImages((prev) => {
       const updated = [...prev];
@@ -60,7 +60,7 @@ export const ImagesCarousel = ({
     onImagesChange?.(images.length - 1);
   };
   const handlePickImages = async () => {
-    Presets.System.impactLight();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newImages = await pickImages();
     setImages!((prev) => {
       const resultImages = [...prev, ...newImages];
@@ -89,7 +89,7 @@ export const ImagesCarousel = ({
             <Pressable
               style={{ flex: 1 }}
               onLongPress={() => {
-                Presets.System.impactMedium();
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                 setSelectedImage(imageUrl);
                 setModalVisible(true);
               }}
@@ -137,7 +137,7 @@ export const ImagesCarousel = ({
             <TouchableOpacity
               style={{ flex: 1, width: "100%" }}
               onPress={() => {
-                Presets.System.selection();
+                Haptics.selectionAsync();
                 setModalVisible(false);
               }}
             >
@@ -175,7 +175,11 @@ export const ImagesCarousel = ({
             style={styles.imageUploadButton}
             onPress={handlePickImages}
           >
-            <Ionicons name="camera" size={24} color={styles.primaryIcon.color} />
+            <Ionicons
+              name="camera"
+              size={24}
+              color={styles.primaryIcon.color}
+            />
           </TouchableOpacity>
         </View>
       ) : null}

@@ -3,10 +3,10 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { TouchableOpacity, View } from "react-native";
-import { Presets } from "react-native-pulsar";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { Car, useCarFirstImage } from "../../api/car";
 import { UIText } from "../UIText";
+import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 
 export const CarItem = ({
   item,
@@ -29,7 +29,7 @@ export const CarItem = ({
   const isLoading = isFirstImageFetching || isFirstImageLoading;
 
   const handlePress = () => {
-    Presets.System.impactMedium();
+    impactAsync(ImpactFeedbackStyle.Light);
     if (onPress) {
       onPress();
     } else {

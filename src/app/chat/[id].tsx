@@ -16,7 +16,7 @@ import {
   InputToolbar,
   Send,
 } from "react-native-gifted-chat";
-import { Presets } from "react-native-pulsar";
+import * as Haptics from "expo-haptics";
 import { StyleSheet } from "react-native-unistyles";
 import { getChatById, useCarTitle, useUserProfile } from "../../api/chat";
 import { useOnlineUsersContext } from "../../contexts/OnlineUsersContext";
@@ -81,7 +81,7 @@ export default function ChatScreen() {
 
   const onSend = useCallback(
     (newMessages: IMessage[]) => {
-      Presets.System.impactMedium();
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       onSendAsync(newMessages);
     },
     [onSendAsync],
@@ -97,7 +97,7 @@ export default function ChatScreen() {
       >
         <TouchableOpacity
           onPress={() => {
-            Presets.System.impactLight();
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             handleLeaveChat();
           }}
           style={styles.backButton}
@@ -113,7 +113,7 @@ export default function ChatScreen() {
         <Pressable
           style={styles.headerInfo}
           onPress={() => {
-            Presets.System.selection();
+            Haptics.selectionAsync();
             router.push(`/user/${chattingUserId ?? ""}/user-cars`);
           }}
         >

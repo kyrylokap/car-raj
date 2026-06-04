@@ -4,13 +4,14 @@ import {
   TouchableOpacity,
   TouchableOpacityProps,
 } from "react-native";
-import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
+import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 
-import { Presets } from "react-native-pulsar";
+import { StyleSheet, UnistylesVariants } from "react-native-unistyles";
 
 type ButtonProps = TouchableOpacityProps & {
   loading?: boolean;
   children: React.ReactNode;
+  hapticsFeedbackStyle?: ImpactFeedbackStyle;
 } & UnistylesVariants<typeof styles>;
 
 export const UIButton: React.FC<ButtonProps> = ({
@@ -20,6 +21,7 @@ export const UIButton: React.FC<ButtonProps> = ({
   children,
   disabled,
   style,
+  hapticsFeedbackStyle = ImpactFeedbackStyle.Light,
   onPress,
   ...props
 }) => {
@@ -29,7 +31,8 @@ export const UIButton: React.FC<ButtonProps> = ({
   });
 
   const handlePress = (e: any) => {
-    Presets.System.impactLight();
+    if (hapticsFeedbackStyle) impactAsync(hapticsFeedbackStyle);
+
     onPress?.(e);
   };
 
