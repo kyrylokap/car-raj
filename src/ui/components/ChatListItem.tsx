@@ -60,7 +60,7 @@ export const ChatListItem = ({
   };
 
   const gesture = Gesture.Pan()
-    .activeOffsetX([-20, 20]) // Увеличили порог, чтобы не "люфтило" при скролле
+    .activeOffsetX([-20, 20])
     .failOffsetY([-10, 10])
     .onChange((event) => {
       const nextX = translateX.value + event.changeX;
@@ -68,7 +68,6 @@ export const ChatListItem = ({
     })
     .onEnd(() => {
       if (translateX.value < SWIPE_THRESHOLD / 2) {
-        // Делаем пружину жестче (stiffness) и четче
         translateX.value = withSpring(SWIPE_THRESHOLD, {
           damping: 25,
           stiffness: 180,

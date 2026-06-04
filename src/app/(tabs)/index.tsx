@@ -92,9 +92,8 @@ export default function SearchScreen() {
 
         <FlashList
           testID="search-car-list"
-          onRefresh={() => {
-            refetchInfiniteData();
-          }}
+          onRefresh={refetchInfiniteData}
+          keyboardDismissMode="on-drag"
           refreshing={isRefetching}
           data={cars}
           renderItem={({ item, index }) => {

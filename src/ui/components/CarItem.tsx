@@ -7,6 +7,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { Car, useCarFirstImage } from "../../api/car";
 import { UIText } from "../UIText";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
+import { formatPostedTime } from "../../utils/time";
 
 export const CarItem = ({
   item,
@@ -72,6 +73,17 @@ export const CarItem = ({
           style={styles.scrim}
           pointerEvents="none"
         />
+
+        <View style={styles.timeBadge}>
+          <Ionicons
+            name="time-outline"
+            size={11}
+            color="rgba(255,255,255,0.75)"
+          />
+          <UIText size="xxs" style={styles.timeBadgeText}>
+            {formatPostedTime(item?.created_at)}
+          </UIText>
+        </View>
 
         <View style={styles.priceBadge}>
           <UIText size="sm" style={styles.priceText}>
@@ -206,6 +218,24 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.borderRadius.full,
     paddingHorizontal: theme.spacing.sm,
     paddingVertical: theme.spacing.xs,
+  },
+  timeBadge: {
+    position: "absolute",
+    top: theme.spacing.md,
+    left: theme.spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.s(4),
+    backgroundColor: "rgba(0,0,0,0.65)",
+    backdropFilter: "blur(8px)",
+    borderRadius: theme.borderRadius.full,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+  },
+  timeBadgeText: {
+    color: "rgba(255,255,255,0.9)",
+    fontSize: theme.s(11),
+    fontWeight: "500",
   },
   locationText: {
     color: "rgba(255,255,255,0.9)",

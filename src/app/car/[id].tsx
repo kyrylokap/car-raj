@@ -15,6 +15,7 @@ import { useCarImages } from "../../api/car";
 import { useCarDetails } from "../../hooks/useCarDetails";
 import { UIButton, UIText } from "../../ui";
 import { ImagesCarousel } from "../../ui/components/ImagesCarousel";
+import { formatPostedTime } from "../../utils/time";
 
 export default function CarDetailsScreen() {
   const router = useRouter();
@@ -83,6 +84,16 @@ export default function CarDetailsScreen() {
               <UIText size="xs" color="textSecondary">
                 {car?.year} · {car?.location}
               </UIText>
+              <View style={styles.postedRow}>
+                <Ionicons
+                  name="time-outline"
+                  size={13}
+                  color={styles.postedIcon.color}
+                />
+                <UIText size="xs" color="textSecondary">
+                  Posted {formatPostedTime(car?.created_at)}
+                </UIText>
+              </View>
             </View>
             <View style={styles.pricePill}>
               <UIText size="sm" style={styles.priceLabel}>
@@ -345,6 +356,15 @@ const styles = StyleSheet.create((theme, rt) => ({
   priceLabel: {
     color: theme.colors.textSecondary,
     fontSize: 11,
+  },
+  postedRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.s(4),
+    marginTop: theme.s(2),
+  },
+  postedIcon: {
+    color: theme.colors.textSecondary,
   },
 
   statStrip: {
