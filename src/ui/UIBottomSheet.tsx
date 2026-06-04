@@ -5,6 +5,7 @@ import {
   BottomSheetFooterProps,
   BottomSheetModal,
   BottomSheetModalProps,
+  BottomSheetView,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import { BlurView } from "expo-blur";
@@ -94,7 +95,6 @@ export const UIBottomSheet = memo(
         <BottomSheetScrollView
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          automaticallyAdjustKeyboardInsets={true}
           contentContainerStyle={
             footer ? styles.scrollContentWithFooter : undefined
           }
@@ -102,9 +102,11 @@ export const UIBottomSheet = memo(
           {children}
         </BottomSheetScrollView>
       ) : (
-        <View style={footer ? styles.scrollContentWithFooter : undefined}>
+        <BottomSheetView
+          style={footer ? styles.scrollContentWithFooter : undefined}
+        >
           {children}
-        </View>
+        </BottomSheetView>
       );
 
       return (

@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import React, { useRef } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import * as Haptics from "expo-haptics";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, withUnistyles } from "react-native-unistyles";
 import { useUser } from "../../api/auth";
 import { useUserCarsCount } from "../../api/car";
 import { UIText } from "../../ui";
@@ -12,6 +12,8 @@ import { UIBottomSheetRef } from "../../ui/UIBottomSheet";
 import { FavoritesSheet } from "../../ui/sheets/FavoritesSheet";
 import { MyVehiclesSheet } from "../../ui/sheets/MyVehiclesSheet";
 import { SellVehicleSheet } from "../../ui/sheets/SellVehicleSheet";
+
+const UniImage = withUnistyles(Image);
 
 const menuItems = [
   {
@@ -68,7 +70,7 @@ export default function ProfileScreen() {
         <View style={styles.profileSection}>
           <View style={styles.avatarWrap}>
             {user?.user_metadata?.avatar_url ? (
-              <Image
+              <UniImage
                 style={styles.avatar}
                 source={{ uri: user.user_metadata.avatar_url }}
                 cachePolicy="memory-disk"
@@ -87,12 +89,12 @@ export default function ProfileScreen() {
               <UIText size="xl" weight="bold" style={styles.nameText}>
                 {name}
               </UIText>
-              <Ionicons
+              {/*<Ionicons
                 name="checkmark-circle"
                 size={22}
                 color={styles.primaryIcon.color}
                 style={styles.verifiedIcon}
-              />
+              />*/}
             </View>
             <UIText size="sm" color="textSecondary">
               {user?.email}
@@ -274,9 +276,11 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
 
   profileSection: {
-    alignItems: "center",
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: theme.spacing.xl,
     paddingHorizontal: theme.spacing.lg,
+    gap: theme.spacing.lg,
   },
   avatarWrap: {
     marginBottom: theme.spacing.lg,
@@ -284,8 +288,8 @@ const styles = StyleSheet.create((theme, rt) => ({
     justifyContent: "center",
   },
   avatar: {
-    width: theme.s(110),
-    height: theme.s(110),
+    width: theme.s(70),
+    height: theme.s(70),
     borderRadius: theme.borderRadius.full,
     borderWidth: 3,
     borderColor: theme.colors.surface,
@@ -304,7 +308,7 @@ const styles = StyleSheet.create((theme, rt) => ({
     fontWeight: "700",
   },
   infoWrap: {
-    alignItems: "center",
+    alignItems: "flex-start",
   },
   nameRow: {
     flexDirection: "row",

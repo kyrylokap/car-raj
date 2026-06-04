@@ -37,7 +37,7 @@ export const PhoneNumberModal = forwardRef<UIBottomSheetRef>((_, ref) => {
   };
 
   return (
-    <UIBottomSheet ref={bottomSheetRef} enableDynamicSizing={true}>
+    <UIBottomSheet ref={bottomSheetRef} scrollable={false}>
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.iconContainer}>

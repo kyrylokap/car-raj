@@ -20,7 +20,10 @@ interface FiltersBottomSheetProps {
 
 export type { UIBottomSheetRef as FiltersBottomSheetRef } from "../UIBottomSheet";
 
-export const FiltersBottomSheet = forwardRef<UIBottomSheetRef, FiltersBottomSheetProps>(
+export const FiltersBottomSheet = forwardRef<
+  UIBottomSheetRef,
+  FiltersBottomSheetProps
+>(
   (
     {
       draftFilters,
@@ -35,7 +38,7 @@ export const FiltersBottomSheet = forwardRef<UIBottomSheetRef, FiltersBottomShee
         ref={ref}
         title="Filters"
         enableDynamicSizing={false}
-        snapPoints={["90%"]}
+        snapPoints={["50%"]}
         footer={
           <View style={styles.footerRow}>
             <UIButton
@@ -204,8 +207,8 @@ export const FiltersBottomSheet = forwardRef<UIBottomSheetRef, FiltersBottomShee
 
 const styles = StyleSheet.create((theme) => ({
   content: {
-    paddingTop: 20,
-    paddingBottom: 300,
+    paddingTop: theme.vs(20),
+    paddingBottom: theme.vs(100),
   },
   section: {
     paddingHorizontal: theme.spacing.lg,

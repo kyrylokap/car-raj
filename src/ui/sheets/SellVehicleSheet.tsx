@@ -76,6 +76,10 @@ export const SellVehicleSheet = forwardRef<
   return (
     <UIBottomSheet
       ref={bottomSheetRef}
+      enableDynamicSizing={false}
+      snapPoints={["92%"]}
+      onDismiss={onDismiss}
+      footer={footer}
       title={
         <View style={styles.titleContainer}>
           <View style={styles.titleRow}>
@@ -92,10 +96,6 @@ export const SellVehicleSheet = forwardRef<
           </View>
         </View>
       }
-      enableDynamicSizing={false}
-      snapPoints={["92%"]}
-      onDismiss={onDismiss}
-      footer={footer}
     >
       <View style={styles.scrollContent}>
         <View style={styles.imagesContainer}>
@@ -108,7 +108,11 @@ export const SellVehicleSheet = forwardRef<
           />
           {errors.images && (
             <View style={styles.imageError}>
-              <Ionicons name="warning" size={16} color={styles.errorIcon.color} />
+              <Ionicons
+                name="warning"
+                size={16}
+                color={styles.errorIcon.color}
+              />
               <UIText size="xs" weight="medium" color="error">
                 {errors.images}
               </UIText>
@@ -239,7 +243,11 @@ export const SellVehicleSheet = forwardRef<
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionIcon}>
-                <Ionicons name="cash" size={18} color={styles.primaryIcon.color} />
+                <Ionicons
+                  name="cash"
+                  size={18}
+                  color={styles.primaryIcon.color}
+                />
               </View>
               <UIText size="md" weight="semibold" style={styles.sectionTitle}>
                 Pricing & Location
