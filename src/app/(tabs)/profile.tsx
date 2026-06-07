@@ -58,6 +58,7 @@ export default function ProfileScreen() {
   return (
     <View testID="profile-screen" style={styles.safeArea}>
       <ScrollView
+        bounces={false}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >

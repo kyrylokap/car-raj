@@ -54,6 +54,7 @@ export default function CarDetailsScreen() {
   return (
     <View style={styles.root}>
       <ScrollView
+        bounces={false}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scroll}
       >
