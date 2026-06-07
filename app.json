@@ -11,7 +11,8 @@
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#f9f9f9"
+      "backgroundColor": "#f9f9f9",
+      "width": 250
     },
     "ios": {
       "supportsTablet": true,
@@ -36,11 +37,7 @@
       "package": "com.kyrylokap.autoraj",
       "permissions": ["android.permission.RECORD_AUDIO"]
     },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/icon.png"
-    },
+
     "plugins": [
       "expo-router",
       [
