@@ -6,8 +6,7 @@ const BASE_WIDTH = 390;
 const BASE_HEIGHT = 844;
 
 const scale = (size: number) => (SCREEN_WIDTH / BASE_WIDTH) * size;
-const verticalScale = (size: number) =>
-  (SCREEN_HEIGHT / BASE_HEIGHT) * size;
+const verticalScale = (size: number) => (SCREEN_HEIGHT / BASE_HEIGHT) * size;
 
 export const breakpoints = {
   xs: 0,
@@ -141,41 +140,41 @@ export const lightTheme = {
 
 export const darkTheme = {
   colors: {
-    primary: "#6366F1", // Indigo 500
-    primaryLight: "#818CF8", // Indigo 400
-    primaryDark: "#4F46E5", // Indigo 600
-    secondary: "#A855F7", // Purple 500
-    secondaryLight: "#C084FC", // Purple 400
-    secondaryDark: "#9333EA", // Purple 600
-    success: "#10B981", // Emerald 500
-    successLight: "#34D399", // Emerald 400
-    successDark: "#059669", // Emerald 600
-    warning: "#F59E0B", // Amber 500
-    warningLight: "#FBBF24", // Amber 400
-    warningDark: "#D97706", // Amber 600
-    error: "#EF4444", // Red 500
-    errorLight: "#F87171", // Red 400
-    errorDark: "#DC2626", // Red 600
-    background: "#020617", // Slate 950
-    backgroundSecondary: "#0F172A", // Slate 900
-    surface: "#1E293B", // Slate 800
-    surfaceVariant: "#334155", // Slate 700
-    surfaceElevated: "#0F172A", // Slate 900
-    text: "#F8FAFC", // Slate 50
-    textSecondary: "#94A3B8", // Slate 400
-    textTertiary: "#64748B", // Slate 500
-    textInverse: "#020617",
-    border: "#1E293B", // Slate 800
-    borderLight: "#334155", // Slate 700
-    borderDark: "#0F172A", // Slate 900
-    white: "#F8FAFC",
-    black: "#020617",
-    tabBar: "#0F172A",
-    card: "#1E293B",
-    overlay: "rgba(0, 0, 0, 0.8)",
-    backdrop: "rgba(2, 6, 23, 0.85)",
-    shadow: "rgba(0, 0, 0, 0.5)",
-    shadowDark: "rgba(0, 0, 0, 0.7)",
+    primary: "#6366F1",
+    primaryLight: "#818CF8",
+    primaryDark: "#4F46E5",
+    secondary: "#A855F7",
+    secondaryLight: "#C084FC",
+    secondaryDark: "#9333EA",
+    success: "#22C55E",
+    successLight: "#4ADE80",
+    successDark: "#16A34A",
+    warning: "#F59E0B",
+    warningLight: "#FBBF24",
+    warningDark: "#D97706",
+    error: "#EF4444",
+    errorLight: "#F87171",
+    errorDark: "#DC2626",
+    background: "#000000",
+    backgroundSecondary: "#050505",
+    surface: "#0A0A0A",
+    surfaceVariant: "#121212",
+    surfaceElevated: "#171717",
+    text: "#FFFFFF",
+    textSecondary: "#A1A1AA",
+    textTertiary: "#71717A",
+    textInverse: "#000000",
+    border: "#18181B",
+    borderLight: "#27272A",
+    borderDark: "#09090B",
+    white: "#FFFFFF",
+    black: "#000000",
+    tabBar: "#050505",
+    card: "#0A0A0A",
+    overlay: "rgba(0,0,0,0.8)",
+    backdrop: "rgba(60,60,60,0.9)",
+    shadow: "rgba(0,0,0,0.5)",
+    shadowDark: "rgba(0,0,0,0.8)",
   },
   spacing: {
     xs: 4,

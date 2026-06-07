@@ -91,11 +91,7 @@ export const UIAutocompleteInput = ({
 
   return (
     <View
-      style={[
-        styles.container,
-        containerStyle,
-        isOpen && { zIndex: 1000 }, // Ensure open dropdown is above all other content
-      ]}
+      style={[styles.container, containerStyle, isOpen && { zIndex: 1000 }]}
     >
       {label && (
         <UIText style={[styles.label, hasError && styles.labelError]}>

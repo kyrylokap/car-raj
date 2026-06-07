@@ -279,12 +279,13 @@ export async function getOrCreateChatForCar(
 
 export const useDeleteChat = ({ chatId }: { chatId: string }) => {
   const queryClient = useQueryClient();
-  const user = useUser();
-  const userId = user?.id;
   return useMutation({
     mutationKey: ["deleteChat", chatId],
     mutationFn: async () => {
       return await deleteChat(chatId);
+    },
+    onMutate: () => {
+      queryClient.invalidateQueries({ queryKey: ["userChats"] });
     },
   });
 };

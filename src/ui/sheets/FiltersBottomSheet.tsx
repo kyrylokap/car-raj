@@ -38,7 +38,7 @@ export const FiltersBottomSheet = forwardRef<
         ref={ref}
         title="Filters"
         enableDynamicSizing={false}
-        snapPoints={["50%"]}
+        snapPoints={["50%", "80%"]}
         footer={
           <View style={styles.footerRow}>
             <UIButton

@@ -48,7 +48,7 @@ const ThemedBottomSheetModal = forwardRef<
         borderTopRightRadius: theme.borderRadius.xl,
       }}
       handleIndicatorStyle={{
-        backgroundColor: theme.colors.borderDark,
+        backgroundColor: theme.colors.textTertiary,
         width: theme.s(56),
         height: theme.s(5),
         borderRadius: theme.borderRadius.full,
