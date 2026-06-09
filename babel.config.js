@@ -16,7 +16,7 @@ module.exports = function (api) {
           root: "./",
         },
       ],
-      "react-native-worklets/plugin",
+      ["react-native-worklets/plugin", { processNestedWorklets: true }],
     ],
   };
 };

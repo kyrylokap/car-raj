@@ -16,7 +16,6 @@ export default function MessengerScreen() {
   const {
     data: chats,
     refetch,
-    isLoading,
     isFetching,
     isRefetching,
   } = useUserChats(userId);

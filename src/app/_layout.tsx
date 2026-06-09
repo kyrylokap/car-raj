@@ -48,6 +48,16 @@ function RootLayoutNav() {
             <Stack.Protected guard={!!user}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen name="settings" />
+              <Stack.Screen name="car/[id]" />
+              <Stack.Screen name="chat/[id]" />
+              <Stack.Screen name="user/[userId]/user-cars" />
+              <Stack.Screen
+                name="car-model/[carName]"
+                options={{
+                  fullScreenGestureEnabled: false,
+                  gestureEnabled: false,
+                }}
+              />
             </Stack.Protected>
             <Stack.Screen name="auth" />
           </Stack>

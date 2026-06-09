@@ -38,7 +38,7 @@ export function useCarDetails(carId: string) {
       const chat = await getOrCreateChatForCar(
         carId,
         car.user_id,
-        currentUserId
+        currentUserId,
       );
       queryClient.invalidateQueries({ queryKey: ["userChats", currentUserId] });
       router.push(`/chat/${chat.id}`);
@@ -51,8 +51,12 @@ export function useCarDetails(carId: string) {
     if (!phoneNumber) return;
     const phoneNumberUrl = `tel:${phoneNumber}`;
     Linking.openURL(phoneNumberUrl).catch((err) =>
-      console.error("Error:", err)
+      console.error("Error:", err),
     );
+  };
+  const on3dPress = () => {
+    const carName = `${car?.model} ${car?.brand}`;
+    router.push(`/car-model/${carName}`);
   };
 
   const formatCreatedTime = (dateString: string) => {
@@ -104,5 +108,6 @@ export function useCarDetails(carId: string) {
     handleContactSeller,
     handleCall,
     getSpecsWithIcons,
+    on3dPress,
   };
 }

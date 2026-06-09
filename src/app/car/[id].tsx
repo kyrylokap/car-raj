@@ -32,6 +32,7 @@ export default function CarDetailsScreen() {
     handleContactSeller,
     handleCall,
     getSpecsWithIcons,
+    on3dPress,
   } = useCarDetails(carId);
 
   const {
@@ -261,8 +262,14 @@ export default function CarDetailsScreen() {
         </TouchableOpacity>
       </View>
 
-      {!isOwner && (
-        <View style={styles.cta}>
+      <View style={styles.cta}>
+        <UIButton variant="outline" style={styles.ctaBtn} onPress={on3dPress}>
+          <Ionicons name="layers" size={18} color={styles.primaryIcon.color} />
+          <UIText color="primary" weight="semibold">
+            3d
+          </UIText>
+        </UIButton>
+        {!isOwner && (
           <UIButton
             variant="outline"
             style={styles.ctaBtn}
@@ -275,6 +282,8 @@ export default function CarDetailsScreen() {
             />
             <UIText weight="semibold">Message</UIText>
           </UIButton>
+        )}
+        {!isOwner && (
           <UIButton
             variant="primary"
             style={styles.ctaBtn}
@@ -285,8 +294,8 @@ export default function CarDetailsScreen() {
               Call Now
             </UIText>
           </UIButton>
-        </View>
-      )}
+        )}
+      </View>
     </View>
   );
 }

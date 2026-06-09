@@ -1,7 +1,20 @@
 // Learn more https://docs.expo.io/guides/customizing-metro
-const { getDefaultConfig } = require('expo/metro-config');
+const { getDefaultConfig } = require("expo/metro-config");
+const { mergeConfig } = require("metro-config");
 
-/** @type {import('expo/metro-config').MetroConfig} */
-const config = getDefaultConfig(__dirname);
+const defaultConfig = getDefaultConfig(__dirname);
 
-module.exports = config;
+/**
+ * Metro configuration
+ * https://metrobundler.dev/docs/configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {
+  resolver: {
+    // This makes it possible to import .glb files in your code:
+    assetExts: [...(defaultConfig.resolver?.assetExts || []), "glb"],
+  },
+};
+
+module.exports = mergeConfig(defaultConfig, config);

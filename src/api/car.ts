@@ -447,3 +447,20 @@ export function useCarFirstImage({
     gcTime: 1000 * 60 * 60 * 24,
   });
 }
+
+export const getCar3dModelByName = async (carName: string) => {
+  const res = await fetch(
+    `https://api.sketchfab.com/v3/search?type=models&q=${encodeURIComponent(carName)}&downloadable=true`,
+  );
+  const data = await res.json();
+  const model = data.results?.[0];
+  if (!model) return null;
+  return {
+    uid: model.uid,
+    name: model.name,
+    embedUrl: model.embedUrl,
+    thumbnail:
+      model.thumbnails.images.find((img: any) => img.width === 256)?.url ??
+      model.thumbnails.images[0]?.url,
+  };
+};
