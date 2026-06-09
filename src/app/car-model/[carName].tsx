@@ -11,18 +11,30 @@ export default function CarModelPage() {
   const { data: carModel, isLoading } = useCar3dModel(carName as string);
   const router = useRouter();
 
+  const backButton = (
+    <Pressable style={styles.backButton} onPress={() => router.back()}>
+      <Ionicons name="arrow-back" size={24} color="white" />
+    </Pressable>
+  );
+
   if (isLoading) {
     return (
-      <View style={styles.loading}>
-        <UIText>Loading 3D model...</UIText>
+      <View style={styles.root}>
+        <View style={styles.loading}>
+          <UIText>Loading 3D model...</UIText>
+        </View>
+        {backButton}
       </View>
     );
   }
 
   if (!carModel?.embedUrl) {
     return (
-      <View style={styles.loading}>
-        <UIText>No 3D model found for "{carName}"</UIText>
+      <View style={styles.root}>
+        <View style={styles.loading}>
+          <UIText>No 3D model found for "{carName}"</UIText>
+        </View>
+        {backButton}
       </View>
     );
   }
@@ -40,9 +52,7 @@ export default function CarModelPage() {
           </View>
         )}
       />
-      <Pressable style={styles.backButton} onPress={router.back}>
-        <Ionicons name="arrow-back" size={24} color="white" />
-      </Pressable>
+      {backButton}
     </View>
   );
 }
